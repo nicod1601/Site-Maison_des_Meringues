@@ -46,8 +46,7 @@ return new class extends Migration
 			$table->unsignedInteger('quantite')->default(0);
 			$table->boolean('nouveaute')->default(false);
 			$table->boolean('live')->default(false);
-			$table->boolean('dispo_emporter')->default(true);
-			$table->boolean('dispo_expedition')->default(false);
+
 
 			$table->foreign('id_forme')
 				  ->references('id_forme')->on('forme')
@@ -65,10 +64,22 @@ return new class extends Migration
 				  ->references(['id_forme', 'id_condi'])->on('forme_condi')
 				  ->onDelete('restrict');
 		});
+
+		Schema::create('boutique', function (Blueprint $table) {
+			$table->unsignedBigInteger('id_produit');
+			$table->boolean('dispo_emporter')->default(true);
+			$table->boolean('dispo_expedition')->default(false);
+			$table->unsignedInteger('stock_total')->default(0);
+
+			$table->foreign('id_produit')
+				  ->references('id_produit')->on('produit')
+				  ->onDelete('restrict');
+		});
 	}
 
 	public function down(): void
 	{
+		Schema::dropIfExists('boutique');
 		Schema::dropIfExists('produit');
 		Schema::dropIfExists('forme_condi');
 		Schema::dropIfExists('parfum');

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="{{ asset('ressources/css/style.css') }}">
+        @vite(['resources/css/style.css'])
 		<title>{{ config('app.name', 'Laravel') }}</title>
 	</head>
 	<body>
