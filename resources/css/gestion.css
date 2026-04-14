@@ -141,11 +141,19 @@
     background: var(--color-primary-light);
 }
 
+/* En-tête sticky */
 #excel-table thead th {
     position: sticky;
     top: 0;
     background: var(--color-cream);
     z-index: 1;
+}
+
+/* Largeur minimale des cellules pour éviter l'écrasement */
+#excel-table th,
+#excel-table td {
+    min-width: 120px;
+    white-space: nowrap;
 }
 
 /* Actions flottantes de la section tableau */
@@ -258,7 +266,11 @@
     margin: 0 auto;
 }
 
-/* Responsive adjustements */
+/* Utilitaires manquants */
+.mb-2xl { margin-bottom: var(--space-2xl); }
+.mt-2xl { margin-top: var(--space-2xl); }
+
+/* Responsive */
 @media (max-width: 768px) {
     .panel-grid { grid-template-columns: 1fr; }
 }

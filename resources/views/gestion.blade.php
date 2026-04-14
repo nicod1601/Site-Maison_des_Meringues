@@ -10,6 +10,7 @@
 	<body>
 		<nav class="navbar">
 			<div class="navbar__inner">
+                <img src="{{ asset('resources/fichier/image/La_Maison_des_Meringues_logo.png') }}" alt="Logo" class="navbar__logo-img">
 				<a href="/" class="navbar__logo">Maison des <span>Meringues</span></a>
 				<div class="navbar__links">
 					<a href="/">Accueil</a>
@@ -83,7 +84,7 @@
 								<input type="file" id="file-input" name="file" accept=".xlsx,.xls,.csv" hidden>
 							</label>
 
-							<button type="submit" style="margin-top:20px, text-align:center;" class="btn btn--primary btn--sm w-full">
+							<button type="submit" style="margin-top:20px; text-align:center;" class="btn btn--primary btn--sm w-full">
 								Confirmer
 							</button>
 						</form>
@@ -100,12 +101,6 @@
 				<div class="card">
 					<div class="card__body" style="display:flex;flex-direction:column;height:100%;gap:var(--space-lg);">
 						<p class="card__tag">Options d'import</p>
-
-						<!--<div class="form-group" style="margin-bottom:0;">
-							<label class="form-label" for="annee-select">Année</label>
-							<select id="annee-select" name="annee" class="form-select">
-							</select>
-						</div>-->
 
 						<div class="form-group" style="margin-bottom:0;">
 							<label class="form-label" for="type-select">Type de données</label>
@@ -135,28 +130,50 @@
 				</div>
 
 				<!-- Actions au-dessus du tableau -->
-				<div class="table-actions">
-					<span class="table-meta" id="table-meta-info">Aucune donnée chargée</span>
-					<div class="flex gap-sm">
-						<button class="btn btn--ghost btn--sm" id="btn-export" style="display:none;">
-							⬇ Exporter
-						</button>
-						<button class="btn btn--secondary btn--sm" id="confirm-btn" style="display:none;">
-							✓ Confirmer l'import
-						</button>
+				@if ($datas !== null)
+					<div class="table-actions">
+						<span class="table-meta" id="table-meta-info">Aucune donnée chargée</span>
+						<div class="flex gap-sm">
+							<button class="btn btn--ghost btn--sm" id="btn-export" style="display:none;">
+								⬇ Exporter
+							</button>
+							<button class="btn btn--secondary btn--sm" id="confirm-btn" style="display:none;">
+								✓ Confirmer l'import
+							</button>
+						</div>
 					</div>
-				</div>
+				@endif
 
 				<!-- Tableau ou état vide -->
 				<div class="card overflow-hidden" id="table-card">
-					<div id="table-empty-state" class="empty-state">
-						<div class="empty-state__icon">📋</div>
-						<p class="empty-state__title">Aucun fichier importé</p>
-						<p>Sélectionnez un fichier Excel ou CSV ci-dessus pour visualiser son contenu ici.</p>
-					</div>
-					<div class="data-table-wrapper" id="table-wrapper" style="display:none;">
-						<table id="excel-table"></table>
-					</div>
+					@if ($datas === null)
+						<div id="table-empty-state" class="empty-state">
+							<div class="empty-state__icon">📋</div>
+							<p class="empty-state__title">Aucun fichier importé</p>
+							<p>Sélectionnez un fichier Excel ou CSV ci-dessus pour visualiser son contenu ici.</p>
+						</div>
+					@else
+						<div class="data-table-wrapper" id="table-wrapper">
+							<table id="excel-table">
+								<thead>
+									<tr>
+										@foreach ($datas[0][0] as $cell)
+											<th>{{ $cell }}</th>
+										@endforeach
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (array_slice($datas[0], 1) as $row)
+										<tr>
+											@foreach ($row as $cell)
+												<td>{{ $cell }}</td>
+											@endforeach
+										</tr>
+									@endforeach
+								</tbody>
+							</table>
+						</div>
+					@endif
 				</div>
 
 				<!-- Pagination -->
@@ -192,17 +209,28 @@
 				<p id="traitement">Traitement en cours…</p>
 			</div>
 		</div>
+
+		<script>
+			const InputFichier = document.getElementById('file-input');
+			const nomFichier   = document.getElementById('name-file');
+			const badge        = document.getElementById('file-name-badge');
+			const badgeText    = document.getElementById('file-name-text');
+			const removeBtn    = document.getElementById('remove-file');
+
+			InputFichier.addEventListener('change', function () {
+				if (InputFichier.files.length > 0) {
+					const name = InputFichier.files[0].name;
+					nomFichier.textContent = name;
+					badgeText.textContent  = name;
+					badge.classList.add('visible');
+				}
+			});
+
+			removeBtn.addEventListener('click', function () {
+				InputFichier.value    = '';
+				nomFichier.textContent = 'Choisir un fichier';
+				badge.classList.remove('visible');
+			});
+		</script>
 	</body>
 </html>
-
-<script>
-    const InputFichier = document.getElementById('file-input');
-    let nomFichier = document.getElementById('name-file');
-
-    InputFichier.addEventListener('change', function () {
-        if (InputFichier.files.length > 0) {
-            nomFichier.textContent = InputFichier.files[0].name;
-        }
-    });
-
-</script>
