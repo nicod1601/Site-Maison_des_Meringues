@@ -7,12 +7,17 @@
 		<title>{{ config('app.name', 'Laravel') }}</title>
 	</head>
 	<body>
+		<nav class="navbar">
+			<div class="navbar__inner">
+				<a href="/" class="navbar__logo">Maison des <span>Meringues</span></a>
 
-		<nav>
-			<a href="" class="navbar">✦ Ma Boutique</a>
-			<div class="navbar__links">
-				<a href="">Catalogue</a>
-				<a href="">Importer</a>
+				<div class="navbar__links">
+					<a href="/" class="active">Accueil</a>
+					<a href="/gestion">Gestionnaire</a>
+					<a href="#">Catalogue</a>
+					<a href="#">Mes Données</a>
+					<a href="/shop" class="navbar__cta">shop</a>
+				</div>
 			</div>
 		</nav>
 	</body>
