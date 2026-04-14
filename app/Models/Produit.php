@@ -14,8 +14,8 @@ class Produit extends Model
 
 	protected $fillable = [
 		'id_forme',
-		'id_condi',
 		'id_parfum',
+        'description',
 		'quantite',
 		'nouveaute',
 		'live',

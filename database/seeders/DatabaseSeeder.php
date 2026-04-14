@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
 		$this->call([
 			FormeSeeder::class,
 			ConditionnementSeeder::class,
+			FormeCondiSeeder::class,
+			ParfumSeeder::class,
 		]);
 	}
 }

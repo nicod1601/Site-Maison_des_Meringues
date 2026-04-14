@@ -76,15 +76,15 @@
 							<label for="file-input" class="drop-zone mt-md" id="drop-zone">
 								<div class="drop-zone__icon">📥</div>
 								<div class="drop-zone__label">
-									<strong>Choisir un fichier</strong>
+									<strong id="name-file">Choisir un fichier</strong>
 									<span class="hint">.xlsx, .csv</span>
 								</div>
 
 								<input type="file" id="file-input" name="file" accept=".xlsx,.xls,.csv" hidden>
 							</label>
 
-							<button type="submit" style="margin-top:10px;">
-								Importer
+							<button type="submit" style="margin-top:20px, text-align:center;" class="btn btn--primary btn--sm w-full">
+								Confirmer
 							</button>
 						</form>
 
@@ -197,3 +197,15 @@
 		</div>
 	</body>
 </html>
+
+<script>
+    const InputFichier = document.getElementById('file-input');
+    let nomFichier = document.getElementById('name-file');
+
+    InputFichier.addEventListener('change', function () {
+        if (InputFichier.files.length > 0) {
+            nomFichier.textContent = InputFichier.files[0].name;
+        }
+    });
+
+</script>
