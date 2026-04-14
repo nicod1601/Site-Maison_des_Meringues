@@ -101,14 +101,11 @@
 					<div class="card__body" style="display:flex;flex-direction:column;height:100%;gap:var(--space-lg);">
 						<p class="card__tag">Options d'import</p>
 
-						<div class="form-group" style="margin-bottom:0;">
+						<!--<div class="form-group" style="margin-bottom:0;">
 							<label class="form-label" for="annee-select">Année</label>
 							<select id="annee-select" name="annee" class="form-select">
-								@foreach($annees as $annee)
-									<option value="{{ $annee['value'] }}">{{ $annee['text'] }}</option>
-								@endforeach
 							</select>
-						</div>
+						</div>-->
 
 						<div class="form-group" style="margin-bottom:0;">
 							<label class="form-label" for="type-select">Type de données</label>

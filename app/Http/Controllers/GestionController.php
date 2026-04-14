@@ -6,22 +6,24 @@ class GestionController extends Controller
 {
 	public function index()
 	{
-		$annees = [];
+		/*$annees = [];
 		$annee = date("Y");
 
 		for($i = $annee - 5; $i < $annee; $i++)
 		{
 			$annees[$annee - $i] = ['value' => $i, 'text' => $i];
-		}
+		}*/
 
 		$type_donnee = [];
 
 		$type_donnee = [
-			['value' => "boutique", 'text' => "Boutique"]
+			['value' => "produits", 'text' => "Produits"],
+			['value' => "formes", 'text' => "Formes"],
+			['value' => "conditionnements", 'text' => "Conditionnements"]
 		];
 
 		$fichiers = [];
 
-		return view('gestion', compact('annees','type_donnee', 'fichiers'));
+		return view('gestion', compact('type_donnee', 'fichiers'));
 	}
 }
