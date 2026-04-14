@@ -6,15 +6,22 @@ class GestionController extends Controller
 {
 	public function index()
 	{
-		// On définit les données nécessaires à la vue gestion.blade.php
-		$annees = [
-			['value' => '2025', 'text' => '2025'],
-			['value' => '2024', 'text' => '2024'],
-			['value' => '2023', 'text' => '2023'],
+		$annees = [];
+		$annee = date("Y");
+
+		for($i = $annee - 5; $i < $annee; $i++)
+		{
+			$annees[$annee - $i] = ['value' => $i, 'text' => $i];
+		}
+
+		$type_donnee = [];
+
+		$type_donnee = [
+			['value' => "boutique", 'text' => "Boutique"]
 		];
 
-		$fichiers = []; // Tableau vide par défaut
+		$fichiers = [];
 
-		return view('gestion', compact('annees', 'fichiers'));
+		return view('gestion', compact('annees','type_donnee', 'fichiers'));
 	}
 }

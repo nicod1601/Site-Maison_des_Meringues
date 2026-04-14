@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-class NewController extends Controller
+class NewsController extends Controller
 {
 	public function index()
 	{
