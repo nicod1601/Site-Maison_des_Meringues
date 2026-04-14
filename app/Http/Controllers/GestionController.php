@@ -14,6 +14,8 @@ class GestionController extends Controller
 
 		$datas = session('import_preview', null);
 
+		session()->forget('import_preview');
+
 		return view('gestion', compact('type_donnee', 'datas'));
 	}
 }

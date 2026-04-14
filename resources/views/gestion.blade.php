@@ -10,7 +10,7 @@
 	<body>
 		<nav class="navbar">
 			<div class="navbar__inner">
-                <img src="{{ asset('resources/fichier/image/La_Maison_des_Meringues_logo.png') }}" alt="Logo" class="navbar__logo-img">
+				<img src="{{ asset('resources/fichier/image/La_Maison_des_Meringues_logo.png') }}" alt="Logo" class="navbar__logo-img">
 				<a href="/" class="navbar__logo">Maison des <span>Meringues</span></a>
 				<div class="navbar__links">
 					<a href="/">Accueil</a>
@@ -18,6 +18,7 @@
 					<a href="#">Catalogue</a>
 					<a href="#">Mes données</a>
 					<a href="/shop" class="navbar__cta">Boutique</a>
+					<a href="#" id="light">💡</a>
 				</div>
 				<div class="navbar__burger" id="burger" aria-label="Menu">
 					<span></span><span></span><span></span>
@@ -220,16 +221,26 @@
 			InputFichier.addEventListener('change', function () {
 				if (InputFichier.files.length > 0) {
 					const name = InputFichier.files[0].name;
-					nomFichier.textContent = name;
+					//nomFichier.textContent = name;
 					badgeText.textContent  = name;
 					badge.classList.add('visible');
 				}
 			});
 
 			removeBtn.addEventListener('click', function () {
-				InputFichier.value    = '';
-				nomFichier.textContent = 'Choisir un fichier';
+				//InputFichier.value    = '';
+				//nomFichier.textContent = 'Choisir un fichier';
 				badge.classList.remove('visible');
+			});
+
+			const lightBtn = document.getElementById('light');
+			lightBtn.addEventListener('click', function () {
+				const body = document.body;
+
+				if(body.style.backgroundColor === "black")
+					body.style.backgroundColor = "white";
+				else
+					body.style.backgroundColor = "black";
 			});
 		</script>
 	</body>
