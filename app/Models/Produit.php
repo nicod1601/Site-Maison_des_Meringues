@@ -15,11 +15,11 @@ class Produit extends Model
 	protected $fillable = [
 		'id_forme',
 		'id_parfum',
-        'description',
+		'description',
 		'quantite',
 		'nouveaute',
 		'live',
-        'dispo_emporter',
-        'dispo_expedition',
+		'dispo_emporter',
+		'dispo_expedition',
 	];
 }

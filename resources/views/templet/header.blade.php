@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		@vite($style?? 'resources/css/style.css')
+		@vite($style ?? 'resources/css/style.css')
 		<title>Gestion — La Maison des Meringues'</title>
 	</head>
 	<body>
