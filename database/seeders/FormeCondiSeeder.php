@@ -4,36 +4,73 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Forme;
+use App\Models\Conditionnement;
 
 class FormeCondiSeeder extends Seeder
 {
 	public function run(): void
-    {
-        DB::table('forme_condi')->insert([
+	{
+		$formes = Forme::all();
+		$conditionnements = Conditionnement::all();
 
-            // MINI
-            [
-                'id_forme' => 1, // Mini
-                'id_condi' => 2, // boite_de_8
-                'prix' => 8.99,
-            ],
-            [
-                'id_forme' => 1,
-                'id_condi' => 1, // sachet_de_4
-                'prix' => 4.50,
-            ],
+		$data = [];
 
-            // NID
-            [
-                'id_forme' => 2, // Nid
-                'id_condi' => 2, // boite_de_8
-                'prix' => 9.99,
-            ],
-            [
-                'id_forme' => 2,
-                'id_condi' => 1,
-                'prix' => 2.00,
-            ],
-        ]);
-    }
+		foreach ($formes as $forme) {
+			foreach ($conditionnements as $condi) {
+
+				if ($forme->nom_forme === "Mini")
+				{
+					if($condi->type === "sachet_de_10")
+					{
+						$data[] = [
+							'id_forme' => $forme->id_forme,
+							'id_condi' => $condi->id_condi,
+							'prix' => 7,
+						];
+					}
+
+					if($condi->type === "individuelle")
+					{
+						$data[] = [
+							'id_forme' => $forme->id_forme,
+							'id_condi' => $condi->id_condi,
+							'prix' => 0.80,
+						];
+					}
+
+				}
+				else
+				{
+					if($condi->type === "individuelle")
+					{
+						$data[] = [
+							'id_forme' => $forme->id_forme,
+							'id_condi' => $condi->id_condi,
+							'prix' => 1.50,
+						];
+					}
+
+					if($condi->type === "sachet_de_4")
+					{
+						$data[] = [
+							'id_forme' => $forme->id_forme,
+							'id_condi' => $condi->id_condi,
+							'prix' => 6,
+						];
+					}
+
+					if($condi->type === "boite_de_8")
+					{
+						$data[] = [
+							'id_forme' => $forme->id_forme,
+							'id_condi' => $condi->id_condi,
+							'prix' => 10,
+						];
+					}
+				}
+			}
+		}
+		DB::table('forme_condi')->insert($data);
+	}
 }

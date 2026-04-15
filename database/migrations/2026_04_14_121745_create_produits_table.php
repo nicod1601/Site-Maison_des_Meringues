@@ -23,11 +23,10 @@ return new class extends Migration
 		});
 
 		Schema::create('forme_condi', function (Blueprint $table) {
+			$table->id('id_forme_condi');
 			$table->unsignedBigInteger('id_forme');
 			$table->unsignedBigInteger('id_condi');
 			$table->decimal('prix', 8, 2);
-
-			$table->primary(['id_forme', 'id_condi']);
 
 			$table->foreign('id_forme')
 				->references('id_forme')->on('forme')
@@ -40,7 +39,7 @@ return new class extends Migration
 
 		Schema::create('produit', function (Blueprint $table) {
 			$table->id('id_produit');
-			$table->unsignedBigInteger('id_forme');
+			$table->unsignedBigInteger('id_forme_condi');
 			$table->unsignedBigInteger('id_parfum');
 
 			$table->string('description');
@@ -51,8 +50,8 @@ return new class extends Migration
 			$table->boolean('dispo_emporter')->default(false);
 			$table->boolean('dispo_expedition')->default(false);
 
-			$table->foreign('id_forme')
-				->references('id_forme')->on('forme')
+			$table->foreign('id_forme_condi')
+				->references('id_forme_condi')->on('forme_condi')
 				->onDelete('restrict');
 
 			$table->foreign('id_parfum')

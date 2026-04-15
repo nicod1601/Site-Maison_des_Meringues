@@ -11,12 +11,11 @@ class UsersImport implements ToCollection
 {
 	public function collection(Collection $rows)
 	{
-        //reset des produits
-        $listProduit = Produit::all();
-        foreach ($listProduit as $produit) {
-            $produit->delete();
-        }
-
+		//reset des produits
+		$listProduit = Produit::all();
+		foreach ($listProduit as $produit) {
+			$produit->delete();
+		}
 
 		$stock = 0;
 		$id_boutique = 1;
@@ -29,11 +28,17 @@ class UsersImport implements ToCollection
 				->where('nom_forme', $row[0])
 				->first();
 
+			if (!$forme) continue;
+
+			$forme_condi = DB::table('forme_condi')
+				->where('id_forme', $forme->id_forme)
+				->first();
+
 			$parfum = DB::table('parfum')
 				->where('nom_parfum', $row[1])
 				->first();
 
-			if (!$forme || !$parfum) continue;
+			if (!$forme_condi || !$parfum) continue;
 
 			$description = $row[2] ?? 'Aucune description';
 
@@ -48,7 +53,7 @@ class UsersImport implements ToCollection
 
 
 			$produit = Produit::create([
-				'id_forme' => $forme->id_forme,
+				'id_forme_condi' => $forme_condi->id_forme_condi,
 				'id_parfum' => $parfum->id_parfum,
 				'description' => $description,
 				'quantite' => $quantite,

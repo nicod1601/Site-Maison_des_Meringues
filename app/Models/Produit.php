@@ -13,7 +13,7 @@ class Produit extends Model
 	public $timestamps = false;
 
 	protected $fillable = [
-		'id_forme',
+		'id_forme_condi',
 		'id_parfum',
 		'description',
 		'quantite',
@@ -22,4 +22,14 @@ class Produit extends Model
 		'dispo_emporter',
 		'dispo_expedition',
 	];
+
+    public function forme_condi()
+    {
+        return $this->belongsTo(Forme_Condi::class, 'id_forme_condi', 'id_forme_condi');
+    }
+
+    public function parfum()
+    {
+        return $this->belongsTo(Parfum::class, 'id_parfum', 'id_parfum');
+    }
 }

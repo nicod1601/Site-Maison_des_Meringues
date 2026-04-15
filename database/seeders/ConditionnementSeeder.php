@@ -13,12 +13,9 @@ class ConditionnementSeeder extends Seeder
 		DB::table('conditionnement')->insert([
 			['type' => 'sachet_de_4'],
 			['type' => 'boite_de_8'],
-			['type' => 'vrac'],
 			['type' => 'sachet_de_10'],
-			['type' => 'sachet_de_2'],
-			['type' => 'sachet_de_5'],
-			['type' => 'cube_transparent_2'],
-			['type' => 'autre'],
+			['type' => 'individuelle'],
+			['type' => 'vrac'],
 		]);
 	}
 }
