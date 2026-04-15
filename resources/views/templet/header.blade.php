@@ -12,10 +12,10 @@
 				<img src="{{ asset('fichier/image/La_Maison_des_Meringues_logo.png') }}" alt="Logo" class="navbar__logo-img">
 				<a href="/" class="navbar__logo">Maison des <span>Meringues</span></a>
 				<div class="navbar__links">
-					<a href="/" class="active">Accueil</a>
-					<a href="/news">Catalogue</a>
-					<a href="/gestion">Gestionnaire</a>
-					<a href="/data">Mes données</a>
+					<a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
+					<a href="/news" class="{{ request()->is('news') ? 'active' : '' }}">Catalogue</a>
+					<a href="/gestion" class="{{ request()->is('gestion') ? 'active' : '' }}">Importation</a>
+					<a href="/data" class="{{ request()->is('data') ? 'active' : '' }}">Mes Données</a>
 					<a href="/shop" class="navbar__cta">Boutique</a>
 					<a href="#" id="light">💡</a>
 				</div>
