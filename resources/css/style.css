@@ -1164,3 +1164,8 @@ tbody tr:last-child td { border-bottom: none; }
   h1, h2, h3 { page-break-after: avoid; }
   img { max-width: 100%; }
 }
+
+/*logo*/
+.navbar__logo-img{
+    width: 50px;
+}

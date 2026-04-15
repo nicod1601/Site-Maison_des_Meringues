@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\DonneController;
 use App\Http\Controllers\GestionController;
+use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccueilController;
 use App\Http\Controllers\ImportController;
 
 Route::get('/', [AccueilController::class, 'index'])->name('index');
+Route::get('/news', [NewsController::class, 'index'])->name('news');
+Route::get('/data', [DonneController::class, 'index'])->name('data');
 Route::get('/gestion', [GestionController::class, 'index'])->name('gestion');
 Route::get('/import/clear',     [ImportController::class,   'clear'])  ->name('import.clear');
 

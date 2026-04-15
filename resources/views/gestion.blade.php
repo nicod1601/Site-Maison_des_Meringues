@@ -1,69 +1,26 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		@vite(['resources/css/style.css'])
-		@vite(['resources/css/gestion.css'])
-		<title>Gestion — {{ config('app.name', 'La Maison des Meringues') }}</title>
-	</head>
-	<body>
-		<nav class="navbar">
-			<div class="navbar__inner">
-				<img src="{{ asset('resources/fichier/image/La_Maison_des_Meringues_logo.png') }}" alt="Logo" class="navbar__logo-img">
-				<a href="/" class="navbar__logo">Maison des <span>Meringues</span></a>
-				<div class="navbar__links">
-					<a href="/">Accueil</a>
-					<a href="/gestion" class="active">Gestionnaire</a>
-					<a href="#">Catalogue</a>
-					<a href="#">Mes données</a>
-					<a href="/shop" class="navbar__cta">Boutique</a>
-					<a href="#" id="light">💡</a>
-				</div>
-				<div class="navbar__burger" id="burger" aria-label="Menu">
-					<span></span><span></span><span></span>
-				</div>
-			</div>
-		</nav>
-
-		<header class="page-header">
-			<div class="container">
-				<p class="breadcrumb">
-					<a href="/">Accueil</a>
-					<span class="breadcrumb__sep">›</span>
-					<span>Gestionnaire</span>
-				</p>
-				<h1 class="page-header__title mt-md">Gestionnaire de données</h1>
-				<p class="page-header__sub">Importez, visualisez et gérez vos fichiers Excel</p>
-			</div>
-		</header>
-
-		<main class="container section">
+@include('templet.header',
+		['titre' => 'Gestionnaire des Données'],
+		['note' => 'Importer vos donner pour mettre à jour votre boutique'],
+		['style' => 'resources/css/gestion.css'])
 
 			<div class="grid grid-3 panel-grid mb-2xl">
-
 				<!-- Colonne 1 : Statistiques -->
 				<div class="card">
 					<div class="card__body">
-						<p class="card__tag">Informations</p>
+						<p class="card__tag">Informations {{ $nom_boutique ?? ""}}</p>
 						<div class="stat-card mt-md">
-							<span class="stat-card__value" id="dossier-count">0</span>
-							<span class="stat-card__label">Fichiers indexés</span>
-							<span class="stat-card__sub" id="last-import-date">Aucun import récent</span>
+							<span class="stat-card__value" id="dossier-count">{{$stock_total ?? '—'}}</span>
+							<span class="stat-card__label">Stock - Total</span>
 						</div>
 
 						<hr class="mt-lg mb-lg">
 
-						<div class="flex-between">
-							<div class="stat-card">
-								<span class="stat-card__value" id="row-count">—</span>
-								<span class="stat-card__label">Lignes</span>
-							</div>
-							<div class="stat-card" style="text-align:right;">
-								<span class="stat-card__value" id="col-count">—</span>
-								<span class="stat-card__label">Colonnes</span>
-							</div>
+                        <div class="stat-card mt-md">
+							<span class="stat-card__value" id="dossier-count">{{ $nb_produits ?? '—'}}</span>
+							<span class="stat-card__label">Type de Produit</span>
 						</div>
+
+                        <hr class="mt-lg mb-lg">
 					</div>
 				</div>
 

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
 			ConditionnementSeeder::class,
 			FormeCondiSeeder::class,
 			ParfumSeeder::class,
+			BoutiqueSeeder::class,
 		]);
 	}
 }

@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Boutique;
+use App\Models\Produit;
+
+
 class GestionController extends Controller
 {
 	public function index()
@@ -16,6 +20,16 @@ class GestionController extends Controller
 
 		session()->forget('import_preview');
 
-		return view('gestion', compact('type_donnee', 'datas'));
+        //Boutique Info
+		$boutique     = Boutique::first();
+		$stock_total  = $boutique->stock_total;
+		$nom_boutique = $boutique->nom_boutique;
+
+        //Produit Info
+        $produits = Produit::all();
+        $nb_produits = $produits->count();
+
+
+		return view('gestion', compact('type_donnee', 'datas', 'stock_total', 'nom_boutique','nb_produits'));
 	}
 }

@@ -48,6 +48,9 @@ return new class extends Migration
 			$table->boolean('nouveaute')->default(false);
 			$table->boolean('live')->default(false);
 
+			$table->boolean('dispo_emporter')->default(false);
+			$table->boolean('dispo_expedition')->default(false);
+
 			$table->foreign('id_forme')
 				->references('id_forme')->on('forme')
 				->onDelete('restrict');
@@ -58,18 +61,9 @@ return new class extends Migration
 		});
 
 		Schema::create('boutique', function (Blueprint $table) {
-
-			$table->unsignedBigInteger('id_produit');
-
-			$table->boolean('dispo_emporter')->default(true);
-			$table->boolean('dispo_expedition')->default(false);
+			$table->id('id_boutique');
+			$table->string('nom_boutique');
 			$table->unsignedInteger('stock_total')->default(0);
-
-			$table->primary('id_produit');
-
-			$table->foreign('id_produit')
-				->references('id_produit')->on('produit')
-				->onDelete('cascade');
 		});
 	}
 

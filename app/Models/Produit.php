@@ -19,5 +19,7 @@ class Produit extends Model
 		'quantite',
 		'nouveaute',
 		'live',
+        'dispo_emporter',
+        'dispo_expedition',
 	];
 }
