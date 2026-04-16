@@ -5,7 +5,7 @@
 			<!-- Marque -->
 			<div class="footer__brand">
 				<h3>Maison des <span style="color: var(--color-primary);">Meringues</span></h3>
-				<p>Des meringues artisanales préparées avec passion, pour émerveiller vos papilles à chaque bouchée.</p>
+				<p>Des meringues artisanales préparées avec passion, pour taquiner vos papilles à chaque bouchée.</p>
 				<div class="social-links" style="margin-top: var(--space-lg);">
 					<a href="#" aria-label="Instagram">
 						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -76,8 +76,7 @@
 				<div style="margin-top: var(--space-xl);">
 					<p class="footer__heading">Horaires</p>
 					<p style="font-size: var(--text-sm); opacity: 0.75; line-height: 1.8;">
-						Lun – Ven : 9h – 18h<br>
-						Samedi : 10h – 16h<br>
+						Lun – Sam : 9h – 18h<br>
 						Dimanche : Fermé
 					</p>
 				</div>

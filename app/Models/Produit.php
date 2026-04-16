@@ -32,4 +32,11 @@ class Produit extends Model
     {
         return $this->belongsTo(Parfum::class, 'id_parfum', 'id_parfum');
     }
+
+    public function tous_conditionnements()
+    {
+        return Forme_Condi::where('id_forme', $this->forme_condi->id_forme)
+            ->with('conditionnement')
+            ->get();
+    }
 }

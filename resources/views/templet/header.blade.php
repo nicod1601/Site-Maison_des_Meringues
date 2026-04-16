@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		@vite($style ?? 'resources/css/style.css')
+		@vite('resources/css/style.css')
 		<title>Gestion — La Maison des Meringues'</title>
 	</head>
 	<body>
@@ -17,18 +17,18 @@
 					<a href="/gestion" class="{{ request()->is('gestion') ? 'active' : '' }}">Importation</a>
 					<a href="/data" class="{{ request()->is('data') ? 'active' : '' }}">Mes Données</a>
 					<a href="/shop" class="navbar__cta">Boutique</a>
-					<a href="#" id="light">💡</a>
 				</div>
-				<div class="navbar__burger" id="burger" aria-label="Menu">
-					<span></span><span></span><span></span>
+				<div class="user-profile">
+					<img src="https://ui-avatars.com/api/?name=Olivia+Rhye&background=c7d9f8&color=0D1B3E" alt="Avatar">
+					<span class="user-name">Olivia Rhye</span>
 				</div>
 			</div>
 		</nav>
 
-		<header class="page-header">
-			<div class="container">
-				<h1 class="page-header__title mt-md">{{$titre}}</h1>
-				<p class="page-header__sub">{{$note}}</p>
+		<header class="{{ request()->is('/') ? 'page-header-home' : 'page-header'}}">
+			<div class="{{ request()->is('/') ? 'container-home' : 'container'}}">
+				<h1 class="{{ request()->is('/') ? 'page-header__title-home' : 'page-header__title'}} mt-md">{{$titre}}</h1>
+				<p class="page-header__sub'">{{$note ?? ''}}</p>
 			</div>
 		</header>
 

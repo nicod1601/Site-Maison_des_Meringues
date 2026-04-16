@@ -23,13 +23,13 @@
 			<table>
 				<thead>
 					<tr>
-						<th>#</th>
-						<th>Parfum</th>
+						<th>Code</th>
+						<th>Article</th>
 						<th>Description</th>
 						<th>Forme</th>
 						<th>Conditionnement</th>
 						<th>Prix (€)</th>
-						<th>Article</th>
+						<th>Stock</th>
 						<th class="th-actions">Actions</th>
 					</tr>
 				</thead>
@@ -41,15 +41,14 @@
 						<td class="td-desc text-muted">{{ Str::limit($produit->description, 60) }}</td>
 						<td><span class="chip">{{ $produit->forme_condi->forme->nom_forme ?? '—' }}</span></td>
                         <td>
-                            <span class="chip">
-                                {{ $produit->forme_condi->conditionnement->type ?? '—' }}
-                            </span>
+                            @foreach($produit->tous_conditionnements() as $fc)
+                                <span class="chip">{{ $fc->conditionnement->type }}</span>
+                            @endforeach
                         </td>
-
                         <td>
-                            <span class="chip">
-                                {{ $produit->forme_condi->prix ?? '—' }} €
-                            </span>
+                            @foreach($produit->tous_conditionnements() as $fc)
+                                <span class="chip chip--gold">{{ $fc->prix }} €</span>
+                            @endforeach
                         </td>
 						<td>
 							@if($produit->quantite > 0)
