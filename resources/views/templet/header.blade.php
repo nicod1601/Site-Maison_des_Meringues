@@ -70,24 +70,26 @@
 			</div>
 		</header>
 
+        <script>
+            const profileBtn = document.querySelector('.navbar__profile');
+            const dropdown = document.querySelector('.navbar__dropdown');
+
+            profileBtn.addEventListener('click', function () {
+                const isOpen = dropdown.classList.contains('open');
+                dropdown.classList.toggle('open', !isOpen);
+                profileBtn.setAttribute('aria-expanded', !isOpen);
+            });
+
+            // Fermer si on clique en dehors
+            document.addEventListener('click', function (e) {
+                if (!profileBtn.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                    profileBtn.setAttribute('aria-expanded', false);
+                }
+            });
+        </script>
+
 		<main class="container section">
 
 
-<script>
-	const profileBtn = document.querySelector('.navbar__profile');
-	const dropdown = document.querySelector('.navbar__dropdown');
 
-	profileBtn.addEventListener('click', function () {
-		const isOpen = dropdown.classList.contains('open');
-		dropdown.classList.toggle('open', !isOpen);
-		profileBtn.setAttribute('aria-expanded', !isOpen);
-	});
-
-	// Fermer si on clique en dehors
-	document.addEventListener('click', function (e) {
-		if (!profileBtn.contains(e.target)) {
-			dropdown.classList.remove('open');
-			profileBtn.setAttribute('aria-expanded', false);
-		}
-	});
-</script>

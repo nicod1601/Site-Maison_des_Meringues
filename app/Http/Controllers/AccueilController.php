@@ -16,17 +16,15 @@ class AccueilController extends Controller
 		//images
 		foreach ($produits as $produit) {
 			if ($produit->forme_condi->forme->nom_forme == 'Mini') {
-				$lien = 'fichier/image/meringues/mini/' . $produit->parfum->nom_parfum . '.png';
-				$trouve = true;
+				$lien = public_path('fichier/image/meringues/mini/' . $produit->parfum->nom_parfum . '.png');
+				$url = 'fichier/image/meringues/mini/' . $produit->parfum->nom_parfum . '.png';
 			} else {
-				$lien = 'fichier/image/meringues/nid/' . $produit->parfum->nom_parfum . '.png';
-				$trouve = true;
+				$lien = public_path('fichier/image/meringues/nid/' . $produit->parfum->nom_parfum . '.png');
+				$url = 'fichier/image/meringues/nid/' . $produit->parfum->nom_parfum . '.png';
 			}
 
-			if($trouve === true){
-				$images[$produit->id_produit] = $lien;
-				$trouve = false;
-				$lien = "";
+			if (file_exists($lien)) {
+				$images[$produit->id_produit] = $url;
 			}
 		}
 

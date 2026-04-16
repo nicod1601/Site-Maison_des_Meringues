@@ -11,7 +11,6 @@ class UsersImport implements ToCollection
 {
 	public function collection(Collection $rows)
 	{
-		//reset des produits
 		$listProduit = Produit::all();
 		foreach ($listProduit as $produit) {
 			$produit->delete();

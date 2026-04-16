@@ -6,6 +6,8 @@ use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccueilController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\CreationController;
+
 
 Route::get('/', [AccueilController::class, 'index'])->name('index');
 Route::get('/news', [NewsController::class, 'index'])->name('news');
@@ -15,5 +17,6 @@ Route::get('/import/clear',     [ImportController::class,   'clear'])  ->name('i
 
 
 Route::post('/import/excel',    [ImportController::class,   'import']) ->name('import.excel');
+Route::post('/data/produit',    [CreationController::class,   'nvproduit']) ->name('nvproduit');
 
 

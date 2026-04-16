@@ -59,7 +59,7 @@
 			</div>
 			<div class="produits-carousel">
 				@foreach($produits as $produit)
-					@if(!empty($images[$produit->id_produit]))
+					@if(isset($images[$produit->id_produit]))
 						<div class="product-card produit-item">
 							<img src="{{ asset($images[$produit->id_produit]) }}"
 								class="product-card__img">
@@ -97,7 +97,7 @@
 								<tr><td>Jeudi</td><td>9h00 – 18h00 <span class="badge badge--new">Ouvert</span></td></div></tr>
 								<tr><td>Vendredi</td><td>9h00 – 18h00 <span class="badge badge--new">Ouvert</span></td></div></tr>
 								<tr><td>Samedi</td><td>9h00 – 18h00 <span class="badge badge--new">Ouvert</span></td></div></tr>
-								<tr><td>Dimanch       </td><td class="text-accent">Fermé</td></tr>
+								<tr><td>Dimanch</td><td><span class="badge badge--close">Fermer</span></td></div></tr>
 							</tbody>
 						</table>
 					</div>

@@ -23,40 +23,40 @@ class Produit extends Model
 		'dispo_expedition',
 	];
 
-    public function forme_condi()
-    {
-        return $this->belongsTo(Forme_Condi::class, 'id_forme_condi', 'id_forme_condi');
-    }
+	public function forme_condi()
+	{
+		return $this->belongsTo(Forme_Condi::class, 'id_forme_condi', 'id_forme_condi');
+	}
 
-    public function parfum()
-    {
-        return $this->belongsTo(Parfum::class, 'id_parfum', 'id_parfum');
-    }
+	public function parfum()
+	{
+		return $this->belongsTo(Parfum::class, 'id_parfum', 'id_parfum');
+	}
 
-    public function tous_conditionnements()
-    {
-        return Forme_Condi::where('id_forme', $this->forme_condi->id_forme)
-            ->with('conditionnement')
-            ->get();
-    }
+	public function tous_conditionnements()
+	{
+		return Forme_Condi::where('id_forme', $this->forme_condi->id_forme)
+			->with('conditionnement')
+			->get();
+	}
 
-    public function isnouveaut()
-    {
-        return $this->nouveaute;
-    }
+	public function isnouveaut()
+	{
+		return $this->nouveaute;
+	}
 
-    public function islive()
-    {
-        return $this->live;
-    }
+	public function islive()
+	{
+		return $this->live;
+	}
 
-    public function isdispo_emporter()
-    {
-        return $this->dispo_emporter;
-    }
+	public function isdispo_emporter()
+	{
+		return $this->dispo_emporter;
+	}
 
-    public function isdispo_expedition()
-    {
-        return $this->dispo_expedition;
-    }
+	public function isdispo_expedition()
+	{
+		return $this->dispo_expedition;
+	}
 }

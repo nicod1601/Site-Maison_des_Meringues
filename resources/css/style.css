@@ -809,6 +809,7 @@ hr {
 .badge--cream    { background: var(--color-cream-dark);   color: var(--color-primary-dark); }
 .badge--outline  { background: transparent; border: 1.5px solid var(--color-primary); color: var(--color-primary); }
 .badge--new      { background: #27ae60; color: #fff; }
+.badge--close      { background: #e3210f; color: #fff; }
 .badge--promo    { background: var(--color-primary-dark); color: var(--color-gold-light); }
 
 
