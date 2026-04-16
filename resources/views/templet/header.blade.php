@@ -9,19 +9,57 @@
 	<body>
 		<nav class="navbar">
 			<div class="navbar__inner">
-				<img src="{{ asset('fichier/image/La_Maison_des_Meringues_logo.png') }}" alt="Logo" class="navbar__logo-img">
-				<a href="/" class="navbar__logo">Maison des <span>Meringues</span></a>
-				<div class="navbar__links">
-					<a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Accueil</a>
-					<a href="/news" class="{{ request()->is('news') ? 'active' : '' }}">Catalogue</a>
-					<a href="/gestion" class="{{ request()->is('gestion') ? 'active' : '' }}">Importation</a>
-					<a href="/data" class="{{ request()->is('data') ? 'active' : '' }}">Mes Données</a>
-					<a href="/shop" class="navbar__cta">Boutique</a>
+
+				<a href="/" class="navbar__logo-zone">
+					<img src="{{ asset('fichier/image/La_Maison_des_Meringues_logo.png') }}"
+						alt="Logo La Maison des Meringues"
+						class="navbar__logo-img">
+					<span class="navbar__logo-text">
+						Maison des<br><span>Meringues</span>
+					</span>
+				</a>
+
+				<span class="navbar__divider"></span>
+
+				<nav class="navbar__links" aria-label="Navigation principale">
+					<a href="/"        class="navbar__link {{ request()->is('/') ? 'active' : '' }}">Accueil</a>
+					<a href="/news"    class="navbar__link {{ request()->is('news') ? 'active' : '' }}">Catalogue</a>
+					<a href="/gestion" class="navbar__link {{ request()->is('gestion') ? 'active' : '' }}">Importation</a>
+					<a href="/data"    class="navbar__link {{ request()->is('data') ? 'active' : '' }}">Mes données</a>
+					<a href="/shop"    class="navbar__cta">Boutique</a>
+				</nav>
+
+				<div class="navbar__profile" aria-expanded="false">
+					<div class="navbar__avatar">OR</div>
+					<span class="navbar__username">Olivia Rhye</span>
+					<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+						stroke="currentColor" stroke-width="1.5">
+						<path d="M3.5 5.5l3.5 3.5 3.5-3.5"/>
+					</svg>
+
+					<div class="navbar__dropdown">
+						<a href="/profil" class="navbar__dropdown-item">
+							<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+								<circle cx="7" cy="5" r="3"/><path d="M2 12c0-2.8 2.2-4 5-4s5 1.2 5 4"/>
+							</svg>
+							Mon profil
+						</a>
+						<a href="/settings" class="navbar__dropdown-item">
+							<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+								<circle cx="7" cy="7" r="5"/><path d="M7 4v3l2 1.5"/>
+							</svg>
+							Paramètres
+						</a>
+						<hr class="navbar__dropdown-sep">
+						<a href="/logout" class="navbar__dropdown-item navbar__dropdown-item--danger">
+							<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+								<path d="M5 2H2v10h3M9 9l3-2-3-2M6 7h6"/>
+							</svg>
+							Se déconnecter
+						</a>
+					</div>
 				</div>
-				<div class="user-profile">
-					<img src="https://ui-avatars.com/api/?name=Olivia+Rhye&background=c7d9f8&color=0D1B3E" alt="Avatar">
-					<span class="user-name">Olivia Rhye</span>
-				</div>
+
 			</div>
 		</nav>
 
@@ -33,3 +71,23 @@
 		</header>
 
 		<main class="container section">
+
+
+<script>
+	const profileBtn = document.querySelector('.navbar__profile');
+	const dropdown = document.querySelector('.navbar__dropdown');
+
+	profileBtn.addEventListener('click', function () {
+		const isOpen = dropdown.classList.contains('open');
+		dropdown.classList.toggle('open', !isOpen);
+		profileBtn.setAttribute('aria-expanded', !isOpen);
+	});
+
+	// Fermer si on clique en dehors
+	document.addEventListener('click', function (e) {
+		if (!profileBtn.contains(e.target)) {
+			dropdown.classList.remove('open');
+			profileBtn.setAttribute('aria-expanded', false);
+		}
+	});
+</script>

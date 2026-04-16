@@ -1,0 +1,71 @@
+/* ── ACCUEIL ───────────────────────────────────────────────── */
+.act-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: var(--color-white);
+}
+
+/* Carousel produits */
+.produits-carousel {
+  display: flex;
+  gap: var(--space-lg);
+  overflow-x: auto;
+  padding-bottom: var(--space-md);
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--color-border) var(--color-cream);
+  scrollbar-width: thin;
+}
+.produit-item {
+  min-width: 200px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* Horaires table */
+.horaires-table { width: 100%; border-collapse: collapse; }
+.horaires-table td {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+.horaires-table td:last-child { text-align: right; font-weight: 600; color: var(--color-primary-dark); }
+.horaires-table tr:last-child td { border-bottom: none; }
+
+/* Cartes livraison */
+.livraison-card {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(232,204,137,0.25);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--color-cream-dark);
+}
+.livraison-card h3 {
+  color: var(--color-gold-light);
+  font-size: var(--text-lg);
+  margin: var(--space-md) 0 var(--space-sm);
+}
+.livraison-card p {
+  font-size: var(--text-sm);
+  opacity: 0.8;
+  line-height: 1.6;
+}
+.livraison-card__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(232,204,137,0.15);
+  border: 1px solid rgba(232,204,137,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: var(--color-gold-light);
+}

@@ -39,4 +39,24 @@ class Produit extends Model
             ->with('conditionnement')
             ->get();
     }
+
+    public function isnouveaut()
+    {
+        return $this->nouveaute;
+    }
+
+    public function islive()
+    {
+        return $this->live;
+    }
+
+    public function isdispo_emporter()
+    {
+        return $this->dispo_emporter;
+    }
+
+    public function isdispo_expedition()
+    {
+        return $this->dispo_expedition;
+    }
 }
