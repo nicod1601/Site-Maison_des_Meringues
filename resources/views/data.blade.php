@@ -59,11 +59,12 @@
 						</td>
 						<td class="td-actions">
 							<a href="/gestion/produit/{{ $produit->id_produit }}/edit" class="btn-icon btn-icon--edit" title="Modifier">✏️</a>
-							<form action="/gestion/produit/{{ $produit->id_produit }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce produit')">
-								@csrf
-								@method('DELETE')
-								<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
-							</form>
+							<form action="/gestion/produit/{{ $produit->id_produit }}" method="POST" class="form-delete">
+                                @csrf
+                                @method('DELETE')
+
+                                <button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+                            </form>
 						</td>
 					</tr>
 					@endforeach

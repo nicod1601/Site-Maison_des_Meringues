@@ -6,7 +6,7 @@ use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccueilController;
 use App\Http\Controllers\ImportController;
-use App\Http\Controllers\CreationController;
+use App\Http\Controllers\ProduitController;
 
 
 Route::get('/', [AccueilController::class, 'index'])->name('index');
@@ -17,6 +17,7 @@ Route::get('/import/clear',     [ImportController::class,   'clear'])  ->name('i
 
 
 Route::post('/import/excel',    [ImportController::class,   'import']) ->name('import.excel');
-Route::post('/data/produit',    [CreationController::class,   'nvproduit']) ->name('nvproduit');
+Route::post('/data/produit',    [ProduitController::class,   'nvproduit']) ->name('nvproduit');
+Route::delete('/gestion/produit/{id}', [ProduitController::class, 'destroy']);
 
 
