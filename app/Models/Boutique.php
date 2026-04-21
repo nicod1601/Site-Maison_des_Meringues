@@ -7,20 +7,30 @@ use Illuminate\Database\Eloquent\Model;
 class Boutique extends Model
 {
 	protected $table = 'boutique';
-
 	protected $primaryKey = 'id_boutique';
-
 	public $timestamps = false;
 
 	protected $fillable = [
-		'id_boutique',
 		'nom_boutique',
-		'id_rayon',
-		'stock_total_boutique',
+		'stock_total',
 	];
 
-	public function rayon()
+	// Une boutique a plusieurs rayons
+	public function rayons()
 	{
-		return $this->belongsTo(Rayon::class, 'id_rayon', 'id_rayon');
+		return $this->hasMany(Rayon::class, 'id_boutique', 'id_boutique');
+	}
+
+	// Tous les produits de la boutique (via les rayons)
+	public function produits()
+	{
+		return $this->hasManyThrough(
+			Produit::class,
+			Rayon::class,
+			'id_boutique',
+			'id_rayon',
+			'id_boutique',
+			'id_rayon'
+		);
 	}
 }

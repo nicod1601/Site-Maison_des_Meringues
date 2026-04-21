@@ -7,14 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Produit extends Model
 {
 	protected $table = 'produit';
-
 	protected $primaryKey = 'id_produit';
-
 	public $timestamps = false;
 
 	protected $fillable = [
 		'id_forme_condi',
 		'id_parfum',
+		'id_rayon',
 		'description',
 		'quantite',
 		'nouveaute',
@@ -22,6 +21,12 @@ class Produit extends Model
 		'dispo_emporter',
 		'dispo_expedition',
 	];
+
+	// Un produit appartient à un rayon (nullable)
+	public function rayon()
+	{
+		return $this->belongsTo(Rayon::class, 'id_rayon', 'id_rayon');
+	}
 
 	public function forme_condi()
 	{
@@ -40,23 +45,8 @@ class Produit extends Model
 			->get();
 	}
 
-	public function isnouveaut()
-	{
-		return $this->nouveaute;
-	}
-
-	public function islive()
-	{
-		return $this->live;
-	}
-
-	public function isdispo_emporter()
-	{
-		return $this->dispo_emporter;
-	}
-
-	public function isdispo_expedition()
-	{
-		return $this->dispo_expedition;
-	}
+	public function isnouveaute(): bool { return (bool) $this->nouveaute; }
+	public function islive(): bool      { return (bool) $this->live; }
+	public function isdispo_emporter(): bool   { return (bool) $this->dispo_emporter; }
+	public function isdispo_expedition(): bool { return (bool) $this->dispo_expedition; }
 }
