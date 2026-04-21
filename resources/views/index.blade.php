@@ -58,21 +58,6 @@
 				<h2>Produits phares</h2>
 			</div>
 			<div class="produits-carousel">
-				@foreach($produits as $produit)
-					@if(isset($images[$produit->id_produit]))
-						<div class="product-card produit-item">
-							<img src="{{ asset($images[$produit->id_produit]) }}"
-								class="product-card__img">
-
-							@if($produit->isnouveaut())
-								<span class="badge badge--primary mb-sm">Nouveauté</span>
-							@endif
-
-							<h3 class="card__title">{{ $produit->parfum->nom_parfum }}</h3>
-							<p class="card__price">{{ $produit['prix'] }}</p>
-						</div>
-					@endif
-				@endforeach
 			</div>
 	</section>
 
@@ -91,7 +76,7 @@
 						<h3 class="card__title mb-lg">Horaires d'ouverture</h3>
 						<table class="horaires-table">
 							<tbody>
-								<tr><td>Lundi</td><td>9h00 – 18h00 <span class="badge badge--new">Ouvert</span></td></div></tr>
+								<tr><td>Lundi</td><td>9h00 – 18h00 <span class="badge badge--new">Ouvert</span></td></tr>
 								<tr><td>Mardi</td><td>9h00 – 18h00 <span class="badge badge--new">Ouvert</span></td></div></tr>
 								<tr><td>Mercredi</td><td>9h00 – 18h00 <span class="badge badge--new">Ouvert</span></td></div></tr>
 								<tr><td>Jeudi</td><td>9h00 – 18h00 <span class="badge badge--new">Ouvert</span></td></div></tr>
@@ -169,5 +154,45 @@
 
 </div>
 </main>
+</body>
 
 @include('templet.footer')
+
+<script>
+	const carousel = document.querySelector('.produits-carousel');
+	const listImages = @json($images);
+	const produits = @json($produits);
+
+	console.log(listImages);
+
+
+	produits.forEach(p => {
+		const div = document.createElement('div');
+		div.classList.add('product-card', 'produit-item');
+
+		div.innerHTML = `
+			<img src="${listImages[p.id_produit] ?? ''}" class="product-card__img">
+			<h3 class="card__title">Meringue ${p.parfum.nom_parfum}</h3>
+		`;
+
+		carousel.appendChild(div);
+	});
+
+	const items = document.querySelectorAll('.produit-item');
+	let index = 0;
+
+	function showSlide(i) {
+		items.forEach(item => {
+			item.style.transform = `translateX(-${i * 100}%)`;
+		});
+	}
+
+	setInterval(() => {
+		index++;
+		if (index >= items.length) index = 0;
+		showSlide(index);
+	}, 5000);
+
+</script>
+</html>
+

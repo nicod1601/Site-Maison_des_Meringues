@@ -13,18 +13,13 @@
 
 /* Carousel produits */
 .produits-carousel {
-  display: flex;
-  gap: var(--space-lg);
-  overflow-x: auto;
-  padding-bottom: var(--space-md);
-  scroll-snap-type: x mandatory;
-  scrollbar-color: var(--color-border) var(--color-cream);
-  scrollbar-width: thin;
+    display: flex;
+    overflow: hidden;
 }
+
 .produit-item {
-  min-width: 200px;
-  flex-shrink: 0;
-  scroll-snap-align: start;
+    min-width: 100%;
+    transition: transform 0.5s ease;
 }
 
 /* Horaires table */

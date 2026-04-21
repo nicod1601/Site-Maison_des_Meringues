@@ -15,6 +15,12 @@ class Boutique extends Model
 	protected $fillable = [
 		'id_boutique',
 		'nom_boutique',
-		'stock_total',
+		'id_rayon',
+		'stock_total_boutique',
 	];
+
+	public function rayon()
+	{
+		return $this->belongsTo(Rayon::class, 'id_rayon', 'id_rayon');
+	}
 }

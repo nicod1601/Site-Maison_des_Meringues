@@ -7,6 +7,7 @@
 		<button class="tab active" data-tab="produits">🍬 Produits</button>
 		<button class="tab" data-tab="formes">🔷 Formes</button>
 		<button class="tab" data-tab="conditionnements">📦 Conditionnements</button>
+        <button class="tab" data-tab="prix">💰 Prix</button>
 	</div>
 
 
@@ -133,7 +134,7 @@
 	<div id="tab-conditionnements" class="tab-panel hidden">
 
 		<div class="data-toolbar">
-			<h2 class="data-toolbar__title">Conditionnements <span class="data-count">{{ count($conditionnements) }}</span></h2>
+			<h2 class="data-toolbar__title">Prix <span class="data-count">{{ count($conditionnements) }}</span></h2>
 			<a href="/gestion/conditionnement/create" class="btn btn--primary btn--sm">+ Nouveau conditionnement</a>
 		</div>
 
@@ -150,11 +151,11 @@
 				<tbody>
 					@foreach($conditionnements as $cond)
 					<tr>
-						<td class="td-id">{{ $cond->id_conditionnement }}</td>
+						<td class="td-id">{{ $cond->id_condi }}</td>
 						<td class="td-name">{{ $cond->type }}</td>
 						<td class="td-actions">
-							<a href="/gestion/conditionnement/{{ $cond->id_conditionnement }}/edit" class="btn-icon btn-icon--edit" title="Modifier">✏️</a>
-							<form action="/gestion/conditionnement/{{ $cond->id_conditionnement }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce conditionnement')">
+							<a href="/gestion/conditionnement/{{ $cond->id_condi }}/edit" class="btn-icon btn-icon--edit" title="Modifier">✏️</a>
+							<form action="/gestion/conditionnement/{{ $cond->id_condi }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce conditionnement')">
 								@csrf
 								@method('DELETE')
 								<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
@@ -173,6 +174,56 @@
 		</div>
 		@endif
 	</div>
+
+
+    {{-- ══ Prix ══ --}}
+	<div id="tab-prix" class="tab-panel hidden">
+
+		<div class="data-toolbar">
+			<h2 class="data-toolbar__title">Prix <span class="data-count">{{ count($conditionnements) }}</span></h2>
+		</div>
+
+		@if(count($forme_condi) > 0)
+		<div class="table-wrapper">
+			<table>
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Forme</th>
+                        <th>Conditionnement</th>
+                        <th>Prix</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach($forme_condi as $fc)
+					<tr>
+						<td class="td-id">{{ $fc->id_forme_condi }}</td>
+						<td class="td-name-forme">{{ $fc->forme->nom_forme }}</td>
+                        <td class="td-name-condi">{{ $fc->conditionnement->type }}</td>
+                        <td class="td-prix">{{ $fc->prix }} €</td>
+						<td class="td-actions">
+							<a href="/gestion/conditionnement/{{ $cond->id_condi }}/edit" class="btn-icon btn-icon--edit" title="Modifier">✏️</a>
+							<form action="/gestion/conditionnement/{{ $cond->id_condi }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce conditionnement')">
+								@csrf
+								@method('DELETE')
+								<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+							</form>
+						</td>
+					</tr>
+					@endforeach
+				</tbody>
+			</table>
+		</div>
+		@else
+		<div class="data-empty">
+			<p class="data-empty__icon">📦</p>
+			<p class="data-empty__text">Aucun conditionnement enregistré pour le moment.</p>
+			<a href="/data/produit" class="btn btn--primary">Créer un conditionnement</a>
+		</div>
+		@endif
+	</div>
+
 </main>
 <div id="modal-produit" class="data-modal hidden" >
 	<div class="data-modal-content">

@@ -59,10 +59,26 @@ return new class extends Migration
 				->onDelete('restrict');
 		});
 
+        Schema::create('rayon', function (Blueprint $table) {
+			$table->id('id_rayon');
+			$table->string('nom_rayon');
+            $table->unsignedBigInteger('id_produit')->nullable();
+
+            $table->foreign('id_produit')
+				->references('id_produit')->on('produit')
+				->onDelete('restrict');
+
+			$table->unsignedInteger('stock_total_rayon')->default(0);
+		});
+
 		Schema::create('boutique', function (Blueprint $table) {
 			$table->id('id_boutique');
 			$table->string('nom_boutique');
-			$table->unsignedInteger('stock_total')->default(0);
+            $table->unsignedBigInteger('id_rayon');
+            $table->foreign('id_rayon')
+                ->references('id_rayon')->on('rayon')
+                ->onDelete('restrict');
+			$table->unsignedInteger('stock_total_boutique')->default(0);
 		});
 	}
 

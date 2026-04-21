@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Boutique;
 use App\Models\Produit;
+use App\Models\Forme;
+use App\Models\Conditionnement;
+use App\Models\Parfum;
+use App\Models\Forme_Condi;
 
 
 class GestionController extends Controller
@@ -29,7 +33,20 @@ class GestionController extends Controller
         $produits = Produit::all();
         $nb_produits = $produits->count();
 
+        // partie donnee
+		$produits = Produit::all();
+		$formes = Forme::all();
+		$conditionnements = Conditionnement::all();
+		$parfums = Parfum::all();
+		$forme_condi = Forme_Condi::all();
 
-		return view('gestion', compact('type_donnee', 'datas', 'stock_total', 'nom_boutique','nb_produits'));
+
+		return view('gestion', compact('type_donnee', 'datas', 'stock_total', 'nom_boutique','nb_produits',
+            'produits',
+            'formes',
+            'conditionnements',
+            'parfums',
+            'forme_condi'
+        ));
 	}
 }
