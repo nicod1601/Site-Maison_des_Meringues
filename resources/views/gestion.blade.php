@@ -2,12 +2,11 @@
 	['titre' => 'Gestion des Données'],
 	['note'  => 'Importer et gérer vos données'])
 @vite('resources/css/gestion.css')
-@vite('resources/css/data.css')
 
 <div class="container" style="display:flex; gap:2rem; align-items:flex-start;">
 
 	{{-- ══ COLONNE GAUCHE ══ --}}
-	<div class="left-column" style="flex:0 0 220px; width:220px; min-width:220px;">
+	<div class="left-column" style="flex:0 0 280px; width:280px; min-width:280px;">
 
 		<div class="grid grid-1 panel-grid mb-2xl">
 
@@ -93,37 +92,10 @@
 
 		</div>
 
-		{{-- Aperçu import --}}
-		<section id="zone-tableau" style="overflow:hidden; max-width:100%;">
-			<div class="section-title"><h2>Aperçu</h2></div>
-			<div class="card overflow-hidden" style="max-width:100%;">
-				@if($datas === null)
-					<div class="empty-state">
-						<div class="empty-state__icon">📋</div>
-						<p class="empty-state__title">Aucun fichier importé</p>
-						<p>Sélectionnez un fichier ci-dessus.</p>
-					</div>
-				@else
-					<div style="overflow-x:auto; max-width:100%; max-height:300px;">
-						<table id="excel-table" style="min-width:400px;">
-							<thead>
-								<tr>@foreach($datas[0][0] as $cell)<th>{{ $cell }}</th>@endforeach</tr>
-							</thead>
-							<tbody>
-								@foreach(array_slice($datas[0], 1) as $row)
-									<tr>@foreach($row as $cell)<td>{{ $cell }}</td>@endforeach</tr>
-								@endforeach
-							</tbody>
-						</table>
-					</div>
-				@endif
-			</div>
-		</section>
-
 	</div>{{-- /left-column --}}
 
 	{{-- ══ COLONNE DROITE ══ --}}
-	<div class="right-column" style="flex:2; min-width:0;">
+	<div class="right-column" style="flex:5; min-width:0;">
 
 		{{-- Onglets --}}
 		<div class="tabs">
@@ -218,11 +190,13 @@
 									@endif
 								</td>
 								<td class="td-actions">
-									<form action="/gestion/produit/{{ $produit->id_produit }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce produit')">
-										@csrf @method('DELETE')
-										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
-									</form>
-								</td>
+								   <div class="actions-wrap">
+									   <form action="/gestion/produit/{{ $produit->id_produit }}" ... class="form-delete" ...>
+										   @csrf @method('DELETE')
+										   <button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+									   </form>
+								   </div>
+							   </td>
 							</tr>
 							@endforeach
 						</tbody>

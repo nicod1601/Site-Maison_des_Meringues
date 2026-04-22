@@ -21,9 +21,24 @@ class UsersImport implements ToCollection
 	public function collection(Collection $rows)
 	{
 		// Détacher tous les produits du rayon avant d'importer
-		// (sans supprimer les produits qui peuvent être dans d'autres rayons)
 		$rayon = Rayon::findOrFail($this->idRayon);
+		$produitIds = $rayon->produits()->pluck('produit.id_produit')->toArray();
+
+		// Détacher les produits du rayon (pas les supprimer)
 		$rayon->produits()->detach();
+
+		// Supprimer SEULEMENT les produits orphelins (non liés à d'autres rayons)
+		foreach ($produitIds as $produitId) {
+			$produit = Produit::find($produitId);
+			if ($produit && $produit->rayons()->count() === 0) {
+				$produit->delete();
+			}
+		}
+
+		// Resetter la séquence à 1 SEULEMENT si la table produit est complètement vide
+		if (Produit::count() === 0) {
+			DB::statement('ALTER SEQUENCE produit_id_produit_seq RESTART WITH 1;');
+		}
 
 		$boutique = Boutique::first();
 
