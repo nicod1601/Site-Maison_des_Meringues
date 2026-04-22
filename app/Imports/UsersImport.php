@@ -20,28 +20,16 @@ class UsersImport implements ToCollection
 
 	public function collection(Collection $rows)
 	{
-		// Détacher tous les produits du rayon avant d'importer
 		$rayon = Rayon::findOrFail($this->idRayon);
 		$produitIds = $rayon->produits()->pluck('produit.id_produit')->toArray();
 
-        //suppression des liens entre les produits et le rayon
-        foreach ($produitIds as $idProduit) {
-            $rayon->produits()->detach($idProduit);
-        }
 
-        // Supprimer les produits qui ne sont liés à aucun autre rayon
-        foreach ($produitIds as $idProduit) {
-            $produit = Produit::find($idProduit);
-            if ($produit->rayons()->count() === 1) {
-                $produit->delete();
-            } else {
-                $produit->rayons()->detach($this->idRayon);
-            }
-        }
-
-		// Resetter la séquence à 1 SEULEMENT si la table produit est complètement vide
-		if (Produit::count() === 0) {
-			DB::statement('ALTER SEQUENCE produit_id_produit_seq RESTART WITH 1;');
+		// Supprimer SEULEMENT les produits orphelins (non liés à d'autres rayons)
+		foreach ($produitIds as $produitId) {
+			$produit = Produit::find($produitId);
+			if ($produit && $produit->rayons()->count() === 0) {
+				$produit->delete();
+			}
 		}
 
 		$boutique = Boutique::first();
@@ -90,31 +78,31 @@ class UsersImport implements ToCollection
 
 			// Créer le produit sans id_rayon
 			$produit = Produit::create([
-			'id_forme_condi'   => $forme_condi->id_forme_condi,
-			'id_parfum'        => $parfum->id_parfum,
-			'id_theme'         => $idTheme,
-			'description'      => $description,
-			'quantite'         => $quantite,
-			'nouveaute'        => $nouveaute,
-			'live'             => $live,
-			'dispo_emporter'   => false,
-			'dispo_expedition' => $expedition,
-		]);
+				'id_forme_condi'   => $forme_condi->id_forme_condi,
+				'id_parfum'        => $parfum->id_parfum,
+				'id_theme'         => $idTheme,
+				'description'      => $description,
+				'quantite'         => $quantite,
+				'nouveaute'        => $nouveaute,
+				'live'             => $live,
+				'dispo_emporter'   => false,
+				'dispo_expedition' => $expedition,
+			]);
 
-		// Lier au rayon courant via la table pivot
-		$produit->rayons()->attach($this->idRayon);
+			// Lier au rayon courant via la table pivot
+            $produit->rayons()->attach($this->idRayon);
 
-		// Si le produit a un thème, le lier aussi à tous les autres rayons
-		// qui ont ce thème (pour ne pas casser les liens existants)
-		if ($idTheme !== null) {
-			$autresRayons = \App\Models\Rayon::whereHas('themes', function ($q) use ($idTheme) {
-				$q->where('theme.id_theme', $idTheme);
-			})->where('id_rayon', '!=', $this->idRayon)->get();
+            // Si le produit a un thème, le lier aussi à tous les autres rayons
+            // qui ont ce thème (pour ne pas casser les liens existants)
+            if ($idTheme !== null) {
+                $autresRayons = \App\Models\Rayon::whereHas('themes', function ($q) use ($idTheme) {
+                    $q->where('theme.id_theme', $idTheme);
+                })->where('id_rayon', '!=', $this->idRayon)->get();
 
-			foreach ($autresRayons as $autreRayon) {
-				$produit->rayons()->syncWithoutDetaching([$autreRayon->id_rayon]);
-			}
-		}
+                foreach ($autresRayons as $autreRayon) {
+                    $produit->rayons()->syncWithoutDetaching([$autreRayon->id_rayon]);
+                }
+            }
 		}
 
 		// Mettre à jour les stocks
