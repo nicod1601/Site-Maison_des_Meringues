@@ -11,16 +11,22 @@ class Produit extends Model
 	public $timestamps = false;
 
 	protected $fillable = [
-		'id_forme_condi',
-		'id_parfum',
-		'id_rayon',
-		'description',
-		'quantite',
-		'nouveaute',
-		'live',
-		'dispo_emporter',
-		'dispo_expedition',
-	];
+        'id_forme_condi',
+        'id_parfum',
+        'id_rayon',
+        'id_theme',        // ← ajout
+        'description',
+        'quantite',
+        'nouveaute',
+        'live',
+        'dispo_emporter',
+        'dispo_expedition',
+    ];
+
+    public function theme()
+    {
+        return $this->belongsTo(Theme::class, 'id_theme', 'id_theme');
+    }
 
 	// Un produit appartient à un rayon (nullable)
 	public function rayon()

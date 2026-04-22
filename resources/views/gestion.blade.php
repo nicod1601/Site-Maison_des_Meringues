@@ -180,9 +180,9 @@
 								<td class="td-desc text-muted">{{ Str::limit($produit->description, 50) }}</td>
 								<td><span class="chip">{{ $produit->rayon->nom_rayon ?? '—' }}</span></td>
 								<td>
-									@if($produit->rayon && $produit->rayon->theme)
-										<span class="chip" style="background:{{ $produit->rayon->theme->couleur }}20; border-color:{{ $produit->rayon->theme->couleur }};">
-											{{ $produit->rayon->theme->icone }} {{ $produit->rayon->theme->nom_theme }}
+									@if($produit->theme)
+										<span class="chip" style="background:{{ $produit->theme->couleur }}20; border-color:{{ $produit->theme->couleur }};">
+											{{ $produit->theme->icone }} {{ $produit->theme->nom_theme }}
 										</span>
 									@else
 										<span class="text-muted">—</span>
@@ -243,13 +243,13 @@
 								<td class="td-id">{{ $rayon->id_rayon }}</td>
 								<td class="td-name">{{ $rayon->nom_rayon }}</td>
 								<td>
-									@if($rayon->theme)
-										<span class="chip" style="background:{{ $rayon->theme->couleur }}20; border-color:{{ $rayon->theme->couleur }};">
-											{{ $rayon->theme->icone }} {{ $rayon->theme->nom_theme }}
+									@forelse($rayon->themes as $theme)
+										<span class="chip" style="background:{{ $theme->couleur }}20; border-color:{{ $theme->couleur }};">
+											{{ $theme->icone }} {{ $theme->nom_theme }}
 										</span>
-									@else
+									@empty
 										<span class="text-muted">—</span>
-									@endif
+									@endforelse
 								</td>
 								<td><span class="stock-badge stock-badge--ok">{{ $rayon->stock_total_rayon }}</span></td>
 								<td class="td-actions">
@@ -458,15 +458,66 @@
 		<form action="{{ route('nvrayon') }}" method="POST">
 			@csrf
 			<input type="hidden" name="id_boutique" value="{{ $boutique->id_boutique }}">
+
 			<label>Nom du rayon</label>
 			<input type="text" name="nom_rayon" placeholder="Ex : Noël, Printemps…" required>
-			<label>Thème associé</label>
-			<select name="id_theme">
-				<option value="">— Aucun thème —</option>
+
+			<label>Thèmes associés <span style="font-weight:400; text-transform:none;">(optionnel)</span></label>
+			<div style="display:flex; flex-wrap:wrap; gap:var(--space-sm); margin-top:var(--space-xs);">
 				@foreach($themes as $theme)
-					<option value="{{ $theme->id_theme }}">{{ $theme->icone }} {{ $theme->nom_theme }}</option>
+					<label style="
+						display:inline-flex;
+						align-items:center;
+						gap:6px;
+						padding: 6px 12px;
+						border-radius: var(--radius-full);
+						border: 1.5px solid var(--color-border);
+						background: var(--color-cream);
+						cursor: pointer;
+						font-size: var(--text-xs);
+						font-weight: 600;
+						transition: all var(--transition-fast);
+						user-select: none;
+					"
+					onmouseenter="this.style.borderColor='{{ $theme->couleur }}'; this.style.background='{{ $theme->couleur }}20';"
+					onmouseleave="if(!this.querySelector('input').checked){ this.style.borderColor='var(--color-border)'; this.style.background='var(--color-cream)'; }"
+					>
+						<input
+							type="checkbox"
+							name="id_themes[]"
+							value="{{ $theme->id_theme }}"
+							style="display:none;"
+							onchange="
+								if(this.checked){
+									this.closest('label').style.borderColor='{{ $theme->couleur }}';
+									this.closest('label').style.background='{{ $theme->couleur }}20';
+									this.closest('label').style.color='{{ $theme->couleur }}';
+								} else {
+									this.closest('label').style.borderColor='var(--color-border)';
+									this.closest('label').style.background='var(--color-cream)';
+									this.closest('label').style.color='inherit';
+								}
+							"
+						>
+						{{ $theme->icone }} {{ $theme->nom_theme }}
+					</label>
 				@endforeach
-			</select>
+			</div>
+
+			{{-- Aperçu du nombre de produits qui seront copiés --}}
+			<div id="preview-produits" style="
+				margin-top: var(--space-lg);
+				padding: var(--space-md);
+				background: var(--color-cream);
+				border-radius: var(--radius-md);
+				border: 1px solid var(--color-border);
+				font-size: var(--text-xs);
+				color: var(--color-text-muted);
+				display: none;
+			">
+				🔍 <span id="preview-text">0 produit(s) seront copiés dans ce rayon</span>
+			</div>
+
 			<div class="modal-actions">
 				<button type="button" class="btn-close-modal">Annuler</button>
 				<button type="submit" class="btn btn--primary">Créer le rayon</button>
@@ -568,4 +619,33 @@
 		this.value === '-1' ? url.searchParams.delete('rayon') : url.searchParams.set('rayon', this.value);
 		window.location.href = url.toString();
 	});
+
+    // Aperçu produits copiés dans nouveau rayon
+    // Données produits par thème (passées depuis le contrôleur)
+    const produitsByTheme = @json($produitsByTheme);
+
+    // Aperçu dynamique dans le modal rayon
+    document.querySelectorAll('input[name="id_themes[]"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updatePreview);
+    });
+
+    function updatePreview() {
+        const checked = [...document.querySelectorAll('input[name="id_themes[]"]:checked')]
+            .map(cb => parseInt(cb.value));
+
+        const preview = document.getElementById('preview-produits');
+        const text    = document.getElementById('preview-text');
+
+        if (checked.length === 0) {
+            preview.style.display = 'none';
+            return;
+        }
+
+        // Compter les produits uniques (sans doublons si thèmes partagés)
+        let total = 0;
+        checked.forEach(id => { total += produitsByTheme[id] || 0; });
+
+        preview.style.display = 'block';
+        text.textContent = `🔍 ${total} produit(s) seront copiés dans ce nouveau rayon`;
+    }
 </script>

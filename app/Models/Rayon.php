@@ -24,9 +24,14 @@ class Rayon extends Model
 	}
 
 	// Un rayon appartient à un thème
-	public function theme()
+	public function themes()
 	{
-		return $this->belongsTo(Theme::class, 'id_theme', 'id_theme');
+		return $this->belongsToMany(
+			Theme::class,
+			'rayon_theme',
+			'id_rayon',
+			'id_theme'
+		);
 	}
 
 	// Un rayon a plusieurs produits

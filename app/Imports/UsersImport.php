@@ -53,10 +53,26 @@ class UsersImport implements ToCollection
 
 			$stock += $quantite;
 
+			$nomTheme = trim($row[6] ?? '');
+			$idTheme  = null;
+
+			if ($nomTheme !== '') {
+				$theme = DB::table('theme')
+					->where('nom_theme', $nomTheme)
+					->first();
+
+				if ($theme) {
+					$idTheme = $theme->id_theme;
+					// Attacher le thème au rayon sans dupliquer
+					$rayon->themes()->syncWithoutDetaching([$theme->id_theme]);
+				}
+			}
+
 			Produit::create([
 				'id_forme_condi'   => $forme_condi->id_forme_condi,
 				'id_parfum'        => $parfum->id_parfum,
 				'id_rayon'         => $this->idRayon,
+				'id_theme'         => $idTheme,        // ← ajout
 				'description'      => $description,
 				'quantite'         => $quantite,
 				'nouveaute'        => $nouveaute,

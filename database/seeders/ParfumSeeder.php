@@ -16,6 +16,7 @@ class ParfumSeeder extends Seeder
 			['nom_parfum' => 'Citron'],
 			['nom_parfum' => 'Vanille'],
 			['nom_parfum' => 'Caramel'],
+            ['nom_parfum' => 'Epice'],
 		]);
 	}
 }

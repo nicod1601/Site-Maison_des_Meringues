@@ -65,19 +65,60 @@ class CreationController extends Controller
 		$request->validate([
 			'nom_rayon'   => 'required|string|max:255',
 			'id_boutique' => 'required|exists:boutique,id_boutique',
-			'id_theme'    => 'nullable|exists:theme,id_theme',
+			'id_themes'   => 'nullable|array',
+			'id_themes.*' => 'exists:theme,id_theme',
 		]);
 
-		Rayon::create([
+		$rayon = Rayon::create([
 			'nom_rayon'         => $request->nom_rayon,
 			'id_boutique'       => $request->id_boutique,
-			'id_theme'          => $request->id_theme,
 			'stock_total_rayon' => 0,
 		]);
 
+		if ($request->id_themes) {
+			// Attacher les thèmes au nouveau rayon
+			$rayon->themes()->sync($request->id_themes);
+
+			// Récupérer les produits des autres rayons ayant ces thèmes
+			$produits = Produit::whereIn('id_theme', $request->id_themes)
+				->where('id_rayon', '!=', $rayon->id_rayon)
+				->get();
+
+			foreach ($produits as $produit) {
+				// Vérifier qu'une copie n'existe pas déjà dans ce rayon
+				// (même parfum + même forme_condi)
+				$dejaPresent = Produit::where('id_rayon', $rayon->id_rayon)
+					->where('id_parfum', $produit->id_parfum)
+					->where('id_forme_condi', $produit->id_forme_condi)
+					->exists();
+
+				if (!$dejaPresent) {
+					Produit::create([
+						'id_forme_condi'   => $produit->id_forme_condi,
+						'id_parfum'        => $produit->id_parfum,
+						'id_rayon'         => $rayon->id_rayon,
+						'id_theme'         => $produit->id_theme,
+						'description'      => $produit->description,
+						'quantite'         => $produit->quantite,
+						'nouveaute'        => $produit->nouveaute,
+						'live'             => $produit->live,
+						'dispo_emporter'   => $produit->dispo_emporter,
+						'dispo_expedition' => $produit->dispo_expedition,
+					]);
+				}
+			}
+
+			// Recalculer le stock du nouveau rayon
+			$rayon->recalculerStock();
+
+			// Recalculer le stock boutique
+			$boutique = Boutique::first();
+			$boutique->stock_total = Rayon::sum('stock_total_rayon');
+			$boutique->save();
+		}
+
 		return redirect()->back()->with('success', 'Rayon créé avec succès !');
 	}
-
 	public function destroyRayon($id)
 	{
 		$rayon = Rayon::findOrFail($id);
