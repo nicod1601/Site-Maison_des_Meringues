@@ -138,7 +138,7 @@
 				<option value="-1" {{ !$rayonId || $rayonId == '-1' ? 'selected' : '' }}>Tous les rayons</option>
 				@foreach($rayons as $rayon)
 					<option value="{{ $rayon->id_rayon }}" {{ (string)$rayonId === (string)$rayon->id_rayon ? 'selected' : '' }}>
-						@foreach($rayon->themes as $t){{ $t->icone }} @endforeach{{ $rayon->nom_rayon }}
+						{{ $rayon->nom_rayon }}
 					</option>
 				@endforeach
 			</select>
