@@ -74,7 +74,7 @@
 							<option value="-1">Sélectionner un rayon</option>
 							@foreach($rayons as $rayon)
 								<option value="{{ $rayon->id_rayon }}">
-									@foreach($rayon->themes as $t){{ $t->icone }} @endforeach{{ $rayon->nom_rayon }}
+									{{ $rayon->nom_rayon }}
 								</option>
 							@endforeach
 						</select>
