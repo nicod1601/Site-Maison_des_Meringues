@@ -275,6 +275,11 @@
     .panel-grid { grid-template-columns: 1fr; }
 }
 
+.left-column {
+    min-width: 0;      /* empêche le débordement flex */
+    overflow: hidden;
+}
+
 
 /*-----*/
 /* donnee */

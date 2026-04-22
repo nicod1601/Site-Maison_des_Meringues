@@ -11,6 +11,11 @@ use App\Models\Boutique;
 
 class UsersImport implements ToCollection
 {
+    private $idRayon;
+    public function __construct(int $idRayon)
+    {
+        $this->idRayon = $idRayon;
+    }
 	public function collection(Collection $rows)
 	{
 		// Supprimer tous les produits existants
@@ -18,12 +23,13 @@ class UsersImport implements ToCollection
 
 		$stock      = 0;
 		$boutique   = Boutique::first();
+        $rayon    = Rayon::findOrFail($this->idRayon);
 
 		// Récupérer (ou créer) le rayon par défaut pour l'import
-		$rayon = Rayon::firstOrCreate(
+		/*$rayon = Rayon::firstOrCreate(
 			['nom_rayon' => 'Meringues', 'id_boutique' => $boutique->id_boutique],
 			['stock_total_rayon' => 0]
-		);
+		);*/
 
 		foreach ($rows as $index => $row) {
 
@@ -56,7 +62,7 @@ class UsersImport implements ToCollection
 			Produit::create([
 				'id_forme_condi'   => $forme_condi->id_forme_condi,
 				'id_parfum'        => $parfum->id_parfum,
-				'id_rayon'         => $rayon->id_rayon, // ← assigné ici
+				'id_rayon'         => $this->idRayon,
 				'description'      => $description,
 				'quantite'         => $quantite,
 				'nouveaute'        => $nouveaute,

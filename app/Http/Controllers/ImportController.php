@@ -22,7 +22,7 @@ class ImportController extends Controller
 
 		session(['import_preview' => $datas]);
 
-		Excel::import(new UsersImport, $file);
+		Excel::import(new UsersImport($request->id_rayon), $file);
 
 		$type_donnee = [
 			['value' => "produits",         'text' => "Produits"],

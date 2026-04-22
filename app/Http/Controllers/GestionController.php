@@ -8,6 +8,7 @@ use App\Models\Forme;
 use App\Models\Conditionnement;
 use App\Models\Parfum;
 use App\Models\Forme_Condi;
+use App\Models\Rayon;
 
 
 class GestionController extends Controller
@@ -32,6 +33,9 @@ class GestionController extends Controller
 		$produits    = Produit::with(['parfum', 'forme_condi.forme', 'forme_condi.conditionnement'])->get();
 		$nb_produits = $produits->count();
 
+        // Rayons pour le select
+        $rayons = Rayon::all();
+
 		// Données annexes
 		$formes           = Forme::all();
 		$conditionnements = Conditionnement::all();
@@ -48,7 +52,9 @@ class GestionController extends Controller
 			'formes',
 			'conditionnements',
 			'parfums',
-			'forme_condi'
+			'forme_condi',
+            'rayons',
+            'boutique',
 		));
 	}
 }

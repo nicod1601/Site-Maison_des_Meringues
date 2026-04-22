@@ -63,20 +63,20 @@
 			{{-- Options d'import --}}
 			<div class="card">
 				<div class="card__body" style="display:flex; flex-direction:column; height:100%; gap:var(--space-lg);">
-					<p class="card__tag">Options d'import</p>
-
+					<p class="card__tag">Séléctionner le Rayon</p>
 					<div class="form-group" style="margin-bottom:0;">
 						<label class="form-label" for="type-select">Type de données</label>
-						<select id="type-select" name="type" class="form-select" form="import-form">
-							@foreach($type_donnee as $type)
-								<option value="{{ $type['value'] }}">{{ $type['text'] }}</option>
+						<select id="type-select" name="id_rayon" class="form-select" form="import-form">
+							<option value="-1">Sélectionner un rayon</option>
+							@foreach($rayons as $rayon)
+								<option value="{{ $rayon->id_rayon }}">{{ $rayon->nom_rayon }}</option>
 							@endforeach
 						</select>
 					</div>
 
 					<div class="flex gap-sm" style="margin-top:auto;">
-						<button class="btn btn--ghost btn--sm" id="delete-btn" title="Supprimer le fichier sélectionné" style="flex-shrink:0;">
-							🗑
+						<button class="btn btn--ghost btn--sm" id="show-files-btn" title="Nouveau Rayon" style="flex-shrink:0;">
+							➕
 						</button>
 					</div>
 				</div>
@@ -85,26 +85,12 @@
 		</div>{{-- /panel-grid --}}
 
 		{{-- Aperçu des données --}}
-		<section id="zone-tableau">
+		<section id="zone-tableau" style="overflow:hidden; max-width:100%;">
 			<div class="section-title">
 				<h2>Aperçu des données</h2>
 			</div>
 
-			@if($datas !== null)
-				<div class="table-actions">
-					<span class="table-meta" id="table-meta-info">Aucune donnée chargée</span>
-					<div class="flex gap-sm">
-						<button class="btn btn--ghost btn--sm" id="btn-export" style="display:none;">
-							⬇ Exporter
-						</button>
-						<button class="btn btn--secondary btn--sm" id="confirm-btn" style="display:none;">
-							✓ Confirmer l'import
-						</button>
-					</div>
-				</div>
-			@endif
-
-			<div class="card overflow-hidden" id="table-card">
+			<div class="card overflow-hidden" id="table-card" style="max-width:100%;">
 				@if($datas === null)
 					<div id="table-empty-state" class="empty-state">
 						<div class="empty-state__icon">📋</div>
@@ -112,8 +98,9 @@
 						<p>Sélectionnez un fichier Excel ou CSV ci-dessus pour visualiser son contenu ici.</p>
 					</div>
 				@else
-					<div class="data-table-wrapper" id="table-wrapper">
-						<table id="excel-table">
+					<div class="data-table-wrapper" id="table-wrapper"
+						style="overflow-x:auto; max-width:100%; max-height:300px;">
+						<table id="excel-table" style="min-width:600px;">
 							<thead>
 								<tr>
 									@foreach($datas[0][0] as $cell)
@@ -162,8 +149,13 @@
 			<button class="tab" data-tab="formes">🔷 Formes</button>
 			<button class="tab" data-tab="conditionnements">📦 Conditionnements</button>
 			<button class="tab" data-tab="prix">💰 Prix</button>
+			<select id="select-rayon" class="form-select form-select--sm" style="margin-left:auto;">
+				<option value="-1">Tous les rayons</option>
+				@foreach($rayons as $rayon)
+					<option value="{{ $rayon->id_rayon }}">{{ $rayon->nom_rayon }}</option>
+				@endforeach
+			</select>
 		</div>
-
 		{{-- ══ PRODUITS ══ --}}
 		<div id="tab-produits" class="tab-panel">
 			<div class="data-toolbar">
@@ -424,6 +416,26 @@
 	</div>
 </div>
 
+
+{{-- ══ MODAL NOUVEAU RAYON ══ --}}
+<div id="modal-rayon" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>Nouveau rayon</h2>
+		<form action="/gestion/rayon" method="POST">
+			@csrf
+			<input type="hidden" name="id_boutique" value="{{ $boutique->id_boutique}}">
+
+			<label for="modal-nom-rayon">Nom du rayon</label>
+			<input type="text" id="modal-nom-rayon" name="nom_rayon" placeholder="Ex : Noel, Printemps, etc..." required>
+
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary">Créer le rayon</button>
+			</div>
+		</form>
+	</div>
+</div>
+
 {{-- ══ OVERLAY CHARGEMENT ══ --}}
 <div id="loading-overlay">
 	<div class="loading-box">
@@ -486,18 +498,59 @@
 	// ── Modal nouveau produit ───────────────────────────────────────────
 	const modal       = document.getElementById('modal-produit');
 	const btnNvProduit = document.getElementById('btn-nvproduit');
-	const closeModal   = document.getElementById('close-modal');
 
 	btnNvProduit.addEventListener('click', () => modal.classList.remove('hidden'));
-	closeModal.addEventListener('click',   () => modal.classList.add('hidden'));
 
-	// Fermer en cliquant sur le fond
-	modal.addEventListener('click', e => {
-		if (e.target === modal) modal.classList.add('hidden');
+	// Gestion générique de la fermeture des modals (fond + boutons annuler)
+	document.querySelectorAll('.data-modal, .btn-close-modal').forEach(el => {
+		el.addEventListener('click', (e) => {
+			if (e.target.classList.contains('data-modal') || e.target.classList.contains('btn-close-modal')) {
+				document.querySelectorAll('.data-modal').forEach(m => m.classList.add('hidden'));
+			}
+		});
 	});
 
 	// ── Overlay chargement à la soumission du form ──────────────────────
 	document.getElementById('import-form').addEventListener('submit', () => {
 		document.getElementById('loading-overlay').classList.add('visible');
+	});
+
+	//Importation vérification du rayon sélectionné
+	const typeSelect = document.getElementById('type-select');
+	const importForm = document.getElementById('import-form');
+	const submitBtn  = importForm.querySelector('button[type="submit"]');
+
+	function updateSubmitState() {
+		const isRayonSelected = typeSelect.value !== "-1";
+		const isFileSelected  = inputFichier.files.length > 0;
+		submitBtn.disabled = !(isRayonSelected && isFileSelected);
+	}
+
+	typeSelect.addEventListener('change', updateSubmitState);
+	inputFichier.addEventListener('change', updateSubmitState);
+	removeBtn.addEventListener('click', () => setTimeout(updateSubmitState, 10));
+
+	// Initialisation au chargement
+	updateSubmitState();
+
+
+	//Selection du rayon pour filtrer les produits affichés
+	const selectRayon = document.getElementById('select-rayon');
+	selectRayon.addEventListener('change', function () {
+		const selectedRayon = this.value;
+		const url = new URL(window.location.href);
+		if (selectedRayon === "-1") {
+			url.searchParams.delete('rayon');
+		} else {
+			url.searchParams.set('rayon', selectedRayon);
+		}
+		window.location.href = url.toString();
+	});
+
+	//affiche le formulaire nouveau rayon
+	const btnNvRayon = document.getElementById('show-files-btn');
+	btnNvRayon.addEventListener('click', () => {
+		const modalRayon = document.getElementById('modal-rayon');
+		modalRayon.classList.remove('hidden');
 	});
 </script>
