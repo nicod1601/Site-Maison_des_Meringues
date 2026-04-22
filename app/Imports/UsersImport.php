@@ -24,6 +24,21 @@ class UsersImport implements ToCollection
 		$rayon = Rayon::findOrFail($this->idRayon);
 		$produitIds = $rayon->produits()->pluck('produit.id_produit')->toArray();
 
+        //suppression des liens entre les produits et le rayon
+        foreach ($produitIds as $idProduit) {
+            $rayon->produits()->detach($idProduit);
+        }
+
+        // Supprimer les produits qui ne sont liés à aucun autre rayon
+        foreach ($produitIds as $idProduit) {
+            $produit = Produit::find($idProduit);
+            if ($produit->rayons()->count() === 1) {
+                $produit->delete();
+            } else {
+                $produit->rayons()->detach($this->idRayon);
+            }
+        }
+
 		// Resetter la séquence à 1 SEULEMENT si la table produit est complètement vide
 		if (Produit::count() === 0) {
 			DB::statement('ALTER SEQUENCE produit_id_produit_seq RESTART WITH 1;');

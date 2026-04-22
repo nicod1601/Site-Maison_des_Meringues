@@ -110,7 +110,8 @@ body {
   line-height: 1.7;
   color: var(--color-text);
   background-color: var(--color-white);
-  padding-top: 80px; /* Ajoute cet espace pour compenser la navbar fixe */
+  padding-top: 80px;
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32"><path d="M2 2 L2 26 L8 18 L16 30 L21 25 L13 14 L20 14 Z" fill="%23C0395A" stroke="%23C9A84C" stroke-width="0.8" stroke-linejoin="round"/></svg>') 2 2, auto;
 }
 
 img, video {
@@ -125,12 +126,13 @@ a {
   color: var(--color-primary);
   text-decoration: none;
   transition: color var(--transition-fast);
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32"><path d="M2 2 L2 26 L8 18 L16 30 L21 25 L13 14 L20 14 Z" fill="%23E8839A" stroke="%23E8CC89" stroke-width="1" stroke-linejoin="round"/></svg>') 2 2, pointer;
 }
 a:hover { color: var(--color-primary-dark); }
 
 button {
   font-family: inherit;
-  cursor: pointer;
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="28" viewBox="0 0 20 28"><path d="M0 0 L0 24 L6 16 L14 26 L18 22 L10 12 L16 12 L0 0 Z" fill="%23E8839A" stroke="%23C9A84C" stroke-width="0.3" stroke-linejoin="round"/></svg>') 0 0, pointer;
   border: none;
   background: none;
 }
@@ -138,6 +140,7 @@ button {
 input, textarea, select {
   font-family: inherit;
   font-size: inherit;
+  cursor: text;
 }
 
 
