@@ -84,8 +84,20 @@ return new class extends Migration
 
 			$table->foreign('id_forme_condi')->references('id_forme_condi')->on('forme_condi')->onDelete('restrict');
 			$table->foreign('id_parfum')->references('id_parfum')->on('parfum')->onDelete('restrict');
-			$table->foreign('id_rayon')->references('id_rayon')->on('rayon')->onDelete('set null');
 		});
+
+        Schema::create('produit_rayon', function (Blueprint $table) {
+            $table->unsignedBigInteger('id_produit');
+            $table->unsignedBigInteger('id_rayon');
+            $table->primary(['id_produit', 'id_rayon']);
+
+            $table->foreign('id_produit')
+                ->references('id_produit')->on('produit')
+                ->onDelete('cascade');
+            $table->foreign('id_rayon')
+                ->references('id_rayon')->on('rayon')
+                ->onDelete('cascade');
+        });
 	}
 
 	public function down(): void

@@ -16,7 +16,7 @@ class Theme extends Model
 		'couleur',
 	];
 
-	// Un thème a plusieurs rayons
+	// Un thème a plusieurs rayons (many-to-many)
 	public function rayons()
 	{
 		return $this->belongsToMany(
@@ -25,5 +25,11 @@ class Theme extends Model
 			'id_theme',
 			'id_rayon'
 		);
+	}
+
+	// Un thème a plusieurs produits
+	public function produits()
+	{
+		return $this->hasMany(Produit::class, 'id_theme', 'id_theme');
 	}
 }

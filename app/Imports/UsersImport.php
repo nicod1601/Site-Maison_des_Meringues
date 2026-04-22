@@ -12,18 +12,20 @@ use App\Models\Boutique;
 class UsersImport implements ToCollection
 {
 	private $idRayon;
+
 	public function __construct(int $idRayon)
 	{
 		$this->idRayon = $idRayon;
 	}
+
 	public function collection(Collection $rows)
 	{
-		// Supprimer tous les produits existants du rayon avant d'importer les nouveaux
-		Produit::query()->where('id_rayon', $this->idRayon)->delete();
+		// Détacher tous les produits du rayon avant d'importer
+		// (sans supprimer les produits qui peuvent être dans d'autres rayons)
+		$rayon = Rayon::findOrFail($this->idRayon);
+		$rayon->produits()->detach();
 
-		$stock      = 0;
-		$boutique   = Boutique::first();
-		$rayon    = Rayon::findOrFail($this->idRayon);
+		$boutique = Boutique::first();
 
 		foreach ($rows as $index => $row) {
 
@@ -51,8 +53,7 @@ class UsersImport implements ToCollection
 			$live        = strtolower($row[5] ?? '') === 'oui';
 			$expedition  = in_array(strtolower($forme->nom_forme), ['mini']);
 
-			$stock += $quantite;
-
+			// Colonne G (index 6) : nom du thème (optionnel)
 			$nomTheme = trim($row[6] ?? '');
 			$idTheme  = null;
 
@@ -60,19 +61,19 @@ class UsersImport implements ToCollection
 				$theme = DB::table('theme')
 					->where('nom_theme', $nomTheme)
 					->first();
-
 				if ($theme) {
 					$idTheme = $theme->id_theme;
+
 					// Attacher le thème au rayon sans dupliquer
 					$rayon->themes()->syncWithoutDetaching([$theme->id_theme]);
 				}
 			}
 
-			Produit::create([
+			// Créer le produit sans id_rayon
+			$produit = Produit::create([
 				'id_forme_condi'   => $forme_condi->id_forme_condi,
 				'id_parfum'        => $parfum->id_parfum,
-				'id_rayon'         => $this->idRayon,
-				'id_theme'         => $idTheme,        // ← ajout
+				'id_theme'         => $idTheme,
 				'description'      => $description,
 				'quantite'         => $quantite,
 				'nouveaute'        => $nouveaute,
@@ -80,13 +81,14 @@ class UsersImport implements ToCollection
 				'dispo_emporter'   => false,
 				'dispo_expedition' => $expedition,
 			]);
+
+			// Lier au rayon via la table pivot
+			$produit->rayons()->attach($this->idRayon);
 		}
 
 		// Mettre à jour les stocks
-		$rayon->stock_total_rayon = $stock;
-		$rayon->save();
-
-		$boutique->stock_total = $stock;
+		$rayon->recalculerStock();
+		$boutique->stock_total = Rayon::sum('stock_total_rayon');
 		$boutique->save();
 	}
 }

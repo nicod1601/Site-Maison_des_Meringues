@@ -20,16 +20,20 @@ class CreationController extends Controller
 			'quantite'       => 'required|integer|min:0',
 		]);
 
-		Produit::create([
+		$produit = Produit::create([
 			'id_parfum'       => $request->id_parfum,
 			'id_forme_condi'  => $request->id_forme_condi,
-			'id_rayon'        => $request->id_rayon ?? $idRayon,
+			'id_theme'        => $request->id_theme ?? null,
 			'description'     => $request->description,
 			'quantite'        => $request->quantite,
 		]);
 
+		// Lier au rayon via la table pivot
+		$idRayonFinal = $request->id_rayon ?? $idRayon;
+		$produit->rayons()->attach($idRayonFinal);
+
 		// Recalcule le stock du rayon et de la boutique
-		$rayon = Rayon::find($request->id_rayon ?? $idRayon);
+		$rayon = Rayon::find($idRayonFinal);
 		if ($rayon) {
 			$rayon->recalculerStock();
 			$boutique = Boutique::first();
@@ -43,17 +47,22 @@ class CreationController extends Controller
 	public function destroy($id)
 	{
 		$produit = Produit::findOrFail($id);
-		$idRayon = $produit->id_rayon;
+
+		// Récupérer tous les rayons liés avant suppression
+		$rayonIds = $produit->rayons()->pluck('rayon.id_rayon');
+
+		// Suppression (cascade supprime aussi produit_rayon)
 		$produit->delete();
 
-		// Recalcule les stocks
-		$rayon = Rayon::find($idRayon);
-		if ($rayon) {
-			$rayon->recalculerStock();
-			$boutique = Boutique::first();
-			$boutique->stock_total = Rayon::sum('stock_total_rayon');
-			$boutique->save();
+		// Recalculer les stocks de tous les rayons concernés
+		foreach ($rayonIds as $rayonId) {
+			$rayon = Rayon::find($rayonId);
+			if ($rayon) $rayon->recalculerStock();
 		}
+
+		$boutique = Boutique::first();
+		$boutique->stock_total = Rayon::sum('stock_total_rayon');
+		$boutique->save();
 
 		return redirect()->back();
 	}
@@ -79,39 +88,18 @@ class CreationController extends Controller
 			// Attacher les thèmes au nouveau rayon
 			$rayon->themes()->sync($request->id_themes);
 
-			// Récupérer les produits des autres rayons ayant ces thèmes
-			$produits = Produit::whereIn('id_theme', $request->id_themes)
-				->where('id_rayon', '!=', $rayon->id_rayon)
-				->get();
+			// Lier les produits existants qui ont ces thèmes
+			$produits = Produit::whereIn('id_theme', $request->id_themes)->get();
 
 			foreach ($produits as $produit) {
-				// Vérifier qu'une copie n'existe pas déjà dans ce rayon
-				// (même parfum + même forme_condi)
-				$dejaPresent = Produit::where('id_rayon', $rayon->id_rayon)
-					->where('id_parfum', $produit->id_parfum)
-					->where('id_forme_condi', $produit->id_forme_condi)
-					->exists();
-
-				if (!$dejaPresent) {
-					Produit::create([
-						'id_forme_condi'   => $produit->id_forme_condi,
-						'id_parfum'        => $produit->id_parfum,
-						'id_rayon'         => $rayon->id_rayon,
-						'id_theme'         => $produit->id_theme,
-						'description'      => $produit->description,
-						'quantite'         => $produit->quantite,
-						'nouveaute'        => $produit->nouveaute,
-						'live'             => $produit->live,
-						'dispo_emporter'   => $produit->dispo_emporter,
-						'dispo_expedition' => $produit->dispo_expedition,
-					]);
+				// Vérifier que le produit n'est pas déjà lié à ce rayon
+				if (!$produit->rayons()->where('rayon.id_rayon', $rayon->id_rayon)->exists()) {
+					$produit->rayons()->attach($rayon->id_rayon);
 				}
 			}
 
-			// Recalculer le stock du nouveau rayon
 			$rayon->recalculerStock();
 
-			// Recalculer le stock boutique
 			$boutique = Boutique::first();
 			$boutique->stock_total = Rayon::sum('stock_total_rayon');
 			$boutique->save();
@@ -119,12 +107,13 @@ class CreationController extends Controller
 
 		return redirect()->back()->with('success', 'Rayon créé avec succès !');
 	}
+
 	public function destroyRayon($id)
 	{
 		$rayon = Rayon::findOrFail($id);
 
-		// Déplace les produits du rayon vers null avant suppression
-		Produit::where('id_rayon', $id)->update(['id_rayon' => null]);
+		// Détacher tous les produits du rayon (supprime les lignes pivot)
+		$rayon->produits()->detach();
 
 		$rayon->delete();
 
@@ -148,8 +137,8 @@ class CreationController extends Controller
 
 		Theme::create([
 			'nom_theme' => $request->nom_theme,
-			'icone'     => $request->icone     ?? '🎨',
-			'couleur'   => $request->couleur   ?? '#C0395A',
+			'icone'     => $request->icone   ?? '🎨',
+			'couleur'   => $request->couleur ?? '#C0395A',
 		]);
 
 		return redirect()->back()->with('success', 'Thème créé avec succès !');
@@ -157,9 +146,10 @@ class CreationController extends Controller
 
 	public function destroyTheme($id)
 	{
-		// Met les rayons liés à null avant suppression
-		Rayon::where('id_theme', $id)->update(['id_theme' => null]);
-		Theme::findOrFail($id)->delete();
+		// Détacher les rayons liés avant suppression
+		$theme = Theme::findOrFail($id);
+		$theme->rayons()->detach();
+		$theme->delete();
 
 		return redirect()->back()->with('success', 'Thème supprimé.');
 	}

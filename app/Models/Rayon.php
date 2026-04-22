@@ -13,7 +13,6 @@ class Rayon extends Model
 	protected $fillable = [
 		'nom_rayon',
 		'id_boutique',
-		'id_theme',
 		'stock_total_rayon',
 	];
 
@@ -23,7 +22,7 @@ class Rayon extends Model
 		return $this->belongsTo(Boutique::class, 'id_boutique', 'id_boutique');
 	}
 
-	// Un rayon appartient à un thème
+	// Un rayon a plusieurs thèmes (many-to-many)
 	public function themes()
 	{
 		return $this->belongsToMany(
@@ -34,10 +33,15 @@ class Rayon extends Model
 		);
 	}
 
-	// Un rayon a plusieurs produits
+	// Un rayon a plusieurs produits (many-to-many)
 	public function produits()
 	{
-		return $this->hasMany(Produit::class, 'id_rayon', 'id_rayon');
+		return $this->belongsToMany(
+			Produit::class,
+			'produit_rayon',
+			'id_rayon',
+			'id_produit'
+		);
 	}
 
 	// Recalcule et sauvegarde le stock du rayon

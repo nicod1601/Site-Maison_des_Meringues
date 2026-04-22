@@ -6,32 +6,31 @@ use Illuminate\Database\Eloquent\Model;
 
 class Produit extends Model
 {
-	protected $table = 'produit';
+	protected $table      = 'produit';
 	protected $primaryKey = 'id_produit';
-	public $timestamps = false;
+	public    $timestamps = false;
 
 	protected $fillable = [
-        'id_forme_condi',
-        'id_parfum',
-        'id_rayon',
-        'id_theme',        // ← ajout
-        'description',
-        'quantite',
-        'nouveaute',
-        'live',
-        'dispo_emporter',
-        'dispo_expedition',
-    ];
+		'id_forme_condi',
+		'id_parfum',
+		'id_theme',
+		'description',
+		'quantite',
+		'nouveaute',
+		'live',
+		'dispo_emporter',
+		'dispo_expedition',
+	];
 
-    public function theme()
-    {
-        return $this->belongsTo(Theme::class, 'id_theme', 'id_theme');
-    }
-
-	// Un produit appartient à un rayon (nullable)
-	public function rayon()
+	// Un produit appartient à plusieurs rayons (many-to-many)
+	public function rayons()
 	{
-		return $this->belongsTo(Rayon::class, 'id_rayon', 'id_rayon');
+		return $this->belongsToMany(
+			Rayon::class,
+			'produit_rayon',
+			'id_produit',
+			'id_rayon'
+		);
 	}
 
 	public function forme_condi()
@@ -44,6 +43,11 @@ class Produit extends Model
 		return $this->belongsTo(Parfum::class, 'id_parfum', 'id_parfum');
 	}
 
+	public function theme()
+	{
+		return $this->belongsTo(Theme::class, 'id_theme', 'id_theme');
+	}
+
 	public function tous_conditionnements()
 	{
 		return Forme_Condi::where('id_forme', $this->forme_condi->id_forme)
@@ -51,8 +55,8 @@ class Produit extends Model
 			->get();
 	}
 
-	public function isnouveaute(): bool { return (bool) $this->nouveaute; }
-	public function islive(): bool      { return (bool) $this->live; }
+	public function isnouveaute(): bool        { return (bool) $this->nouveaute; }
+	public function islive(): bool             { return (bool) $this->live; }
 	public function isdispo_emporter(): bool   { return (bool) $this->dispo_emporter; }
 	public function isdispo_expedition(): bool { return (bool) $this->dispo_expedition; }
 }

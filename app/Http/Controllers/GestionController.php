@@ -28,12 +28,21 @@ class GestionController extends Controller
 
 		$rayonId = $request->query('rayon');
 
-		$query = Produit::with(['parfum', 'forme_condi.forme', 'forme_condi.conditionnement', 'rayon', 'theme']);
+		$query = Produit::with([
+			'parfum',
+			'forme_condi.forme',
+			'forme_condi.conditionnement',
+			'rayons',
+			'theme',
+		]);
+
 		if ($rayonId && $rayonId !== '-1') {
-			$query->where('id_rayon', $rayonId);
+			$query->whereHas('rayons', function ($q) use ($rayonId) {
+				$q->where('rayon.id_rayon', $rayonId);
+			});
 		}
 
-		$produits = $query->get();
+		$produits    = $query->get();
 		$nb_produits = $produits->count();
 
 		$formes           = Forme::all();
@@ -41,17 +50,18 @@ class GestionController extends Controller
 		$parfums          = Parfum::all();
 		$forme_condi      = Forme_Condi::with(['forme', 'conditionnement'])->get();
 
-        $produitsByTheme = $themes->mapWithKeys(function($theme) {
-            return [
-                $theme->id_theme => Produit::where('id_theme', $theme->id_theme)->count()
-            ];
-        });
-
+		// Compter les produits par thème pour l'aperçu du modal
+		$produitsByTheme = $themes->mapWithKeys(function ($theme) {
+			return [
+				$theme->id_theme => Produit::where('id_theme', $theme->id_theme)->count()
+			];
+		});
 
 		return view('gestion', compact(
 			'datas', 'stock_total', 'nom_boutique', 'nb_produits',
 			'produits', 'formes', 'conditionnements', 'parfums',
-			'forme_condi', 'rayons', 'themes', 'boutique', 'rayonId','produitsByTheme',
+			'forme_condi', 'rayons', 'themes', 'boutique', 'rayonId',
+			'produitsByTheme',
 		));
 	}
 }

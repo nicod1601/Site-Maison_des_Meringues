@@ -75,7 +75,7 @@
 							<option value="-1">Sélectionner un rayon</option>
 							@foreach($rayons as $rayon)
 								<option value="{{ $rayon->id_rayon }}">
-									{{ $rayon->theme ? $rayon->theme->icone.' ' : '' }}{{ $rayon->nom_rayon }}
+									@foreach($rayon->themes as $t){{ $t->icone }} @endforeach{{ $rayon->nom_rayon }}
 								</option>
 							@endforeach
 						</select>
@@ -138,7 +138,7 @@
 				<option value="-1" {{ !$rayonId || $rayonId == '-1' ? 'selected' : '' }}>Tous les rayons</option>
 				@foreach($rayons as $rayon)
 					<option value="{{ $rayon->id_rayon }}" {{ (string)$rayonId === (string)$rayon->id_rayon ? 'selected' : '' }}>
-						{{ $rayon->theme ? $rayon->theme->icone.' ' : '' }}{{ $rayon->nom_rayon }}
+						@foreach($rayon->themes as $t){{ $t->icone }} @endforeach{{ $rayon->nom_rayon }}
 					</option>
 				@endforeach
 			</select>
@@ -153,7 +153,7 @@
 						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
 						@if($rayonActif)
 							<span class="chip chip--gold" style="font-size:var(--text-xs);">
-								{{ $rayonActif->theme ? $rayonActif->theme->icone.' ' : '📦 ' }}{{ $rayonActif->nom_rayon }}
+								@foreach($rayonActif->themes as $t){{ $t->icone }} @endforeach {{ $rayonActif->nom_rayon }}
 							</span>
 						@endif
 					@endif
@@ -167,7 +167,7 @@
 						<thead>
 							<tr>
 								<th>#</th><th>Article</th><th>Description</th>
-								<th>Rayon</th><th>Thème</th><th>Forme</th>
+								<th>Rayons</th><th>Thème</th><th>Forme</th>
 								<th>Conditionnement</th><th>Prix (€)</th><th>Stock</th>
 								<th class="th-actions">Actions</th>
 							</tr>
@@ -178,7 +178,17 @@
 								<td class="td-id">{{ $produit->id_produit }}</td>
 								<td class="td-name">{{ $produit->parfum->nom_parfum ?? '—' }}</td>
 								<td class="td-desc text-muted">{{ Str::limit($produit->description, 50) }}</td>
-								<td><span class="chip">{{ $produit->rayon->nom_rayon ?? '—' }}</span></td>
+
+								{{-- Rayons (many-to-many) --}}
+								<td>
+									@forelse($produit->rayons as $r)
+										<span class="chip">{{ $r->nom_rayon }}</span>
+									@empty
+										<span class="text-muted">—</span>
+									@endforelse
+								</td>
+
+								{{-- Thème du produit --}}
 								<td>
 									@if($produit->theme)
 										<span class="chip" style="background:{{ $produit->theme->couleur }}20; border-color:{{ $produit->theme->couleur }};">
@@ -188,6 +198,7 @@
 										<span class="text-muted">—</span>
 									@endif
 								</td>
+
 								<td><span class="chip">{{ $produit->forme_condi->forme->nom_forme ?? '—' }}</span></td>
 								<td>
 									@foreach($produit->tous_conditionnements() as $fc)
@@ -235,7 +246,7 @@
 				<div class="table-wrapper">
 					<table>
 						<thead>
-							<tr><th>#</th><th>Nom</th><th>Thème</th><th>Stock</th><th class="th-actions">Actions</th></tr>
+							<tr><th>#</th><th>Nom</th><th>Thèmes</th><th>Stock</th><th class="th-actions">Actions</th></tr>
 						</thead>
 						<tbody>
 							@foreach($rayons as $rayon)
@@ -281,7 +292,7 @@
 				<div class="table-wrapper">
 					<table>
 						<thead>
-							<tr><th>#</th><th>Thème</th><th>Icône</th><th>Couleur</th><th>Rayons liés</th><th class="th-actions">Actions</th></tr>
+							<tr><th>#</th><th>Thème</th><th>Icône</th><th>Couleur</th><th>Rayons liés</th><th>Produits</th><th class="th-actions">Actions</th></tr>
 						</thead>
 						<tbody>
 							@foreach($themes as $theme)
@@ -296,8 +307,10 @@
 									</span>
 								</td>
 								<td>
-									@php $nb = $rayons->where('id_theme', $theme->id_theme)->count(); @endphp
-									<span class="data-count">{{ $nb }}</span>
+									<span class="data-count">{{ $theme->rayons->count() }}</span>
+								</td>
+								<td>
+									<span class="data-count">{{ $produitsByTheme[$theme->id_theme] ?? 0 }}</span>
 								</td>
 								<td class="td-actions">
 									<form action="/gestion/theme/{{ $theme->id_theme }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce thème')">
@@ -431,11 +444,18 @@
 					<option value="{{ $fc->id_forme_condi }}">{{ $fc->forme->nom_forme }} — {{ $fc->conditionnement->type }} ({{ $fc->prix }} €)</option>
 				@endforeach
 			</select>
+			<label>Thème</label>
+			<select name="id_theme">
+				<option value="">— Aucun thème —</option>
+				@foreach($themes as $theme)
+					<option value="{{ $theme->id_theme }}">{{ $theme->icone }} {{ $theme->nom_theme }}</option>
+				@endforeach
+			</select>
 			<label>Rayon</label>
 			<select name="id_rayon" required>
 				@foreach($rayons as $rayon)
 					<option value="{{ $rayon->id_rayon }}" {{ $rayonId == $rayon->id_rayon ? 'selected' : '' }}>
-						{{ $rayon->theme ? $rayon->theme->icone.' ' : '' }}{{ $rayon->nom_rayon }}
+						@foreach($rayon->themes as $t){{ $t->icone }} @endforeach {{ $rayon->nom_rayon }}
 					</option>
 				@endforeach
 			</select>
@@ -462,7 +482,7 @@
 			<label>Nom du rayon</label>
 			<input type="text" name="nom_rayon" placeholder="Ex : Noël, Printemps…" required>
 
-			<label>Thèmes associés <span style="font-weight:400; text-transform:none;">(optionnel)</span></label>
+			<label>Thèmes associés <span style="font-weight:400; text-transform:none; letter-spacing:0;">(optionnel — les produits liés seront automatiquement ajoutés)</span></label>
 			<div style="display:flex; flex-wrap:wrap; gap:var(--space-sm); margin-top:var(--space-xs);">
 				@foreach($themes as $theme)
 					<label style="
@@ -479,32 +499,22 @@
 						transition: all var(--transition-fast);
 						user-select: none;
 					"
-					onmouseenter="this.style.borderColor='{{ $theme->couleur }}'; this.style.background='{{ $theme->couleur }}20';"
-					onmouseleave="if(!this.querySelector('input').checked){ this.style.borderColor='var(--color-border)'; this.style.background='var(--color-cream)'; }"
+					id="theme-label-{{ $theme->id_theme }}"
 					>
 						<input
 							type="checkbox"
 							name="id_themes[]"
 							value="{{ $theme->id_theme }}"
+							data-couleur="{{ $theme->couleur }}"
 							style="display:none;"
-							onchange="
-								if(this.checked){
-									this.closest('label').style.borderColor='{{ $theme->couleur }}';
-									this.closest('label').style.background='{{ $theme->couleur }}20';
-									this.closest('label').style.color='{{ $theme->couleur }}';
-								} else {
-									this.closest('label').style.borderColor='var(--color-border)';
-									this.closest('label').style.background='var(--color-cream)';
-									this.closest('label').style.color='inherit';
-								}
-							"
+							class="theme-checkbox"
 						>
 						{{ $theme->icone }} {{ $theme->nom_theme }}
 					</label>
 				@endforeach
 			</div>
 
-			{{-- Aperçu du nombre de produits qui seront copiés --}}
+			{{-- Aperçu du nombre de produits qui seront liés --}}
 			<div id="preview-produits" style="
 				margin-top: var(--space-lg);
 				padding: var(--space-md);
@@ -515,7 +525,7 @@
 				color: var(--color-text-muted);
 				display: none;
 			">
-				🔍 <span id="preview-text">0 produit(s) seront copiés dans ce rayon</span>
+				🔍 <span id="preview-text">0 produit(s) seront liés à ce rayon</span>
 			</div>
 
 			<div class="modal-actions">
@@ -555,26 +565,37 @@
 </div>
 
 <script>
-	// Fichier
+	// ── Fichier drag & drop ──
 	const inputFichier = document.getElementById('file-input');
 	const badge        = document.getElementById('file-name-badge');
 	const badgeText    = document.getElementById('file-name-text');
 	const removeBtn    = document.getElementById('remove-file');
 
 	inputFichier.addEventListener('change', () => {
-		if (inputFichier.files.length > 0) { badgeText.textContent = inputFichier.files[0].name; badge.classList.add('visible'); }
+		if (inputFichier.files.length > 0) {
+			badgeText.textContent = inputFichier.files[0].name;
+			badge.classList.add('visible');
+		}
 	});
-	removeBtn.addEventListener('click', () => { inputFichier.value = ''; badge.classList.remove('visible'); });
+	removeBtn.addEventListener('click', () => {
+		inputFichier.value = '';
+		badge.classList.remove('visible');
+	});
 
 	const dropZone = document.getElementById('drop-zone');
 	dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 	dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
 	dropZone.addEventListener('drop', e => {
-		e.preventDefault(); dropZone.classList.remove('drag-over');
-		if (e.dataTransfer.files.length > 0) { inputFichier.files = e.dataTransfer.files; badgeText.textContent = e.dataTransfer.files[0].name; badge.classList.add('visible'); }
+		e.preventDefault();
+		dropZone.classList.remove('drag-over');
+		if (e.dataTransfer.files.length > 0) {
+			inputFichier.files = e.dataTransfer.files;
+			badgeText.textContent = e.dataTransfer.files[0].name;
+			badge.classList.add('visible');
+		}
 	});
 
-	// Onglets
+	// ── Onglets ──
 	document.querySelectorAll('.tabs .tab').forEach(btn => {
 		btn.addEventListener('click', () => {
 			document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
@@ -584,68 +605,84 @@
 		});
 	});
 
-	// Confirmation suppression
-	function confirmSuppr(label) { return confirm('Voulez-vous vraiment supprimer ' + label + ' ?'); }
+	// ── Confirmation suppression ──
+	function confirmSuppr(label) {
+		return confirm('Voulez-vous vraiment supprimer ' + label + ' ?');
+	}
 
-	// Ouverture modals
+	// ── Ouverture modals ──
 	document.getElementById('btn-nvproduit') .addEventListener('click', () => document.getElementById('modal-produit').classList.remove('hidden'));
 	document.getElementById('btn-nvrayon')   .addEventListener('click', () => document.getElementById('modal-rayon')  .classList.remove('hidden'));
 	document.getElementById('btn-nvrayon2')  .addEventListener('click', () => document.getElementById('modal-rayon')  .classList.remove('hidden'));
 	document.getElementById('btn-nvtheme')   .addEventListener('click', () => document.getElementById('modal-theme')  .classList.remove('hidden'));
 	document.getElementById('btn-nvtheme2')  .addEventListener('click', () => document.getElementById('modal-theme')  .classList.remove('hidden'));
 
-	// Fermeture modals
+	// ── Fermeture modals ──
 	document.addEventListener('click', e => {
 		if (e.target.classList.contains('data-modal') || e.target.classList.contains('btn-close-modal')) {
 			document.querySelectorAll('.data-modal').forEach(m => m.classList.add('hidden'));
 		}
 	});
 
-	// Overlay import
-	document.getElementById('import-form').addEventListener('submit', () => document.getElementById('loading-overlay').classList.add('visible'));
+	// ── Overlay import ──
+	document.getElementById('import-form').addEventListener('submit', () => {
+		document.getElementById('loading-overlay').classList.add('visible');
+	});
 
-	// Validation import
+	// ── Validation import ──
 	const typeSelect = document.getElementById('type-select');
 	const submitBtn  = document.getElementById('import-form').querySelector('button[type="submit"]');
-	function updateSubmitState() { submitBtn.disabled = !(typeSelect.value !== '-1' && inputFichier.files.length > 0); }
+	function updateSubmitState() {
+		submitBtn.disabled = !(typeSelect.value !== '-1' && inputFichier.files.length > 0);
+	}
 	typeSelect.addEventListener('change', updateSubmitState);
 	inputFichier.addEventListener('change', updateSubmitState);
 	removeBtn.addEventListener('click', () => setTimeout(updateSubmitState, 10));
 	updateSubmitState();
 
-	// Filtre rayon
+	// ── Filtre rayon ──
 	document.getElementById('select-rayon').addEventListener('change', function () {
 		const url = new URL(window.location.href);
 		this.value === '-1' ? url.searchParams.delete('rayon') : url.searchParams.set('rayon', this.value);
 		window.location.href = url.toString();
 	});
 
-    // Aperçu produits copiés dans nouveau rayon
-    // Données produits par thème (passées depuis le contrôleur)
-    const produitsByTheme = @json($produitsByTheme);
+	// ── Checkboxes thèmes dans le modal rayon ──
+	const produitsByTheme = @json($produitsByTheme);
 
-    // Aperçu dynamique dans le modal rayon
-    document.querySelectorAll('input[name="id_themes[]"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updatePreview);
-    });
+	document.querySelectorAll('.theme-checkbox').forEach(checkbox => {
+		checkbox.addEventListener('change', function () {
+			const label   = this.closest('label');
+			const couleur = this.dataset.couleur;
+			if (this.checked) {
+				label.style.borderColor = couleur;
+				label.style.background  = couleur + '20';
+				label.style.color       = couleur;
+			} else {
+				label.style.borderColor = 'var(--color-border)';
+				label.style.background  = 'var(--color-cream)';
+				label.style.color       = 'inherit';
+			}
+			updatePreview();
+		});
+	});
 
-    function updatePreview() {
-        const checked = [...document.querySelectorAll('input[name="id_themes[]"]:checked')]
-            .map(cb => parseInt(cb.value));
+	function updatePreview() {
+		const checked = [...document.querySelectorAll('.theme-checkbox:checked')]
+			.map(cb => parseInt(cb.value));
 
-        const preview = document.getElementById('preview-produits');
-        const text    = document.getElementById('preview-text');
+		const preview = document.getElementById('preview-produits');
+		const text    = document.getElementById('preview-text');
 
-        if (checked.length === 0) {
-            preview.style.display = 'none';
-            return;
-        }
+		if (checked.length === 0) {
+			preview.style.display = 'none';
+			return;
+		}
 
-        // Compter les produits uniques (sans doublons si thèmes partagés)
-        let total = 0;
-        checked.forEach(id => { total += produitsByTheme[id] || 0; });
+		let total = 0;
+		checked.forEach(id => { total += produitsByTheme[id] || 0; });
 
-        preview.style.display = 'block';
-        text.textContent = `🔍 ${total} produit(s) seront copiés dans ce nouveau rayon`;
-    }
+		preview.style.display = 'block';
+		text.textContent = `${total} produit(s) seront automatiquement liés à ce nouveau rayon`;
+	}
 </script>
