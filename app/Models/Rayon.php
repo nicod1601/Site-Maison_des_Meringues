@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rayon extends Model
 {
-	protected $table = 'rayon';
+	protected $table      = 'rayon';
 	protected $primaryKey = 'id_rayon';
-	public $timestamps = false;
+	public    $timestamps = false;
 
 	protected $fillable = [
 		'nom_rayon',
 		'id_boutique',
+		'id_theme',
 		'stock_total_rayon',
 	];
 
@@ -20,6 +21,12 @@ class Rayon extends Model
 	public function boutique()
 	{
 		return $this->belongsTo(Boutique::class, 'id_boutique', 'id_boutique');
+	}
+
+	// Un rayon appartient à un thème
+	public function theme()
+	{
+		return $this->belongsTo(Theme::class, 'id_theme', 'id_theme');
 	}
 
 	// Un rayon a plusieurs produits

@@ -11,25 +11,19 @@ use App\Models\Boutique;
 
 class UsersImport implements ToCollection
 {
-    private $idRayon;
-    public function __construct(int $idRayon)
-    {
-        $this->idRayon = $idRayon;
-    }
+	private $idRayon;
+	public function __construct(int $idRayon)
+	{
+		$this->idRayon = $idRayon;
+	}
 	public function collection(Collection $rows)
 	{
-		// Supprimer tous les produits existants
-		Produit::query()->delete();
+		// Supprimer tous les produits existants du rayon avant d'importer les nouveaux
+		Produit::query()->where('id_rayon', $this->idRayon)->delete();
 
 		$stock      = 0;
 		$boutique   = Boutique::first();
-        $rayon    = Rayon::findOrFail($this->idRayon);
-
-		// Récupérer (ou créer) le rayon par défaut pour l'import
-		/*$rayon = Rayon::firstOrCreate(
-			['nom_rayon' => 'Meringues', 'id_boutique' => $boutique->id_boutique],
-			['stock_total_rayon' => 0]
-		);*/
+		$rayon    = Rayon::findOrFail($this->idRayon);
 
 		foreach ($rows as $index => $row) {
 

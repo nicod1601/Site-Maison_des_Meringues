@@ -9,52 +9,42 @@ use App\Models\Conditionnement;
 use App\Models\Parfum;
 use App\Models\Forme_Condi;
 use App\Models\Rayon;
-
+use App\Models\Theme;
+use Illuminate\Http\Request;
 
 class GestionController extends Controller
 {
-	public function index()
+	public function index(Request $request)
 	{
-		$type_donnee = [
-			['value' => 'produits',         'text' => 'Produits'],
-			['value' => 'formes',           'text' => 'Formes'],
-			['value' => 'conditionnements', 'text' => 'Conditionnements'],
-		];
-
 		$datas = session('import_preview', null);
 		session()->forget('import_preview');
 
-		// Boutique
 		$boutique     = Boutique::first();
-		$stock_total  = $boutique->stock_total;   // ← colonne renommée
+		$stock_total  = $boutique->stock_total;
 		$nom_boutique = $boutique->nom_boutique;
 
-		// Produits
-		$produits    = Produit::with(['parfum', 'forme_condi.forme', 'forme_condi.conditionnement'])->get();
+		$rayons = Rayon::with('theme')->get();
+		$themes = Theme::all();
+
+		$rayonId = $request->query('rayon');
+
+		$query = Produit::with(['parfum', 'forme_condi.forme', 'forme_condi.conditionnement', 'rayon.theme']);
+		if ($rayonId && $rayonId !== '-1') {
+			$query->where('id_rayon', $rayonId);
+		}
+
+		$produits    = $query->get();
 		$nb_produits = $produits->count();
 
-        // Rayons pour le select
-        $rayons = Rayon::all();
-
-		// Données annexes
 		$formes           = Forme::all();
 		$conditionnements = Conditionnement::all();
 		$parfums          = Parfum::all();
 		$forme_condi      = Forme_Condi::with(['forme', 'conditionnement'])->get();
 
 		return view('gestion', compact(
-			'type_donnee',
-			'datas',
-			'stock_total',
-			'nom_boutique',
-			'nb_produits',
-			'produits',
-			'formes',
-			'conditionnements',
-			'parfums',
-			'forme_condi',
-            'rayons',
-            'boutique',
+			'datas', 'stock_total', 'nom_boutique', 'nb_produits',
+			'produits', 'formes', 'conditionnements', 'parfums',
+			'forme_condi', 'rayons', 'themes', 'boutique', 'rayonId',
 		));
 	}
 }

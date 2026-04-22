@@ -45,16 +45,20 @@ return new class extends Migration
             $table->unsignedInteger('stock_total')->default(0);
         });
 
-        // Le rayon appartient à une boutique
-        Schema::create('rayon', function (Blueprint $table) {
-            $table->id('id_rayon');
-            $table->string('nom_rayon');
-            $table->unsignedBigInteger('id_boutique');
-            $table->unsignedInteger('stock_total_rayon')->default(0);
+         // Nouvelle table theme
+        Schema::create('theme', function (Blueprint $table) {
+            $table->id('id_theme');
+            $table->string('nom_theme');
+            $table->string('icone')->default('🎨'); // emoji ou nom d'icône
+            $table->string('couleur')->default('#C0395A'); // couleur hex
+        });
 
-            $table->foreign('id_boutique')
-                ->references('id_boutique')->on('boutique')
-                ->onDelete('cascade');
+        // Ajout de id_theme dans rayon (nullable pour ne pas casser l'existant)
+        Schema::table('rayon', function (Blueprint $table) {
+            $table->unsignedBigInteger('id_theme')->nullable()->after('nom_rayon');
+            $table->foreign('id_theme')
+                ->references('id_theme')->on('theme')
+                ->onDelete('set null');
         });
 
         // Le produit appartient à un rayon
@@ -88,6 +92,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('produit');
+        Schema::dropIfExists('theme');
         Schema::dropIfExists('rayon');
         Schema::dropIfExists('boutique');
         Schema::dropIfExists('forme_condi');
