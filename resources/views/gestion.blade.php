@@ -130,6 +130,7 @@
 							</span>
 						@endif
 					@endif
+					<input type="text" id="search-input" class="form-input form-input--sm" placeholder="Rechercher...">
 				</h2>
 				<button class="btn btn--primary btn--sm" id="btn-nvproduit">+ Nouveau produit</button>
 			</div>
@@ -139,9 +140,16 @@
 					<table>
 						<thead>
 							<tr>
-								<th>#</th><th>Article</th><th>Description</th>
-								<th>Rayons</th><th>Thème</th><th>Forme</th>
-								<th>Conditionnement</th><th>Prix (€)</th><th>Stock</th>
+								<th>#</th>
+								<th>Nom-Code</th>
+								<th>Article</th>
+								<th>Description</th>
+								<th>Rayons</th>
+								<th>Thème</th>
+								<th>Forme</th>
+								<th>Conditionnement</th>
+								<th>Prix (€)</th>
+								<th>Stock</th>
 								<th class="th-actions">Actions</th>
 							</tr>
 						</thead>
@@ -149,6 +157,7 @@
 							@foreach($produits as $produit)
 							<tr>
 								<td class="td-id">{{ $produit->id_produit }}</td>
+								<td class="td-namecode">{{ $produit->nom_produit ?? '—'}}</td>
 								<td class="td-name">{{ $produit->parfum->nom_parfum ?? '—' }}</td>
 								<td class="td-desc text-muted">{{ Str::limit($produit->description, 50) }}</td>
 
@@ -191,12 +200,21 @@
 									@endif
 								</td>
 								<td class="td-actions">
-								   <div class="actions-wrap">
-									   <form action="/gestion/produit/{{ $produit->id_produit }}" ... class="form-delete" ...>
-										   @csrf @method('DELETE')
-										   <button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
-									   </form>
-								   </div>
+									<div class="actions-wrap">
+										<form action="/gestion/produit/{{ $produit->id_produit }}" ... class="form-delete" ...>
+											@csrf @method('DELETE')
+											<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+										</form>
+									</div>
+									<div class="actions-wrap">
+										<form>
+											@if ($produit->live === true)
+												<label><input type="checkbox" name="live{{$produit->id_produit}}" value="{{ $produit->id_produit }}" checked> Live</label>
+											@else
+												<label><input type="checkbox" name="live{{$produit->id_produit}}" value="{{ $produit->id_produit }}"> Live</label>
+											@endif
+										</form>
+									</div>
 							   </td>
 							</tr>
 							@endforeach
@@ -749,4 +767,14 @@
 		preview.style.display = 'block';
 		text.textContent = `${total} produit(s) seront automatiquement liés à ce nouveau rayon`;
 	}
+
+	/*-- Recherche rapide produits -*/
+	document.getElementById('search-input').addEventListener('input', function () {
+		const query = this.value.toLowerCase();
+		document.querySelectorAll('#tab-produits tbody tr').forEach(row => {
+			const namecode = row.querySelector('.td-namecode').textContent.toLowerCase();
+			const name     = row.querySelector('.td-name').textContent.toLowerCase();
+			row.style.display = (namecode.includes(query) || name.includes(query)) ? '' : 'none';
+		});
+	});
 </script>

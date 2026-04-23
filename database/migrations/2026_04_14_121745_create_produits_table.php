@@ -66,6 +66,7 @@ return new class extends Migration
 
 		Schema::create('produit', function (Blueprint $table) {
 			$table->id('id_produit');
+			$table->string('nom_produit');
 			$table->unsignedBigInteger('id_forme_condi');
 			$table->unsignedBigInteger('id_parfum');
 			$table->unsignedBigInteger('id_rayon')->nullable();
@@ -86,24 +87,24 @@ return new class extends Migration
 			$table->foreign('id_parfum')->references('id_parfum')->on('parfum')->onDelete('restrict');
 		});
 
-        Schema::create('produit_rayon', function (Blueprint $table) {
-            $table->unsignedBigInteger('id_produit');
-            $table->unsignedBigInteger('id_rayon');
-            $table->primary(['id_produit', 'id_rayon']);
+		Schema::create('produit_rayon', function (Blueprint $table) {
+			$table->unsignedBigInteger('id_produit');
+			$table->unsignedBigInteger('id_rayon');
+			$table->primary(['id_produit', 'id_rayon']);
 
-            $table->foreign('id_produit')
-                ->references('id_produit')->on('produit')
-                ->onDelete('cascade');
-            $table->foreign('id_rayon')
-                ->references('id_rayon')->on('rayon')
-                ->onDelete('cascade');
-        });
+			$table->foreign('id_produit')
+				->references('id_produit')->on('produit')
+				->onDelete('cascade');
+			$table->foreign('id_rayon')
+				->references('id_rayon')->on('rayon')
+				->onDelete('cascade');
+		});
 	}
 
 	public function down(): void
 	{
 		Schema::dropIfExists('produit');
-         Schema::dropIfExists('rayon_theme');
+		 Schema::dropIfExists('rayon_theme');
 		Schema::dropIfExists('rayon');
 		Schema::dropIfExists('theme');
 		Schema::dropIfExists('boutique');

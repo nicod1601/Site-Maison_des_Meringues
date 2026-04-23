@@ -11,6 +11,7 @@ class Produit extends Model
 	public    $timestamps = false;
 
 	protected $fillable = [
+		'nom_produit',
 		'id_forme_condi',
 		'id_parfum',
 		'id_theme',
