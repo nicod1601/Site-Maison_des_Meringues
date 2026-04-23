@@ -26,3 +26,19 @@ Route::delete('/gestion/rayon/{id}',         [CreationController::class, 'destro
 // Thèmes
 Route::post  ('/gestion/theme',              [CreationController::class, 'nvtheme'])      ->name('nvtheme');
 Route::delete('/gestion/theme/{id}',         [CreationController::class, 'destroyTheme'])->name('destroyTheme');
+
+// Formes
+Route::post('/gestion/forme', [CreationController::class, 'nvforme'])->name('nvforme');
+Route::delete('/gestion/forme/{id}', [CreationController::class, 'destroyForme'])->name('destroyForme');
+
+// Conditionnements
+Route::post('/gestion/conditionnement', [CreationController::class, 'nvconditionnement'])->name('nvconditionnement');
+Route::delete('/gestion/conditionnement/{id}', [CreationController::class, 'destroyConditionnement'])->name('destroyConditionnement');
+
+// Forme-Condi (Prix)
+Route::post('/gestion/forme_condi', [CreationController::class, 'nvformecondi'])->name('nvformecondi');
+Route::delete('/gestion/forme_condi/{id}', [CreationController::class, 'destroyFormeCondi'])->name('destroyFormeCondi');
+
+// Parfums (bonus)
+Route::post('/gestion/parfum', [CreationController::class, 'nvparfum'])->name('nvparfum');
+Route::delete('/gestion/parfum/{id}', [CreationController::class, 'destroyParfum'])->name('destroyParfum');

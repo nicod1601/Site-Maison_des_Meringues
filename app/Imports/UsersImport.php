@@ -60,7 +60,6 @@ class UsersImport implements ToCollection
 			$live        = strtolower($row[5] ?? '') === 'oui';
 			$expedition  = in_array(strtolower($forme->nom_forme), ['mini']);
 
-			// Colonne G (index 6) : nom du thème (optionnel)
 			$nomTheme = trim($row[6] ?? '');
 			$idTheme  = null;
 
@@ -71,12 +70,10 @@ class UsersImport implements ToCollection
 				if ($theme) {
 					$idTheme = $theme->id_theme;
 
-					// Attacher le thème au rayon sans dupliquer
 					$rayon->themes()->syncWithoutDetaching([$theme->id_theme]);
 				}
 			}
 
-			// Créer le produit sans id_rayon
 			$produit = Produit::create([
 				'id_forme_condi'   => $forme_condi->id_forme_condi,
 				'id_parfum'        => $parfum->id_parfum,
@@ -88,21 +85,17 @@ class UsersImport implements ToCollection
 				'dispo_emporter'   => false,
 				'dispo_expedition' => $expedition,
 			]);
+			$produit->rayons()->attach($this->idRayon);
 
-			// Lier au rayon courant via la table pivot
-            $produit->rayons()->attach($this->idRayon);
+			if ($idTheme !== null) {
+				$autresRayons = \App\Models\Rayon::whereHas('themes', function ($q) use ($idTheme) {
+					$q->where('theme.id_theme', $idTheme);
+				})->where('id_rayon', '!=', $this->idRayon)->get();
 
-            // Si le produit a un thème, le lier aussi à tous les autres rayons
-            // qui ont ce thème (pour ne pas casser les liens existants)
-            if ($idTheme !== null) {
-                $autresRayons = \App\Models\Rayon::whereHas('themes', function ($q) use ($idTheme) {
-                    $q->where('theme.id_theme', $idTheme);
-                })->where('id_rayon', '!=', $this->idRayon)->get();
-
-                foreach ($autresRayons as $autreRayon) {
-                    $produit->rayons()->syncWithoutDetaching([$autreRayon->id_rayon]);
-                }
-            }
+				foreach ($autresRayons as $autreRayon) {
+					$produit->rayons()->syncWithoutDetaching([$autreRayon->id_rayon]);
+				}
+			}
 		}
 
 		// Mettre à jour les stocks

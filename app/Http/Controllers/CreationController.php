@@ -6,6 +6,10 @@ use App\Models\Produit;
 use App\Models\Rayon;
 use App\Models\Theme;
 use App\Models\Boutique;
+use App\Models\Forme;
+use App\Models\Conditionnement;
+use App\Models\Forme_Condi;
+use App\Models\Parfum;
 use Illuminate\Http\Request;
 
 class CreationController extends Controller
@@ -152,5 +156,74 @@ class CreationController extends Controller
 		$theme->delete();
 
 		return redirect()->back()->with('success', 'Thème supprimé.');
+	}
+	// ── FORMES ────────────────────────────────────────────────────────────
+
+	public function nvforme(Request $request)
+	{
+		$request->validate(['nom_forme' => 'required|string|max:255']);
+		Forme::create(['nom_forme' => $request->nom_forme]);
+		return redirect()->back()->with('success', 'Forme créée avec succès !');
+	}
+
+	public function destroyForme($id)
+	{
+		Forme::findOrFail($id)->delete();
+		return redirect()->back()->with('success', 'Forme supprimée.');
+	}
+
+	// ── CONDITIONNEMENTS ──────────────────────────────────────────────────
+
+	public function nvconditionnement(Request $request)
+	{
+		$request->validate(['type' => 'required|string|max:255']);
+		Conditionnement::create(['type' => $request->type]);
+		return redirect()->back()->with('success', 'Conditionnement créé avec succès !');
+	}
+
+	public function destroyConditionnement($id)
+	{
+		Conditionnement::findOrFail($id)->delete();
+		return redirect()->back()->with('success', 'Conditionnement supprimé.');
+	}
+
+	// ── FORME_CONDI (PRIX) ────────────────────────────────────────────────
+
+	public function nvformecondi(Request $request)
+	{
+		$request->validate([
+			'id_forme' => 'required|exists:forme,id_forme',
+			'id_condi' => 'required|exists:conditionnement,id_condi',
+			'prix'     => 'required|numeric|min:0',
+		]);
+
+		Forme_Condi::create([
+			'id_forme' => $request->id_forme,
+			'id_condi' => $request->id_condi,
+			'prix'     => $request->prix,
+		]);
+
+		return redirect()->back()->with('success', 'Prix créé avec succès !');
+	}
+
+	public function destroyFormeCondi($id)
+	{
+		Forme_Condi::findOrFail($id)->delete();
+		return redirect()->back()->with('success', 'Prix supprimé.');
+	}
+
+	// ── PARFUMS ───────────────────────────────────────────────────────────
+
+	public function nvparfum(Request $request)
+	{
+		$request->validate(['nom_parfum' => 'required|string|max:255']);
+		\App\Models\Parfum::create(['nom_parfum' => $request->nom_parfum]);
+		return redirect()->back()->with('success', 'Parfum créé avec succès !');
+	}
+
+	public function destroyParfum($id)
+	{
+		\App\Models\Parfum::findOrFail($id)->delete();
+		return redirect()->back()->with('success', 'Parfum supprimé.');
 	}
 }

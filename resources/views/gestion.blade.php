@@ -3,44 +3,44 @@
 	['note'  => 'Importer et gérer vos données'])
 @vite('resources/css/gestion.css')
 
-<div class="container" style="display:flex; gap:2rem; align-items:flex-start;">
+<div class="container gestion-layout">
 
 	{{-- ══ COLONNE GAUCHE ══ --}}
-	<div class="left-column" style="flex:0 0 280px; width:280px; min-width:280px;">
+	<div class="gestion-left-panel">
 
 		<div class="grid grid-1 panel-grid mb-2xl">
 
 			{{-- Statistiques --}}
 			<div class="card">
 				<div class="card__body">
-					<p class="card__tag" style="white-space:normal; word-break:break-word; font-size:var(--text-xs);">
+				<p class="card__tag card__tag--wrap">
 						Infos {{ $nom_boutique ?? '' }}
 					</p>
 					<div class="stat-card mt-md">
 						<span class="stat-card__value">{{ $stock_total ?? '—' }}</span>
-						<span class="stat-card__label" style="white-space:normal;">Stock — Total</span>
+						<span class="stat-card__label">Stock — Total</span>
 					</div>
 					<hr class="mt-lg mb-lg">
 					<div class="stat-card">
 						<span class="stat-card__value">{{ $nb_produits ?? '—' }}</span>
-						<span class="stat-card__label" style="white-space:normal;">Types de produit</span>
+						<span class="stat-card__label">Types de produit</span>
 					</div>
 					<hr class="mt-lg mb-lg">
 					<div class="stat-card">
 						<span class="stat-card__value">{{ count($rayons) }}</span>
-						<span class="stat-card__label" style="white-space:normal;">Rayons</span>
+						<span class="stat-card__label">Rayons</span>
 					</div>
 					<hr class="mt-lg mb-lg">
 					<div class="stat-card">
 						<span class="stat-card__value">{{ count($themes) }}</span>
-						<span class="stat-card__label" style="white-space:normal;">Thèmes</span>
+						<span class="stat-card__label">Thèmes</span>
 					</div>
 				</div>
 			</div>
 
 			{{-- Import fichier --}}
 			<div class="card">
-				<div class="card__body" style="display:flex; flex-direction:column; height:100%;">
+				<div class="card__body card--flex-column">
 					<p class="card__tag">Importer un fichier</p>
 					<form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data" id="import-form">
 						@csrf
@@ -57,7 +57,7 @@
 							<span id="file-name-text">fichier.xlsx</span>
 							<span class="remove-file" id="remove-file" title="Retirer le fichier">✕</span>
 						</div>
-						<button type="submit" class="btn btn--primary btn--sm w-full" style="margin-top:16px;">
+						<button type="submit" class="btn btn--primary btn--sm w-full btn-submit-modal">
 							↑ Importer
 						</button>
 					</form>
@@ -66,9 +66,9 @@
 
 			{{-- Sélection rayon import --}}
 			<div class="card">
-				<div class="card__body" style="display:flex; flex-direction:column; height:100%; gap:var(--space-lg);">
+				<div class="card__body card--flex-column" style="gap:var(--space-lg);">
 					<p class="card__tag">Sélectionner le Rayon</p>
-					<div class="form-group" style="margin-bottom:0;">
+					<div class="form-group form-group--no-margin">
 						<label class="form-label" for="type-select">Rayon d'import</label>
 						<select id="type-select" name="id_rayon" class="form-select" form="import-form">
 							<option value="-1">Sélectionner un rayon</option>
@@ -79,11 +79,11 @@
 							@endforeach
 						</select>
 					</div>
-					<div class="flex gap-sm" style="margin-top:auto;">
-						<button class="btn btn--ghost btn--sm" id="btn-nvrayon" title="Nouveau Rayon" style="flex-shrink:0;">
+					<div class="flex gap-sm flex-spacer">
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvrayon" title="Nouveau Rayon">
 							➕ Rayon
 						</button>
-						<button class="btn btn--ghost btn--sm" id="btn-nvtheme" title="Nouveau Thème" style="flex-shrink:0;">
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvtheme" title="Nouveau Thème">
 							🎨 Thème
 						</button>
 					</div>
@@ -92,21 +92,22 @@
 
 		</div>
 
-	</div>{{-- /left-column --}}
+	</div>{{-- /gestion-left-panel --}}
 
 	{{-- ══ COLONNE DROITE ══ --}}
-	<div class="right-column" style="flex:5; min-width:0;">
+	<div class="gestion-right-panel">
 
 		{{-- Onglets --}}
 		<div class="tabs">
 			<button class="tab active" data-tab="produits">🍬 Produits</button>
 			<button class="tab" data-tab="rayons">🗂 Rayons</button>
-			<button class="tab" data-tab="themes">🎨 Thèmes</button>
 			<button class="tab" data-tab="formes">🔷 Formes</button>
 			<button class="tab" data-tab="conditionnements">📦 Conditionnements</button>
+			<button class="tab" data-tab="parfums">🍓 Parfums</button>
+			<button class="tab" data-tab="themes">🎨 Thèmes</button>
 			<button class="tab" data-tab="prix">💰 Prix</button>
 
-			<select id="select-rayon" class="form-select form-select--sm" style="margin-left:auto; max-width:160px;">
+			<select id="select-rayon" class="form-select form-select--sm select--right">
 				<option value="-1" {{ !$rayonId || $rayonId == '-1' ? 'selected' : '' }}>Tous les rayons</option>
 				@foreach($rayons as $rayon)
 					<option value="{{ $rayon->id_rayon }}" {{ (string)$rayonId === (string)$rayon->id_rayon ? 'selected' : '' }}>
@@ -124,7 +125,7 @@
 					@if($rayonId && $rayonId != '-1')
 						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
 						@if($rayonActif)
-							<span class="chip chip--gold" style="font-size:var(--text-xs);">
+							<span class="chip chip--gold">
 								@foreach($rayonActif->themes as $t){{ $t->icone }} @endforeach {{ $rayonActif->nom_rayon }}
 							</span>
 						@endif
@@ -163,7 +164,7 @@
 								{{-- Thème du produit --}}
 								<td>
 									@if($produit->theme)
-										<span class="chip" style="background:{{ $produit->theme->couleur }}20; border-color:{{ $produit->theme->couleur }};">
+										<span class="chip chip--dynamic-color" style="background:{{ $produit->theme->couleur }}20; border-color:{{ $produit->theme->couleur }};">
 											{{ $produit->theme->icone }} {{ $produit->theme->nom_theme }}
 										</span>
 									@else
@@ -229,7 +230,7 @@
 								<td class="td-name">{{ $rayon->nom_rayon }}</td>
 								<td>
 									@forelse($rayon->themes as $theme)
-										<span class="chip" style="background:{{ $theme->couleur }}20; border-color:{{ $theme->couleur }};">
+									<span class="chip chip--dynamic-color" style="background:{{ $theme->couleur }}20; border-color:{{ $theme->couleur }};">
 											{{ $theme->icone }} {{ $theme->nom_theme }}
 										</span>
 									@empty
@@ -273,10 +274,10 @@
 							<tr>
 								<td class="td-id">{{ $theme->id_theme }}</td>
 								<td class="td-name">{{ $theme->nom_theme }}</td>
-								<td style="font-size:1.4rem;">{{ $theme->icone }}</td>
-								<td>
-									<span style="display:inline-flex; align-items:center; gap:6px;">
-										<span style="width:16px; height:16px; border-radius:50%; background:{{ $theme->couleur }}; border:1px solid var(--color-border); display:inline-block;"></span>
+							<td class="theme-icon">{{ $theme->icone }}</td>
+							<td>
+								<span class="color-swatch">
+									<span class="color-swatch__circle" style="background:{{ $theme->couleur }};"></span>
 										{{ $theme->couleur }}
 									</span>
 								</td>
@@ -309,6 +310,7 @@
 		<div id="tab-formes" class="tab-panel hidden">
 			<div class="data-toolbar">
 				<h2 class="data-toolbar__title">Formes <span class="data-count">{{ count($formes) }}</span></h2>
+				<button class="btn btn--primary btn--sm" id="btn-nvforme">+ Nouvelle forme</button>
 			</div>
 			@if(count($formes) > 0)
 				<div class="table-wrapper">
@@ -339,6 +341,7 @@
 		<div id="tab-conditionnements" class="tab-panel hidden">
 			<div class="data-toolbar">
 				<h2 class="data-toolbar__title">Conditionnements <span class="data-count">{{ count($conditionnements) }}</span></h2>
+				<button class="btn btn--primary btn--sm" id="btn-nvcondi">+ Nouveau conditionnement</button>
 			</div>
 			@if(count($conditionnements) > 0)
 				<div class="table-wrapper">
@@ -369,6 +372,7 @@
 		<div id="tab-prix" class="tab-panel hidden">
 			<div class="data-toolbar">
 				<h2 class="data-toolbar__title">Prix <span class="data-count">{{ count($forme_condi) }}</span></h2>
+				<button class="btn btn--primary btn--sm" id="btn-nvprix">+ Nouveau prix</button>
 			</div>
 			@if(count($forme_condi) > 0)
 				<div class="table-wrapper">
@@ -397,7 +401,38 @@
 			@endif
 		</div>
 
-	</div>{{-- /right-column --}}
+		{{-- ══ PARFUMS ══ --}}
+		<div id="tab-parfums" class="tab-panel hidden">
+			<div class="data-toolbar">
+				<h2 class="data-toolbar__title">Parfums <span class="data-count">{{ count($parfums) }}</span></h2>
+				<button class="btn btn--primary btn--sm" id="btn-nvparfum">+ Nouveau parfum</button>
+			</div>
+			@if(count($parfums) > 0)
+				<div class="table-wrapper">
+					<table>
+						<thead><tr><th>#</th><th>Nom</th><th>Actions</th></tr></thead>
+						<tbody>
+							@foreach($parfums as $parfum)
+							<tr>
+								<td class="td-id">{{ $parfum->id_parfum }}</td>
+								<td class="td-name">{{ $parfum->nom_parfum }}</td>
+								<td class="td-actions">
+									<form action="/gestion/parfum/{{ $parfum->id_parfum }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce parfum')">
+										@csrf @method('DELETE')
+										<button type="submit" class="btn-icon btn-icon--delete">🗑️</button>
+									</form>
+								</td>
+							</tr>
+							@endforeach
+						</tbody>
+					</table>
+				</div>
+			@else
+				<div class="data-empty"><p class="data-empty__icon">🍓</p><p class="data-empty__text">Aucun parfum.</p></div>
+			@endif
+		</div>
+
+	</div>{{-- /gestion-right-panel --}}
 </div>
 
 {{-- ══ MODAL NOUVEAU PRODUIT ══ --}}
@@ -457,30 +492,14 @@
 			<input type="text" name="nom_rayon" placeholder="Ex : Noël, Printemps…" required>
 
 			<label>Thèmes associés <span style="font-weight:400; text-transform:none; letter-spacing:0;">(optionnel — les produits liés seront automatiquement ajoutés)</span></label>
-			<div style="display:flex; flex-wrap:wrap; gap:var(--space-sm); margin-top:var(--space-xs);">
+			<div class="themes-selector">
 				@foreach($themes as $theme)
-					<label style="
-						display:inline-flex;
-						align-items:center;
-						gap:6px;
-						padding: 6px 12px;
-						border-radius: var(--radius-full);
-						border: 1.5px solid var(--color-border);
-						background: var(--color-cream);
-						cursor: pointer;
-						font-size: var(--text-xs);
-						font-weight: 600;
-						transition: all var(--transition-fast);
-						user-select: none;
-					"
-					id="theme-label-{{ $theme->id_theme }}"
-					>
+					<label class="themes-selector-item" id="theme-label-{{ $theme->id_theme }}">
 						<input
 							type="checkbox"
 							name="id_themes[]"
 							value="{{ $theme->id_theme }}"
 							data-couleur="{{ $theme->couleur }}"
-							style="display:none;"
 							class="theme-checkbox"
 						>
 						{{ $theme->icone }} {{ $theme->nom_theme }}
@@ -489,16 +508,7 @@
 			</div>
 
 			{{-- Aperçu du nombre de produits qui seront liés --}}
-			<div id="preview-produits" style="
-				margin-top: var(--space-lg);
-				padding: var(--space-md);
-				background: var(--color-cream);
-				border-radius: var(--radius-md);
-				border: 1px solid var(--color-border);
-				font-size: var(--text-xs);
-				color: var(--color-text-muted);
-				display: none;
-			">
+			<div id="preview-produits" class="preview-produits">
 				🔍 <span id="preview-text">0 produit(s) seront liés à ce rayon</span>
 			</div>
 
@@ -525,6 +535,82 @@
 			<div class="modal-actions">
 				<button type="button" class="btn-close-modal">Annuler</button>
 				<button type="submit" class="btn btn--primary">Créer le thème</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+{{-- ══ MODAL NOUVELLE FORME ══ --}}
+<div id="modal-forme" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>Nouvelle forme</h2>
+		<form action="{{ route('nvforme') }}" method="POST">
+			@csrf
+			<label>Nom de la forme</label>
+			<input type="text" name="nom_forme" placeholder="Ex : Mini, Nid, Géant…" required>
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary">Créer</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+{{-- ══ MODAL NOUVEAU CONDITIONNEMENT ══ --}}
+<div id="modal-condi" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>Nouveau conditionnement</h2>
+		<form action="{{ route('nvconditionnement') }}" method="POST">
+			@csrf
+			<label>Type de conditionnement</label>
+			<input type="text" name="type" placeholder="Ex : sachet_de_4, boite_de_8…" required>
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary">Créer</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+{{-- ══ MODAL NOUVEAU PRIX ══ --}}
+<div id="modal-prix" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>Nouveau prix</h2>
+		<form action="{{ route('nvformecondi') }}" method="POST">
+			@csrf
+			<label>Forme</label>
+			<select name="id_forme" required>
+				@foreach($formes as $f)
+					<option value="{{ $f->id_forme }}">{{ $f->nom_forme }}</option>
+				@endforeach
+			</select>
+			<label>Conditionnement</label>
+			<select name="id_condi" required>
+				@foreach($conditionnements as $c)
+					<option value="{{ $c->id_condi }}">{{ $c->type }}</option>
+				@endforeach
+			</select>
+			<label>Prix (€)</label>
+			<input type="number" name="prix" step="0.01" min="0" placeholder="Ex : 6.50" required>
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary">Créer</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+{{-- ══ MODAL NOUVEAU PARFUM ══ --}}
+<div id="modal-parfum" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>Nouveau parfum</h2>
+		<form action="{{ route('nvparfum') }}" method="POST">
+			@csrf
+			<label>Nom du parfum</label>
+			<input type="text" name="nom_parfum" placeholder="Ex : Framboise, Pistache…" required>
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary">Créer</button>
 			</div>
 		</form>
 	</div>
@@ -590,6 +676,10 @@
 	document.getElementById('btn-nvrayon2')  .addEventListener('click', () => document.getElementById('modal-rayon')  .classList.remove('hidden'));
 	document.getElementById('btn-nvtheme')   .addEventListener('click', () => document.getElementById('modal-theme')  .classList.remove('hidden'));
 	document.getElementById('btn-nvtheme2')  .addEventListener('click', () => document.getElementById('modal-theme')  .classList.remove('hidden'));
+	document.getElementById('btn-nvforme')  .addEventListener('click', () => document.getElementById('modal-forme') .classList.remove('hidden'));
+	document.getElementById('btn-nvcondi')  .addEventListener('click', () => document.getElementById('modal-condi') .classList.remove('hidden'));
+	document.getElementById('btn-nvprix')   .addEventListener('click', () => document.getElementById('modal-prix')  .classList.remove('hidden'));
+	document.getElementById('btn-nvparfum') .addEventListener('click', () => document.getElementById('modal-parfum').classList.remove('hidden'));
 
 	// ── Fermeture modals ──
 	document.addEventListener('click', e => {
