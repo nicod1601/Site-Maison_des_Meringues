@@ -83,8 +83,9 @@
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvrayon" title="Nouveau Rayon">
 							➕ Rayon
 						</button>
-						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvtheme" title="Nouveau Thème">
-							🎨 Thème
+						{{-- ✅ Corrigé : bouton Thème remplacé par bouton Event --}}
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvevent" title="Nouvel Event">
+							🎉 Event
 						</button>
 					</div>
 				</div>
@@ -105,6 +106,7 @@
 			<button class="tab" data-tab="conditionnements">📦 Conditionnements</button>
 			<button class="tab" data-tab="parfums">🍓 Parfums</button>
 			<button class="tab" data-tab="themes">🎨 Thèmes</button>
+			<button class="tab" data-tab="events">🎉 Events</button>{{-- ✅ Onglet Events ajouté --}}
 			<button class="tab" data-tab="prix">💰 Prix</button>
 
 			<select id="select-rayon" class="form-select form-select--sm select--right">
@@ -126,7 +128,8 @@
 						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
 						@if($rayonActif)
 							<span class="chip chip--gold">
-								@foreach($rayonActif->themes as $t){{ $t->icone }} @endforeach {{ $rayonActif->nom_rayon }}
+								{{-- ✅ Corrigé : ->themes → ->events (un rayon est lié à des events) --}}
+								@foreach($rayonActif->events as $e){{ $e->icone }} @endforeach {{ $rayonActif->nom_rayon }}
 							</span>
 						@endif
 					@endif
@@ -157,7 +160,7 @@
 							@foreach($produits as $produit)
 							<tr>
 								<td class="td-id">{{ $produit->id_produit }}</td>
-								<td class="td-namecode">{{ $produit->nom_produit ?? '—'}}</td>
+								<td class="td-namecode">{{ $produit->nom_produit ?? '—' }}</td>
 								<td class="td-name">{{ $produit->parfum->nom_parfum ?? '—' }}</td>
 								<td class="td-desc text-muted">{{ Str::limit($produit->description, 50) }}</td>
 
@@ -170,9 +173,9 @@
 									@endforelse
 								</td>
 
-								{{-- Thème du produit --}}
+								{{-- Thème du produit (optionnel, indicateur de tri) --}}
 								<td>
-									@if($produit->theme)
+									@if($produit->theme && $produit->theme->id_theme)
 										<span class="chip chip--dynamic-color" style="background:{{ $produit->theme->couleur }}20; border-color:{{ $produit->theme->couleur }};">
 											{{ $produit->theme->icone }} {{ $produit->theme->nom_theme }}
 										</span>
@@ -181,17 +184,22 @@
 									@endif
 								</td>
 
-								<td><span class="chip">{{ $produit->forme_condi->forme->nom_forme ?? '—' }}</span></td>
+								<td>
+									<span class="chip">{{ $produit->formeCondi->forme->nom_forme ?? '—' }}</span>
+								</td>
+
 								<td>
 									@foreach($produit->tous_conditionnements() as $fc)
-										<span class="chip">{{ $fc->conditionnement->type }}</span>
+										<span class="chip">{{ $fc->conditionnement->type ?? '—'}}</span>
 									@endforeach
 								</td>
+
 								<td>
 									@foreach($produit->tous_conditionnements() as $fc)
-										<span class="chip chip--gold">{{ $fc->prix }} €</span>
+										<span class="chip">{{ $fc->prix ?? '—' }} €</span>
 									@endforeach
 								</td>
+
 								<td>
 									@if($produit->quantite > 0)
 										<span class="stock-badge stock-badge--ok">{{ $produit->quantite }}</span>
@@ -199,23 +207,30 @@
 										<span class="stock-badge stock-badge--rupture">Rupture</span>
 									@endif
 								</td>
+
 								<td class="td-actions">
 									<div class="actions-wrap">
-										<form action="/gestion/produit/{{ $produit->id_produit }}" ... class="form-delete" ...>
+										<form action="{{ route('produit.destroy', $produit->id_produit) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce produit')">
 											@csrf @method('DELETE')
 											<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
 										</form>
 									</div>
+
 									<div class="actions-wrap">
-										<form>
-											@if ($produit->live === true)
-												<label><input type="checkbox" name="live{{$produit->id_produit}}" value="{{ $produit->id_produit }}" checked> Live</label>
-											@else
-												<label><input type="checkbox" name="live{{$produit->id_produit}}" value="{{ $produit->id_produit }}"> Live</label>
-											@endif
+										<form action="{{ route('produit.live', $produit->id_produit) }}" method="POST">
+											@csrf @method('PATCH')
+											<label>
+												<input
+													type="checkbox"
+													name="live"
+													value="1"
+													{{ $produit->live ? 'checked' : '' }}
+													onchange="this.form.submit()"
+												> Live
+											</label>
 										</form>
 									</div>
-							   </td>
+								</td>
 							</tr>
 							@endforeach
 						</tbody>
@@ -239,7 +254,8 @@
 				<div class="table-wrapper">
 					<table>
 						<thead>
-							<tr><th>#</th><th>Nom</th><th>Thèmes</th><th>Stock</th><th class="th-actions">Actions</th></tr>
+							{{-- ✅ Corrigé : colonne Thèmes → Events --}}
+							<tr><th>#</th><th>Nom</th><th>Events</th><th>Stock</th><th class="th-actions">Actions</th></tr>
 						</thead>
 						<tbody>
 							@foreach($rayons as $rayon)
@@ -247,9 +263,10 @@
 								<td class="td-id">{{ $rayon->id_rayon }}</td>
 								<td class="td-name">{{ $rayon->nom_rayon }}</td>
 								<td>
-									@forelse($rayon->themes as $theme)
-									<span class="chip chip--dynamic-color" style="background:{{ $theme->couleur }}20; border-color:{{ $theme->couleur }};">
-											{{ $theme->icone }} {{ $theme->nom_theme }}
+									{{-- ✅ Corrigé : $rayon->themes → $rayon->events --}}
+									@forelse($rayon->events as $event)
+										<span class="chip chip--dynamic-color" style="background:{{ $event->couleur }}20; border-color:{{ $event->couleur }};">
+											{{ $event->icone }} {{ $event->nom_event }}
 										</span>
 									@empty
 										<span class="text-muted">—</span>
@@ -257,7 +274,13 @@
 								</td>
 								<td><span class="stock-badge stock-badge--ok">{{ $rayon->stock_total_rayon }}</span></td>
 								<td class="td-actions">
-									<form action="/gestion/rayon/{{ $rayon->id_rayon }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce rayon')">
+									{{-- Bouton modifier les events du rayon --}}
+									<button
+										class="btn-icon btn-icon--edit"
+										title="Modifier les events"
+										onclick="ouvrirModalEditRayon({{ $rayon->id_rayon }}, '{{ $rayon->nom_rayon }}', {{ json_encode($rayon->events->pluck('id_event')) }})"
+									>✏️</button>
+									<form action="{{ route('rayon.destroy', $rayon->id_rayon) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce rayon')">
 										@csrf @method('DELETE')
 										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
 									</form>
@@ -285,28 +308,27 @@
 				<div class="table-wrapper">
 					<table>
 						<thead>
-							<tr><th>#</th><th>Thème</th><th>Icône</th><th>Couleur</th><th>Rayons liés</th><th>Produits</th><th class="th-actions">Actions</th></tr>
+							{{-- ✅ Corrigé : colonne "Rayons liés" supprimée (theme n'a plus de relation rayons) --}}
+							<tr><th>#</th><th>Thème</th><th>Icône</th><th>Couleur</th><th>Produits</th><th class="th-actions">Actions</th></tr>
 						</thead>
 						<tbody>
 							@foreach($themes as $theme)
 							<tr>
 								<td class="td-id">{{ $theme->id_theme }}</td>
 								<td class="td-name">{{ $theme->nom_theme }}</td>
-							<td class="theme-icon">{{ $theme->icone }}</td>
-							<td>
-								<span class="color-swatch">
-									<span class="color-swatch__circle" style="background:{{ $theme->couleur }};"></span>
+								<td class="theme-icon">{{ $theme->icone }}</td>
+								<td>
+									<span class="color-swatch">
+										<span class="color-swatch__circle" style="background:{{ $theme->couleur }};"></span>
 										{{ $theme->couleur }}
 									</span>
 								</td>
-								<td>
-									<span class="data-count">{{ $theme->rayons->count() }}</span>
-								</td>
+								{{-- ✅ Corrigé : $theme->rayons->count() supprimé → $produitsByTheme --}}
 								<td>
 									<span class="data-count">{{ $produitsByTheme[$theme->id_theme] ?? 0 }}</span>
 								</td>
 								<td class="td-actions">
-									<form action="/gestion/theme/{{ $theme->id_theme }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce thème')">
+									<form action="{{ route('theme.destroy', $theme->id_theme) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce thème')">
 										@csrf @method('DELETE')
 										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
 									</form>
@@ -320,6 +342,56 @@
 				<div class="data-empty">
 					<p class="data-empty__icon">🎨</p>
 					<p class="data-empty__text">Aucun thème enregistré.</p>
+				</div>
+			@endif
+		</div>
+
+		{{-- ══ EVENTS ══ --}}
+		{{-- ✅ Onglet Events entièrement ajouté --}}
+		<div id="tab-events" class="tab-panel hidden">
+			<div class="data-toolbar">
+				<h2 class="data-toolbar__title">Events <span class="data-count">{{ count($events) }}</span></h2>
+				<button class="btn btn--primary btn--sm" id="btn-nvevent2">+ Nouvel event</button>
+			</div>
+			@if(count($events) > 0)
+				<div class="table-wrapper">
+					<table>
+						<thead>
+							<tr><th>#</th><th>Event</th><th>Icône</th><th>Couleur</th><th>Rayons liés</th><th>Produits éligibles</th><th class="th-actions">Actions</th></tr>
+						</thead>
+						<tbody>
+							@foreach($events as $event)
+							<tr>
+								<td class="td-id">{{ $event->id_event }}</td>
+								<td class="td-name">{{ $event->nom_event }}</td>
+								<td class="theme-icon">{{ $event->icone }}</td>
+								<td>
+									<span class="color-swatch">
+										<span class="color-swatch__circle" style="background:{{ $event->couleur }};"></span>
+										{{ $event->couleur }}
+									</span>
+								</td>
+								<td>
+									<span class="data-count">{{ $event->rayons->count() }}</span>
+								</td>
+								<td>
+									<span class="data-count">{{ $produitsByEvent[$event->id_event] ?? 0 }}</span>
+								</td>
+								<td class="td-actions">
+									<form action="{{ route('event.destroy', $event->id_event) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('cet event')">
+										@csrf @method('DELETE')
+										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+									</form>
+								</td>
+							</tr>
+							@endforeach
+						</tbody>
+					</table>
+				</div>
+			@else
+				<div class="data-empty">
+					<p class="data-empty__icon">🎉</p>
+					<p class="data-empty__text">Aucun event enregistré.</p>
 				</div>
 			@endif
 		</div>
@@ -340,7 +412,7 @@
 								<td class="td-id">{{ $forme->id_forme }}</td>
 								<td class="td-name">{{ $forme->nom_forme }}</td>
 								<td class="td-actions">
-									<form action="/gestion/forme/{{ $forme->id_forme }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('cette forme')">
+									<form action="{{ route('forme.destroy', $forme->id_forme) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('cette forme')">
 										@csrf @method('DELETE')
 										<button type="submit" class="btn-icon btn-icon--delete">🗑️</button>
 									</form>
@@ -371,7 +443,7 @@
 								<td class="td-id">{{ $cond->id_condi }}</td>
 								<td class="td-name">{{ $cond->type }}</td>
 								<td class="td-actions">
-									<form action="/gestion/conditionnement/{{ $cond->id_condi }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce conditionnement')">
+									<form action="{{ route('conditionnement.destroy', $cond->id_condi) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce conditionnement')">
 										@csrf @method('DELETE')
 										<button type="submit" class="btn-icon btn-icon--delete">🗑️</button>
 									</form>
@@ -404,7 +476,7 @@
 								<td>{{ $fc->conditionnement->type }}</td>
 								<td class="td-prix">{{ $fc->prix }} €</td>
 								<td class="td-actions">
-									<form action="/gestion/forme_condi/{{ $fc->id_forme_condi }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce prix')">
+									<form action="{{ route('formecondi.destroy', $fc->id_forme_condi) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce prix')">
 										@csrf @method('DELETE')
 										<button type="submit" class="btn-icon btn-icon--delete">🗑️</button>
 									</form>
@@ -435,7 +507,7 @@
 								<td class="td-id">{{ $parfum->id_parfum }}</td>
 								<td class="td-name">{{ $parfum->nom_parfum }}</td>
 								<td class="td-actions">
-									<form action="/gestion/parfum/{{ $parfum->id_parfum }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce parfum')">
+									<form action="{{ route('parfum.destroy', $parfum->id_parfum) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce parfum')">
 										@csrf @method('DELETE')
 										<button type="submit" class="btn-icon btn-icon--delete">🗑️</button>
 									</form>
@@ -457,7 +529,7 @@
 <div id="modal-produit" class="data-modal hidden">
 	<div class="data-modal-content">
 		<h2>Nouveau produit</h2>
-		<form action="/gestion/produit/0" method="POST">
+		<form action="{{ route('produit.store') }}" method="POST">
 			@csrf
 			<label>Parfum</label>
 			<select name="id_parfum" required>
@@ -471,7 +543,7 @@
 					<option value="{{ $fc->id_forme_condi }}">{{ $fc->forme->nom_forme }} — {{ $fc->conditionnement->type }} ({{ $fc->prix }} €)</option>
 				@endforeach
 			</select>
-			<label>Thème</label>
+			<label>Thème <span style="font-weight:400;">(optionnel — indicateur de tri)</span></label>
 			<select name="id_theme">
 				<option value="">— Aucun thème —</option>
 				@foreach($themes as $theme)
@@ -482,10 +554,13 @@
 			<select name="id_rayon" required>
 				@foreach($rayons as $rayon)
 					<option value="{{ $rayon->id_rayon }}" {{ $rayonId == $rayon->id_rayon ? 'selected' : '' }}>
-						@foreach($rayon->themes as $t){{ $t->icone }} @endforeach {{ $rayon->nom_rayon }}
+						{{-- ✅ Corrigé : ->themes → ->events --}}
+						@foreach($rayon->events as $e){{ $e->icone }} @endforeach {{ $rayon->nom_rayon }}
 					</option>
 				@endforeach
 			</select>
+			<label>Nom du produit</label>
+			<input type="text" name="nom_produit" placeholder="Nom du produit" required>
 			<label>Description</label>
 			<input type="text" name="description" placeholder="Description courte">
 			<label>Quantité</label>
@@ -509,24 +584,25 @@
 			<label>Nom du rayon</label>
 			<input type="text" name="nom_rayon" placeholder="Ex : Noël, Printemps…" required>
 
-			<label>Thèmes associés <span style="font-weight:400; text-transform:none; letter-spacing:0;">(optionnel — les produits liés seront automatiquement ajoutés)</span></label>
+			{{-- ✅ Corrigé : sélection d'Events (et non de Thèmes) pour le rayon --}}
+			{{-- Un rayon est lié à des events (occasion), pas à des thèmes (tri produit) --}}
+			<label>Events associés <span style="font-weight:400; text-transform:none; letter-spacing:0;">(optionnel — les produits éligibles à ces events seront liés)</span></label>
 			<div class="themes-selector">
-				@foreach($themes as $theme)
-					<label class="themes-selector-item" id="theme-label-{{ $theme->id_theme }}">
+				@foreach($events as $event)
+					<label class="themes-selector-item" id="event-label-{{ $event->id_event }}">
 						<input
 							type="checkbox"
-							name="id_themes[]"
-							value="{{ $theme->id_theme }}"
-							data-couleur="{{ $theme->couleur }}"
-							class="theme-checkbox"
+							name="id_events[]"
+							value="{{ $event->id_event }}"
+							data-couleur="{{ $event->couleur }}"
+							class="event-checkbox"
 						>
-						{{ $theme->icone }} {{ $theme->nom_theme }}
+						{{ $event->icone }} {{ $event->nom_event }}
 					</label>
 				@endforeach
 			</div>
 
-			{{-- Aperçu du nombre de produits qui seront liés --}}
-			<div id="preview-produits" class="preview-produits">
+			<div id="preview-produits" class="preview-produits" style="display:none;">
 				🔍 <span id="preview-text">0 produit(s) seront liés à ce rayon</span>
 			</div>
 
@@ -545,7 +621,7 @@
 		<form action="{{ route('nvtheme') }}" method="POST">
 			@csrf
 			<label>Nom du thème</label>
-			<input type="text" name="nom_theme" placeholder="Ex : Fleurs, Fruits, Noël…" required>
+			<input type="text" name="nom_theme" placeholder="Ex : Fleurs, Fruits…" required>
 			<label>Icône (emoji)</label>
 			<input type="text" name="icone" placeholder="Ex : 🌸" maxlength="4" value="🎨">
 			<label>Couleur</label>
@@ -553,6 +629,27 @@
 			<div class="modal-actions">
 				<button type="button" class="btn-close-modal">Annuler</button>
 				<button type="submit" class="btn btn--primary">Créer le thème</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+{{-- ══ MODAL NOUVEL EVENT ══ --}}
+{{-- ✅ Nouveau modal Event ajouté --}}
+<div id="modal-event" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>Nouvel event</h2>
+		<form action="{{ route('nvevent') }}" method="POST">
+			@csrf
+			<label>Nom de l'event</label>
+			<input type="text" name="nom_event" placeholder="Ex : Noël, Printemps, Anniversaire…" required>
+			<label>Icône (emoji)</label>
+			<input type="text" name="icone" placeholder="Ex : 🎄" maxlength="4" value="🎉">
+			<label>Couleur</label>
+			<input type="color" name="couleur" value="#C0392B" style="height:42px; padding:4px 8px;">
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary">Créer l'event</button>
 			</div>
 		</form>
 	</div>
@@ -634,6 +731,36 @@
 	</div>
 </div>
 
+
+{{-- ══ MODAL MODIFIER RAYON ══ --}}
+<div id="modal-edit-rayon" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2 id="edit-rayon-titre">Modifier le rayon</h2>
+		<form id="form-edit-rayon" method="POST">
+			@csrf @method('PUT')
+			<label>Events associés <span style="font-weight:400; text-transform:none; letter-spacing:0;">(les produits seront automatiquement mis à jour)</span></label>
+			<div class="themes-selector" id="edit-events-selector">
+				@foreach($events as $event)
+					<label class="themes-selector-item edit-event-item" data-id="{{ $event->id_event }}" data-couleur="{{ $event->couleur }}">
+						<input
+							type="checkbox"
+							name="id_events[]"
+							value="{{ $event->id_event }}"
+							data-couleur="{{ $event->couleur }}"
+							class="edit-event-checkbox"
+						>
+						{{ $event->icone }} {{ $event->nom_event }}
+					</label>
+				@endforeach
+			</div>
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary">Enregistrer</button>
+			</div>
+		</form>
+	</div>
+</div>
+
 {{-- ══ OVERLAY CHARGEMENT ══ --}}
 <div id="loading-overlay">
 	<div class="loading-box">
@@ -692,12 +819,14 @@
 	document.getElementById('btn-nvproduit') .addEventListener('click', () => document.getElementById('modal-produit').classList.remove('hidden'));
 	document.getElementById('btn-nvrayon')   .addEventListener('click', () => document.getElementById('modal-rayon')  .classList.remove('hidden'));
 	document.getElementById('btn-nvrayon2')  .addEventListener('click', () => document.getElementById('modal-rayon')  .classList.remove('hidden'));
-	document.getElementById('btn-nvtheme')   .addEventListener('click', () => document.getElementById('modal-theme')  .classList.remove('hidden'));
+	// ✅ Corrigé : btn-nvtheme retiré du panneau gauche, remplacé par btn-nvevent
+	document.getElementById('btn-nvevent')   .addEventListener('click', () => document.getElementById('modal-event')  .classList.remove('hidden'));
+	document.getElementById('btn-nvevent2')  .addEventListener('click', () => document.getElementById('modal-event')  .classList.remove('hidden'));
 	document.getElementById('btn-nvtheme2')  .addEventListener('click', () => document.getElementById('modal-theme')  .classList.remove('hidden'));
-	document.getElementById('btn-nvforme')  .addEventListener('click', () => document.getElementById('modal-forme') .classList.remove('hidden'));
-	document.getElementById('btn-nvcondi')  .addEventListener('click', () => document.getElementById('modal-condi') .classList.remove('hidden'));
-	document.getElementById('btn-nvprix')   .addEventListener('click', () => document.getElementById('modal-prix')  .classList.remove('hidden'));
-	document.getElementById('btn-nvparfum') .addEventListener('click', () => document.getElementById('modal-parfum').classList.remove('hidden'));
+	document.getElementById('btn-nvforme')   .addEventListener('click', () => document.getElementById('modal-forme')  .classList.remove('hidden'));
+	document.getElementById('btn-nvcondi')   .addEventListener('click', () => document.getElementById('modal-condi')  .classList.remove('hidden'));
+	document.getElementById('btn-nvprix')    .addEventListener('click', () => document.getElementById('modal-prix')   .classList.remove('hidden'));
+	document.getElementById('btn-nvparfum')  .addEventListener('click', () => document.getElementById('modal-parfum') .classList.remove('hidden'));
 
 	// ── Fermeture modals ──
 	document.addEventListener('click', e => {
@@ -729,10 +858,11 @@
 		window.location.href = url.toString();
 	});
 
-	// ── Checkboxes thèmes dans le modal rayon ──
-	const produitsByTheme = @json($produitsByTheme);
+	// ── Checkboxes events dans le modal rayon ──
+	// ✅ Corrigé : theme-checkbox → event-checkbox, produitsByTheme → produitsByEvent
+	const produitsByEvent = @json($produitsByEvent);
 
-	document.querySelectorAll('.theme-checkbox').forEach(checkbox => {
+	document.querySelectorAll('.event-checkbox').forEach(checkbox => {
 		checkbox.addEventListener('change', function () {
 			const label   = this.closest('label');
 			const couleur = this.dataset.couleur;
@@ -750,7 +880,7 @@
 	});
 
 	function updatePreview() {
-		const checked = [...document.querySelectorAll('.theme-checkbox:checked')]
+		const checked = [...document.querySelectorAll('.event-checkbox:checked')]
 			.map(cb => parseInt(cb.value));
 
 		const preview = document.getElementById('preview-produits');
@@ -762,13 +892,13 @@
 		}
 
 		let total = 0;
-		checked.forEach(id => { total += produitsByTheme[id] || 0; });
+		checked.forEach(id => { total += produitsByEvent[id] || 0; });
 
 		preview.style.display = 'block';
-		text.textContent = `${total} produit(s) seront automatiquement liés à ce nouveau rayon`;
+		text.textContent = `${total} produit(s) éligible(s) seront automatiquement liés à ce nouveau rayon`;
 	}
 
-	/*-- Recherche rapide produits -*/
+	// ── Recherche rapide produits ──
 	document.getElementById('search-input').addEventListener('input', function () {
 		const query = this.value.toLowerCase();
 		document.querySelectorAll('#tab-produits tbody tr').forEach(row => {
@@ -777,4 +907,46 @@
 			row.style.display = (namecode.includes(query) || name.includes(query)) ? '' : 'none';
 		});
 	});
+
+	// ── Modal modifier rayon ──
+	function ouvrirModalEditRayon(id, nom, eventIds) {
+		document.getElementById('edit-rayon-titre').textContent = 'Modifier : ' + nom;
+		document.getElementById('form-edit-rayon').action = '/gestion/rayon/' + id;
+
+		// Cocher les events actuels du rayon
+		document.querySelectorAll('.edit-event-checkbox').forEach(cb => {
+			const checked = eventIds.includes(parseInt(cb.value));
+			cb.checked = checked;
+			const label = cb.closest('label');
+			const couleur = cb.dataset.couleur;
+			if (checked) {
+				label.style.borderColor = couleur;
+				label.style.background  = couleur + '20';
+				label.style.color       = couleur;
+			} else {
+				label.style.borderColor = 'var(--color-border)';
+				label.style.background  = 'var(--color-cream)';
+				label.style.color       = 'inherit';
+			}
+		});
+
+		document.getElementById('modal-edit-rayon').classList.remove('hidden');
+	}
+
+	document.querySelectorAll('.edit-event-checkbox').forEach(checkbox => {
+		checkbox.addEventListener('change', function () {
+			const label   = this.closest('label');
+			const couleur = this.dataset.couleur;
+			if (this.checked) {
+				label.style.borderColor = couleur;
+				label.style.background  = couleur + '20';
+				label.style.color       = couleur;
+			} else {
+				label.style.borderColor = 'var(--color-border)';
+				label.style.background  = 'var(--color-cream)';
+				label.style.color       = 'inherit';
+			}
+		});
+	});
+
 </script>

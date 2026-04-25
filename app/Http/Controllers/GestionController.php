@@ -10,6 +10,7 @@ use App\Models\Parfum;
 use App\Models\Forme_Condi;
 use App\Models\Rayon;
 use App\Models\Theme;
+use App\Models\Event; // ✅ Ajouté
 use Illuminate\Http\Request;
 
 class GestionController extends Controller
@@ -23,8 +24,11 @@ class GestionController extends Controller
 		$stock_total  = $boutique->stock_total;
 		$nom_boutique = $boutique->nom_boutique;
 
-		$rayons = Rayon::with('themes')->get();
+		// ✅ Corrigé : Rayon::with('themes') → with('events')
+		// Les rayons sont liés à des events (many-to-many), plus à des themes
+		$rayons = Rayon::with('events')->get();
 		$themes = Theme::all();
+		$events = Event::all(); // ✅ Ajouté : nécessaire pour le tab Events et le modal Rayon
 
 		$rayonId = $request->query('rayon');
 
@@ -34,6 +38,7 @@ class GestionController extends Controller
 			'forme_condi.conditionnement',
 			'rayons',
 			'theme',
+			'events', // ✅ Ajouté : pour afficher les events du produit si besoin
 		]);
 
 		if ($rayonId && $rayonId !== '-1') {
@@ -50,18 +55,25 @@ class GestionController extends Controller
 		$parfums          = Parfum::all();
 		$forme_condi      = Forme_Condi::with(['forme', 'conditionnement'])->get();
 
-		// Compter les produits par thème pour l'aperçu du modal
+		// Nombre de produits par thème (pour l'affichage dans le tab Thèmes)
 		$produitsByTheme = $themes->mapWithKeys(function ($theme) {
 			return [
 				$theme->id_theme => Produit::where('id_theme', $theme->id_theme)->count()
 			];
 		});
 
+		// ✅ Ajouté : nombre de produits par event (pour l'affichage dans le tab Events)
+		$produitsByEvent = $events->mapWithKeys(function ($event) {
+			return [
+				$event->id_event => $event->produits()->count()
+			];
+		});
+
 		return view('gestion', compact(
 			'datas', 'stock_total', 'nom_boutique', 'nb_produits',
 			'produits', 'formes', 'conditionnements', 'parfums',
-			'forme_condi', 'rayons', 'themes', 'boutique', 'rayonId',
-			'produitsByTheme',
+			'forme_condi', 'rayons', 'themes', 'events', 'boutique', 'rayonId',
+			'produitsByTheme', 'produitsByEvent',
 		));
 	}
 }
