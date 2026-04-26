@@ -827,3 +827,62 @@ td.td-actions {
 @media (max-width: 768px) {
     .panel-grid { grid-template-columns: 1fr; }
 }
+
+
+/* ══ CASE LIVE ══ */
+
+/* Wrapper du label */
+.actions-wrap label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted, #888);
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+/* Cache la checkbox native */
+.actions-wrap input[type="checkbox"][name="live"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 32px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--color-border, #ddd);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.25s ease;
+    flex-shrink: 0;
+}
+
+/* Le petit cercle du toggle */
+.actions-wrap input[type="checkbox"][name="live"]::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* État coché — toggle vert + cercle décalé */
+.actions-wrap input[type="checkbox"][name="live"]:checked {
+    background: #22c55e;
+}
+
+.actions-wrap input[type="checkbox"][name="live"]:checked::before {
+    transform: translateX(14px);
+}
+
+/* Label devient vert quand coché */
+.actions-wrap:has(input[name="live"]:checked) label {
+    color: #22c55e;
+}

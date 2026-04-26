@@ -291,8 +291,7 @@ class CreationController extends Controller
 	{
 		$boutique = Boutique::first();
 		if ($boutique) {
-			$boutique->stock_total = Rayon::sum('stock_total_rayon');
-			$boutique->save();
+			$boutique->recalculerStock();
 		}
 	}
 }

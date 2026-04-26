@@ -34,10 +34,11 @@ class Boutique extends Model
 		);
 	}
 
-	// ✅ Ajouté : recalcule le stock total en sommant les stocks de tous les rayons
 	public function recalculerStock(): void
 	{
-		$this->stock_total = $this->rayons()->sum('stock_total_rayon');
+		$this->stock_total = Produit::whereHas('rayons', function ($query) {
+			$query->where('id_boutique', $this->id_boutique);
+		})->sum('quantite');
 		$this->save();
 	}
 }

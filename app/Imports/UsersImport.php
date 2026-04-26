@@ -14,19 +14,11 @@ use App\Models\Event;
 
 class UsersImport implements ToCollection
 {
-	private int $idRayon;
-
-	public function __construct(int $idRayon)
-	{
-		$this->idRayon = $idRayon;
-	}
+	private const RAYON_BASE_ID = 1;
 
 	public function collection(Collection $rows)
 	{
-		// L'import est conçu pour alimenter le rayon de base uniquement.
-		// La répartition dans les rayons événementiels se fait via syncProduitsDepuisEvents()
-		// lors de la création ou modification d'un rayon.
-		$rayon    = Rayon::with('boutique')->findOrFail($this->idRayon);
+		$rayon    = Rayon::with('boutique')->findOrFail(self::RAYON_BASE_ID);
 		$boutique = $rayon->boutique;
 
 		$produitsImportesIds = [];
@@ -74,7 +66,7 @@ class UsersImport implements ToCollection
 			$live        = strtolower(trim($row[6] ?? '')) === 'oui';
 			$expedition  = strtolower($forme->nom_forme) === 'mini';
 
-			// ── Thème (optionnel, indicateur de tri sur le produit) ────────
+			// ── Thème (optionnel) ──────────────────────────────────────────
 			$nomTheme = trim($row[7] ?? '');
 			$idTheme  = null;
 			if ($nomTheme !== '') {
@@ -86,9 +78,6 @@ class UsersImport implements ToCollection
 			}
 
 			// ── Events (optionnels, séparés par des virgules) ─────────────
-			// On lit et on enregistre les events du produit.
-			// Mais on ne filtre PAS et on ne propage PAS ici —
-			// la propagation est gérée par syncProduitsDepuisEvents() au niveau des rayons.
 			$eventIds  = [];
 			$nomEvents = trim($row[8] ?? '');
 			if ($nomEvents !== '') {
@@ -121,15 +110,15 @@ class UsersImport implements ToCollection
 				]
 			);
 
-			// Synchroniser les events du produit (pour que les rayons puissent s'en servir)
+			// Synchroniser les events du produit
 			if (!empty($eventIds)) {
 				$produit->events()->sync($eventIds);
 			} else {
 				$produit->events()->detach();
 			}
 
-			// Lier uniquement au rayon d'import (le rayon Base)
-			$produit->rayons()->syncWithoutDetaching([$this->idRayon]);
+			// Lier uniquement au rayon Base
+			$produit->rayons()->syncWithoutDetaching([self::RAYON_BASE_ID]);
 
 			$produitsImportesIds[] = $produit->id_produit;
 		}
@@ -141,7 +130,7 @@ class UsersImport implements ToCollection
 			$rayon->produits()->detach($aDetacher);
 		}
 
-		// ── Mise à jour du stock du rayon Base et de la boutique ──────────
+		// ── Mise à jour du stock ───────────────────────────────────────────
 		$rayon->recalculerStock();
 		$boutique->recalculerStock();
 	}

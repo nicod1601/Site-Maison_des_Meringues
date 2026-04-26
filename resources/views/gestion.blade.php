@@ -39,57 +39,38 @@
 			</div>
 
 			{{-- Import fichier --}}
-			<div class="card">
-				<div class="card__body card--flex-column">
-					<p class="card__tag">Importer un fichier</p>
-					<form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data" id="import-form">
-						@csrf
-						<label for="file-input" class="drop-zone mt-md" id="drop-zone">
-							<div class="drop-zone__icon">📥</div>
-							<div class="drop-zone__label">
-								<strong id="name-file">Choisir un fichier</strong>
-								<span class="hint">.xlsx, .csv</span>
-							</div>
-							<input type="file" id="file-input" name="file" accept=".xlsx,.xls,.csv" hidden>
-						</label>
-						<div id="file-name-badge">
-							<span class="file-icon">📄</span>
-							<span id="file-name-text">fichier.xlsx</span>
-							<span class="remove-file" id="remove-file" title="Retirer le fichier">✕</span>
-						</div>
-						<button type="submit" class="btn btn--primary btn--sm w-full btn-submit-modal">
-							↑ Importer
-						</button>
-					</form>
-				</div>
-			</div>
-
-			{{-- Sélection rayon import --}}
-			<div class="card">
-				<div class="card__body card--flex-column" style="gap:var(--space-lg);">
-					<p class="card__tag">Sélectionner le Rayon</p>
-					<div class="form-group form-group--no-margin">
-						<label class="form-label" for="type-select">Rayon d'import</label>
-						<select id="type-select" name="id_rayon" class="form-select" form="import-form">
-							<option value="-1">Sélectionner un rayon</option>
-							@foreach($rayons as $rayon)
-								<option value="{{ $rayon->id_rayon }}">
-									{{ $rayon->nom_rayon }}
-								</option>
-							@endforeach
-						</select>
-					</div>
-					<div class="flex gap-sm flex-spacer">
-						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvrayon" title="Nouveau Rayon">
-							➕ Rayon
-						</button>
-						{{-- ✅ Corrigé : bouton Thème remplacé par bouton Event --}}
-						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvevent" title="Nouvel Event">
-							🎉 Event
-						</button>
-					</div>
-				</div>
-			</div>
+            <div class="card">
+                <div class="card__body card--flex-column">
+                    <p class="card__tag">Importer un fichier</p>
+                    <form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data" id="import-form">
+                        @csrf
+                        <label for="file-input" class="drop-zone mt-md" id="drop-zone">
+                            <div class="drop-zone__icon">📥</div>
+                            <div class="drop-zone__label">
+                                <strong id="name-file">Choisir un fichier</strong>
+                                <span class="hint">.xlsx, .csv</span>
+                            </div>
+                            <input type="file" id="file-input" name="file" accept=".xlsx,.xls,.csv" hidden>
+                        </label>
+                        <div id="file-name-badge">
+                            <span class="file-icon">📄</span>
+                            <span id="file-name-text">fichier.xlsx</span>
+                            <span class="remove-file" id="remove-file" title="Retirer le fichier">✕</span>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--sm w-full btn-submit-modal">
+                            ↑ Importer
+                        </button>
+                    </form>
+                    <div class="flex gap-sm flex-spacer">
+                        <button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvrayon" title="Nouveau Rayon">
+                            ➕ Rayon
+                        </button>
+                        <button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvevent" title="Nouvel Event">
+                            🎉 Event
+                        </button>
+                    </div>
+                </div>
+            </div>
 
 		</div>
 
@@ -185,7 +166,7 @@
 								</td>
 
 								<td>
-									<span class="chip">{{ $produit->formeCondi->forme->nom_forme ?? '—' }}</span>
+									<span class="chip">{{ $produit->forme_condi->forme->nom_forme ?? '—' }}</span>
 								</td>
 
 								<td>
@@ -841,12 +822,10 @@
 	});
 
 	// ── Validation import ──
-	const typeSelect = document.getElementById('type-select');
 	const submitBtn  = document.getElementById('import-form').querySelector('button[type="submit"]');
 	function updateSubmitState() {
-		submitBtn.disabled = !(typeSelect.value !== '-1' && inputFichier.files.length > 0);
-	}
-	typeSelect.addEventListener('change', updateSubmitState);
+        submitBtn.disabled = !(inputFichier.files.length > 0);
+    }
 	inputFichier.addEventListener('change', updateSubmitState);
 	removeBtn.addEventListener('click', () => setTimeout(updateSubmitState, 10));
 	updateSubmitState();
