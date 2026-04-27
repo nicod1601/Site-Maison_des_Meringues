@@ -34,11 +34,10 @@ class GestionController extends Controller
 
 		$query = Produit::with([
 			'parfum',
-			'forme_condi.forme',
-			'forme_condi.conditionnement',
+			'forme.forme_condis.conditionnement',
 			'rayons',
 			'theme',
-			'events', // ✅ Ajouté : pour afficher les events du produit si besoin
+			'events',
 		]);
 
 		if ($rayonId && $rayonId !== '-1') {

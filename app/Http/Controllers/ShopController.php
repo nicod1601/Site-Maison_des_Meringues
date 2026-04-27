@@ -13,11 +13,11 @@ class ShopController extends Controller
 	/**
 	 * Page principale de la boutique.
 	 *
-	 * URL : /boutique/{id_boutique}
+	 * URL : /shop/{id_boutique}
 	 * Paramètres GET optionnels :
 	 *   - rayon  : id_rayon  → filtre les produits à un seul rayon
 	 *   - theme  : id_theme  → filtre par thème (dans le rayon sélectionné)
-	 *   - filtre : nouveaute | emporter | expedition | live
+	 *   - filtre : nouveaute | emporter | expedition | dispo
 	 *   - tri    : prix_asc | prix_desc | nom_asc | nouveautes
 	 */
 	public function index(Request $request, int $id_boutique)
@@ -41,11 +41,10 @@ class ShopController extends Controller
 		// ── 4. Construction de la requête produits ────────────────
 		$query = Produit::with([
 				'theme',
-				'forme_condi.forme',
-				'forme_condi.conditionnement',
+				'forme.forme_condis.conditionnement', // ✅ chemin correct via forme
 				'parfum',
 			])
-			->where('live', true); // On n'affiche que les produits actifs
+			->where('live', true);
 
 		// Filtre par rayon
 		if ($rayonActif) {
@@ -80,18 +79,8 @@ class ShopController extends Controller
 				break;
 		}
 
-		// Tri
+		// Tri SQL (sauf prix, géré en PHP après le get())
 		switch ($request->tri) {
-			case 'prix_asc':
-				$query->join('forme_condi as fc_tri', 'produit.id_forme_condi', '=', 'fc_tri.id_forme_condi')
-					  ->orderBy('fc_tri.prix', 'asc')
-					  ->select('produit.*');
-				break;
-			case 'prix_desc':
-				$query->join('forme_condi as fc_tri', 'produit.id_forme_condi', '=', 'fc_tri.id_forme_condi')
-					  ->orderBy('fc_tri.prix', 'desc')
-					  ->select('produit.*');
-				break;
 			case 'nom_asc':
 				$query->orderBy('nom_produit', 'asc');
 				break;
@@ -103,16 +92,22 @@ class ShopController extends Controller
 		}
 
 		$produits = $query->get();
+
+		// ✅ Tri par prix en PHP (le prix vient du premier forme_condi de la forme)
+		// produit.id_forme_condi n'existe pas → on trie après le get()
+		if (in_array($request->tri, ['prix_asc', 'prix_desc'])) {
+			$produits = $produits->sortBy(
+				fn($p) => $p->forme?->forme_condis->first()?->prix ?? PHP_INT_MAX,
+				SORT_REGULAR,
+				$request->tri === 'prix_desc'
+			)->values();
+		}
+
 		$totalProduits = $produits->count();
 
 		// ── 5. Regroupement par thème ─────────────────────────────
-		// On groupe les produits récupérés par thème pour l'affichage
-		// Les produits sans thème apparaissent dans un groupe "Autres"
-		$produitsParTheme = $produits->groupBy(fn($p) =>
-			$p->id_theme ?? 0
-		);
+		$produitsParTheme = $produits->groupBy(fn($p) => $p->id_theme ?? 0);
 
-		// On construit la liste des thèmes à afficher dans l'ordre
 		$themesAffiches = collect();
 
 		// D'abord les produits avec thème (triés par nom_theme)
@@ -129,11 +124,11 @@ class ShopController extends Controller
 		$sanTheme = $produitsParTheme->get(0, collect());
 		if ($sanTheme->isNotEmpty()) {
 			$themesAffiches->push((object)[
-				'id_theme'         => null,
-				'nom_theme'        => 'Autres créations',
-				'icone'            => null,
-				'couleur'          => null,
-				'produits_affiches'=> $sanTheme,
+				'id_theme'          => null,
+				'nom_theme'         => 'Autres créations',
+				'icone'             => null,
+				'couleur'           => null,
+				'produits_affiches' => $sanTheme,
 			]);
 		}
 

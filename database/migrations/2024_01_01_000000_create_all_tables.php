@@ -78,9 +78,8 @@ return new class extends Migration
 		Schema::create('produit', function (Blueprint $table) {
 			$table->increments('id_produit');
 			$table->string('nom_produit');
-			$table->unsignedInteger('id_forme_condi');
+			$table->unsignedInteger('id_forme');
 			$table->unsignedInteger('id_parfum');
-			// Thème optionnel : sert uniquement au tri/filtrage des produits
 			$table->unsignedInteger('id_theme')->nullable();
 			$table->text('description')->nullable();
 			$table->integer('quantite')->default(0);
@@ -89,7 +88,7 @@ return new class extends Migration
 			$table->boolean('dispo_emporter')->default(true);
 			$table->boolean('dispo_expedition')->default(true);
 
-			$table->foreign('id_forme_condi')->references('id_forme_condi')->on('forme_condi')->onDelete('restrict');
+			$table->foreign('id_forme')->references('id_forme')->on('forme')->onDelete('restrict');
 			$table->foreign('id_parfum')->references('id_parfum')->on('parfum')->onDelete('restrict');
 			$table->foreign('id_theme')->references('id_theme')->on('theme')->onDelete('set null');
 		});

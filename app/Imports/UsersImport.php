@@ -44,13 +44,6 @@ class UsersImport implements ToCollection
 			$forme = $formesCache[$nomForme];
 			if (!$forme) continue;
 
-			// ── Forme_Condi ────────────────────────────────────────────────
-			if (!isset($formeCondiCache[$forme->id_forme])) {
-				$formeCondiCache[$forme->id_forme] = Forme_Condi::where('id_forme', $forme->id_forme)->first();
-			}
-			$formeCondi = $formeCondiCache[$forme->id_forme];
-			if (!$formeCondi) continue;
-
 			// ── Parfum ─────────────────────────────────────────────────────
 			$nomParfum = trim($row[2] ?? '');
 			if (!isset($parfumsCache[$nomParfum])) {
@@ -96,7 +89,7 @@ class UsersImport implements ToCollection
 			$produit = Produit::updateOrCreate(
 				[
 					'nom_produit'    => $nomProduit,
-					'id_forme_condi' => $formeCondi->id_forme_condi,
+					'id_forme' => $forme->id_forme,
 					'id_parfum'      => $parfum->id_parfum,
 				],
 				[

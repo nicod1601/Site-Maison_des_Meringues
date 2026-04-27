@@ -184,17 +184,17 @@
 								</td>
 
 								<td>
-									<span class="chip">{{ $produit->forme_condi->forme->nom_forme ?? '—' }}</span>
+									<span class="chip">{{ $produit->forme->nom_forme ?? '—' }}</span>
 								</td>
 
 								<td>
-									@foreach($produit->tous_conditionnements() as $fc)
-										<span class="chip">{{ $fc->conditionnement->type ?? '—'}}</span>
+									@foreach($produit->forme->forme_condis as $fc)
+										<span class="chip">{{ $fc->conditionnement->type ?? '—' }}</span>
 									@endforeach
 								</td>
 
 								<td>
-									@foreach($produit->tous_conditionnements() as $fc)
+									@foreach($produit->forme->forme_condis as $fc)
 										<span class="chip">{{ $fc->prix ?? '—' }} €</span>
 									@endforeach
 								</td>

@@ -8,7 +8,7 @@
 </head>
 <body>
 
-{{-- ── NAVBAR (identique aux autres pages) ────────────────── --}}
+{{-- ── NAVBAR ──────────────────────────────────────────────── --}}
 <nav class="navbar">
 	<div class="navbar__inner">
 
@@ -64,7 +64,7 @@
 </nav>
 
 
-{{-- ── HERO BOUTIQUE (remplace le page-header standard) ──── --}}
+{{-- ── HERO BOUTIQUE ───────────────────────────────────────── --}}
 <div class="boutique-hero">
 	<div class="boutique-hero__inner">
 		<p class="boutique-hero__eyebrow">Nos créations</p>
@@ -78,12 +78,11 @@
 		</p>
 	</div>
 
-    {{-- ── VÉRIFICATION RAYONS ACTIFS ──────────────────────── --}}
+	{{-- ── VÉRIFICATION RAYONS ACTIFS ──────────────────────── --}}
 	@php
-		$rayonsActifs = $rayons->filter(fn($r) => $r->islive());
+		$rayonsActifs      = $rayons->filter(fn($r) => $r->islive());
 		$rayonsActifsCount = $rayonsActifs->count();
 
-		// Si 1 seul rayon actif et aucun rayon sélectionné, le sélectionner automatiquement
 		$rayonSelectionne = request('rayon');
 		if ($rayonsActifsCount === 1 && !$rayonSelectionne) {
 			$rayonSelectionne = $rayonsActifs->first()->id_rayon;
@@ -93,17 +92,15 @@
 	{{-- ── NAVIGATION DES RAYONS ───────────────────────────── --}}
 	<nav class="rayon-nav" aria-label="Rayons de la boutique">
 		<div class="rayon-nav__inner">
-
 			@foreach($rayons as $rayon)
 				@if($rayon->islive())
 					<a href="{{ route('shop', ['id_boutique' => $boutique->id_boutique, 'rayon' => $rayon->id_rayon]) }}"
-					class="rayon-nav__item {{ $rayonSelectionne == $rayon->id_rayon ? 'active' : '' }}">
+					   class="rayon-nav__item {{ $rayonSelectionne == $rayon->id_rayon ? 'active' : '' }}">
 						{{ $rayon->nom_rayon }}
 						<span class="rayon-nav__count">{{ $rayon->produits_count }}</span>
 					</a>
 				@endif
 			@endforeach
-
 		</div>
 	</nav>
 </div>
@@ -111,7 +108,6 @@
 
 {{-- ── CORPS ───────────────────────────────────────────────── --}}
 <main class="boutique-body" id="boutique-contenu">
-
 
 	@if($rayonsActifsCount === 0)
 		{{-- Aucun rayon actif --}}
@@ -121,205 +117,200 @@
 			<p class="boutique-empty__text">Merci de patienter pour l'ajout des produits</p>
 		</div>
 	@else
-		{{-- Au moins un rayon actif --}}
 
-	{{-- ── BARRE D'OUTILS ─────────────────────────────────── --}}
-	@php
-		$baseParams = array_filter([
-			'id_boutique' => $boutique->id_boutique,
-			'rayon'       => $rayonSelectionne,
-			'theme'       => request('theme'),
-			'tri'         => request('tri'),
-		]);
-	@endphp
+		{{-- ── BARRE D'OUTILS ─────────────────────────────────── --}}
+		<div class="boutique-toolbar">
+			<div class="boutique-toolbar__left">
+				<span class="boutique-toolbar__count">
+					{{ $totalProduits }} produit{{ $totalProduits > 1 ? 's' : '' }}
+					@if($rayonActif)
+						dans <strong>{{ $rayonActif->nom_rayon }}</strong>
+					@endif
+				</span>
 
-	<div class="boutique-toolbar">
-		<div class="boutique-toolbar__left">
-
-			<span class="boutique-toolbar__count">
-				{{ $totalProduits }} produit{{ $totalProduits > 1 ? 's' : '' }}
-				@if($rayonActif)
-					dans <strong>{{ $rayonActif->nom_rayon }}</strong>
-				@endif
-			</span>
-
-
-			<div class="boutique-view-toggle" role="group" aria-label="Mode d'affichage">
-				<button class="boutique-view-btn active" id="btn-grille"
-						aria-label="Vue grille" onclick="switchView('grille')">⊞</button>
-				<button class="boutique-view-btn" id="btn-liste"
-						aria-label="Vue liste"  onclick="switchView('liste')">☰</button>
+				<div class="boutique-view-toggle" role="group" aria-label="Mode d'affichage">
+					<button class="boutique-view-btn active" id="btn-grille"
+							aria-label="Vue grille" onclick="switchView('grille')">⊞</button>
+					<button class="boutique-view-btn" id="btn-liste"
+							aria-label="Vue liste"  onclick="switchView('liste')">☰</button>
+				</div>
 			</div>
 		</div>
-	</div>
-	{{-- /boutique-toolbar --}}
+		{{-- /boutique-toolbar --}}
 
 
-	{{-- ── SECTIONS PAR THÈME ──────────────────────────────── --}}
+		{{-- ── SECTIONS PAR THÈME ──────────────────────────────── --}}
+		@forelse($themesAffiches as $themeIndex => $theme)
 
-	@forelse($themesAffiches as $themeIndex => $theme)
+			@if($themeIndex > 0)
+				<div class="theme-divider" aria-hidden="true">
+					<span class="theme-divider__icon">✦</span>
+				</div>
+			@endif
 
-		@if($themeIndex > 0)
-		<div class="theme-divider" aria-hidden="true">
-			<span class="theme-divider__icon">✦</span>
-		</div>
-		@endif
+			<section class="theme-section"
+					 id="theme-{{ $theme->id_theme ?? 'autres' }}"
+					 aria-labelledby="titre-theme-{{ $theme->id_theme ?? 'autres' }}">
 
-		<section class="theme-section"
-				 id="theme-{{ $theme->id_theme ?? 'autres' }}"
-				 aria-labelledby="titre-theme-{{ $theme->id_theme ?? 'autres' }}">
-
-			{{-- En-tête du thème --}}
-			<div class="theme-header">
-				<div class="theme-header__left">
-					<p class="theme-header__eyebrow">Thème</p>
-					<h2 class="theme-header__title" id="titre-theme-{{ $theme->id_theme ?? 'autres' }}">
-						@if($theme->icone)
-							<span aria-hidden="true" style="margin-right:.3em;">{{ $theme->icone }}</span>
-						@endif
-						<span @if($theme->couleur) style="color:{{ $theme->couleur }}" @endif>
-							{{ $theme->nom_theme }}
+				{{-- En-tête du thème --}}
+				<div class="theme-header">
+					<div class="theme-header__left">
+						<p class="theme-header__eyebrow">Thème</p>
+						<h2 class="theme-header__title" id="titre-theme-{{ $theme->id_theme ?? 'autres' }}">
+							@if($theme->icone)
+								<span aria-hidden="true" style="margin-right:.3em;">{{ $theme->icone }}</span>
+							@endif
+							<span @if($theme->couleur) style="color:{{ $theme->couleur }}" @endif>
+								{{ $theme->nom_theme }}
+							</span>
+						</h2>
+						<div class="theme-header__ornament" aria-hidden="true">
+							<span class="theme-header__ornament-line"
+								@if($theme->couleur) style="background:{{ $theme->couleur }}" @endif></span>
+							<span class="theme-header__ornament-dot"
+								@if($theme->couleur) style="background:{{ $theme->couleur }}" @endif></span>
+							<span class="theme-header__ornament-line"
+								@if($theme->couleur) style="background:{{ $theme->couleur }}" @endif></span>
+						</div>
+					</div>
+					<div class="theme-header__action">
+						<span class="badge badge--cream">
+							{{ $theme->produits_affiches->count() }}
+							produit{{ $theme->produits_affiches->count() > 1 ? 's' : '' }}
 						</span>
-					</h2>
-					<div class="theme-header__ornament" aria-hidden="true">
-						<span class="theme-header__ornament-line"
-							@if($theme->couleur) style="background:{{ $theme->couleur }}" @endif></span>
-						<span class="theme-header__ornament-dot"
-							@if($theme->couleur) style="background:{{ $theme->couleur }}" @endif></span>
-						<span class="theme-header__ornament-line"
-							@if($theme->couleur) style="background:{{ $theme->couleur }}" @endif></span>
 					</div>
 				</div>
-				<div class="theme-header__action">
-					<span class="badge badge--cream">
-						{{ $theme->produits_affiches->count() }}
-						produit{{ $theme->produits_affiches->count() > 1 ? 's' : '' }}
-					</span>
-				</div>
-			</div>
 
-			{{-- Grille produits --}}
-			<div class="products-grid" id="grille-theme-{{ $theme->id_theme ?? 'autres' }}">
+				{{-- Grille produits --}}
+				<div class="products-grid" id="grille-theme-{{ $theme->id_theme ?? 'autres' }}">
 
-				@foreach($theme->produits_affiches as $produit)
-				<article class="boutique-card" aria-label="{{ $produit->nom_produit }}">
+					@foreach($theme->produits_affiches as $produit)
+					{{-- ✅ On récupère le premier forme_condi de la forme du produit --}}
+					@php $fc = $produit->forme?->forme_condis->first() @endphp
 
-					{{-- Placeholder image --}}
-					<div class="boutique-card__img-wrap">
-						<div class="boutique-card__img-placeholder" aria-hidden="true"
-							@if($theme->couleur)
-								style="background:linear-gradient(135deg,{{ $theme->couleur }}22 0%,{{ $theme->couleur }}44 100%);"
-							@endif>
-							{{ $theme->icone ?? '🍬' }}
-						</div>
-						<div class="boutique-card__badges">
-							@if($produit->nouveaute)
-								<span class="badge badge--new">Nouveau</span>
-							@endif
-							@if($produit->quantite == 0)
-								<span class="badge badge--close">Épuisé</span>
-							@endif
-						</div>
-					</div>
+					<article class="boutique-card" aria-label="{{ $produit->nom_produit }}">
 
-					{{-- Corps --}}
-					<div class="boutique-card__body">
-
-						@if($produit->parfum)
-							<p class="boutique-card__theme">{{ $produit->parfum->nom_parfum }}</p>
-						@endif
-
-						<h3 class="boutique-card__name">{{ $produit->nom_produit }}</h3>
-
-						@if($produit->forme_condi)
-							<p class="boutique-card__desc">
-								@if($produit->forme_condi->forme){{ $produit->forme_condi->forme->nom_forme }}@endif
-								@if($produit->forme_condi->conditionnement) &mdash; {{ $produit->forme_condi->conditionnement->type }}@endif
-							</p>
-						@endif
-
-						@if($produit->description)
-							<p class="boutique-card__desc" style="margin-top:.2rem;">
-								{{ Str::limit($produit->description, 80) }}
-							</p>
-						@endif
-
-						<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:var(--space-sm);">
-							@if($produit->dispo_emporter)
-								<span class="badge badge--cream" style="font-size:10px;">🛍 Emporter</span>
-							@endif
-							@if($produit->dispo_expedition)
-								<span class="badge badge--cream" style="font-size:10px;">📦 Expédition</span>
-							@endif
-						</div>
-
-						<div class="boutique-card__footer">
-							<div>
-								@if($produit->forme_condi)
-									<p class="boutique-card__price">
-										{{ number_format($produit->forme_condi->prix, 2, ',', ' ') }} €
-									</p>
-								@else
-									<p class="boutique-card__price" style="color:var(--color-text-muted);">— €</p>
+						{{-- Placeholder image --}}
+						<div class="boutique-card__img-wrap">
+							<div class="boutique-card__img-placeholder" aria-hidden="true"
+								@if($theme->couleur)
+									style="background:linear-gradient(135deg,{{ $theme->couleur }}22 0%,{{ $theme->couleur }}44 100%);"
+								@endif>
+								{{ $theme->icone ?? '🍬' }}
+							</div>
+							<div class="boutique-card__badges">
+								@if($produit->nouveaute)
+									<span class="badge badge--new">Nouveau</span>
 								@endif
-								@if($produit->quantite > 0)
-									<p class="boutique-card__price-old">{{ $produit->quantite }} en stock</p>
-								@else
-									<p class="boutique-card__price-old" style="color:#c0392b;">Épuisé</p>
+								@if($produit->quantite == 0)
+									<span class="badge badge--close">Épuisé</span>
+								@endif
+							</div>
+						</div>
+
+						{{-- Corps --}}
+						<div class="boutique-card__body">
+
+							@if($produit->parfum)
+								<p class="boutique-card__theme">{{ $produit->parfum->nom_parfum }}</p>
+							@endif
+
+							<h3 class="boutique-card__name">{{ $produit->nom_produit }}</h3>
+
+							{{-- ✅ Description : forme + conditionnement via $fc --}}
+							@if($produit->forme)
+								<p class="boutique-card__desc">
+									{{ $produit->forme->nom_forme }}
+									@if($fc?->conditionnement)
+										&mdash; {{ $fc->conditionnement->type }}
+									@endif
+								</p>
+							@endif
+
+							@if($produit->description)
+								<p class="boutique-card__desc" style="margin-top:.2rem;">
+									{{ Str::limit($produit->description, 80) }}
+								</p>
+							@endif
+
+							<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:var(--space-sm);">
+								@if($produit->dispo_emporter)
+									<span class="badge badge--cream" style="font-size:10px;">🛍 Emporter</span>
+								@endif
+								@if($produit->dispo_expedition)
+									<span class="badge badge--cream" style="font-size:10px;">📦 Expédition</span>
 								@endif
 							</div>
 
-							@if($produit->quantite > 0)
-								<button class="boutique-card__add-btn"
-										onclick="voirProduit({{ $produit->id_produit }})"
-										aria-label="Voir {{ $produit->nom_produit }}"
-										title="Voir le produit">→</button>
-							@else
-								<span class="boutique-card__add-btn"
-									  style="background:var(--color-border);cursor:not-allowed;"
-									  aria-disabled="true">✕</span>
-							@endif
+							<div class="boutique-card__footer">
+								<div>
+									{{-- ✅ Prix via $fc --}}
+									@if($fc)
+										<p class="boutique-card__price">
+											{{ number_format($fc->prix, 2, ',', ' ') }} €
+										</p>
+									@else
+										<p class="boutique-card__price" style="color:var(--color-text-muted);">— €</p>
+									@endif
+
+									@if($produit->quantite > 0)
+										<p class="boutique-card__price-old">{{ $produit->quantite }} en stock</p>
+									@else
+										<p class="boutique-card__price-old" style="color:#c0392b;">Épuisé</p>
+									@endif
+								</div>
+
+								@if($produit->quantite > 0)
+									<button class="boutique-card__add-btn"
+											onclick="voirProduit({{ $produit->id_produit }})"
+											aria-label="Voir {{ $produit->nom_produit }}"
+											title="Voir le produit">→</button>
+								@else
+									<span class="boutique-card__add-btn"
+										  style="background:var(--color-border);cursor:not-allowed;"
+										  aria-disabled="true">✕</span>
+								@endif
+							</div>
+
 						</div>
+					</article>
+					@endforeach
 
-					</div>
-				</article>
-				@endforeach
+				</div>
+				{{-- /products-grid --}}
 
+			</section>
+
+		@empty
+
+			<div class="boutique-empty">
+				<div class="boutique-empty__icon">🎂</div>
+				<h2 class="boutique-empty__title">Aucun produit disponible</h2>
+				<p>
+					@if(request()->hasAny(['filtre', 'theme', 'rayon']))
+						Aucun produit ne correspond à ces filtres.<br>
+						<a href="{{ route('shop', $boutique->id_boutique) }}"
+						   class="btn btn--ghost btn--sm mt-md">Réinitialiser les filtres</a>
+					@else
+						Notre boutique est en cours de préparation. Revenez bientôt&nbsp;!
+					@endif
+				</p>
 			</div>
-			{{-- /products-grid --}}
 
-		</section>
-
-	@empty
-
-		<div class="boutique-empty">
-			<div class="boutique-empty__icon">🎂</div>
-			<h2 class="boutique-empty__title">Aucun produit disponible</h2>
-			<p>
-				@if(request()->hasAny(['filtre', 'theme', 'rayon']))
-					Aucun produit ne correspond à ces filtres.<br>
-					<a href="{{ route('shop', $boutique->id_boutique) }}"
-					   class="btn btn--ghost btn--sm mt-md">Réinitialiser les filtres</a>
-				@else
-					Notre boutique est en cours de préparation. Revenez bientôt&nbsp;!
-				@endif
-			</p>
-		</div>
-
-	@endforelse
+		@endforelse
 
 	@endif {{-- Fin vérification rayons actifs --}}
 
 </main>
 
 
-{{-- ── FOOTER (même include que les autres pages) ─────────── --}}
+{{-- ── FOOTER ──────────────────────────────────────────────── --}}
 @include('templet.footer')
 
 
 {{-- ── SCRIPTS ─────────────────────────────────────────────── --}}
 <script>
-	// Navbar dropdown (identique au header)
+	// Navbar dropdown
 	const profileBtn = document.querySelector('.navbar__profile');
 	const dropdown   = document.querySelector('.navbar__dropdown');
 	profileBtn.addEventListener('click', function () {

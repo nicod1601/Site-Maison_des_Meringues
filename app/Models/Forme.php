@@ -16,4 +16,14 @@ class Forme extends Model
         'id_forme',
         'nom_forme',
 	];
+
+    public function forme_condis() {
+        return $this->hasMany(Forme_Condi::class, 'id_forme');
+    }
+
+    // La méthode migre ici
+    public function tous_conditionnements() {
+        return $this->hasMany(Forme_Condi::class, 'id_forme')
+                    ->with('conditionnement');
+    }
 }
