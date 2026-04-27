@@ -6,10 +6,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccueilController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\CreationController;
+use App\Http\Controllers\ShopController;
+
+// Menu Accueil
 
 Route::get('/',        [AccueilController::class, 'index'])->name('index');
 Route::get('/news',    [NewsController::class,    'index'])->name('news');
 Route::get('/gestion', [GestionController::class, 'index'])->name('gestion');
+Route::get('/shop/{id_boutique}', [ShopController::class, 'index'])->name('shop');
 
 // Import
 Route::post('/import/excel', [ImportController::class, 'import'])->name('import.excel');
@@ -48,3 +52,7 @@ Route::delete('/gestion/parfum/{id}', [CreationController::class, 'destroyParfum
 // Événements
 Route::post  ('/gestion/event',      [CreationController::class, 'nvevent'])      ->name('nvevent');
 Route::delete('/gestion/event/{id}', [CreationController::class, 'destroyEvent']) ->name('event.destroy');
+
+// Shop
+Route::get('/boutique/{id_boutique}', [ShopController::class, 'index'])->name('shop.index');
+
