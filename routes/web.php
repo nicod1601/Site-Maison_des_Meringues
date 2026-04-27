@@ -28,6 +28,7 @@ Route::patch ('/gestion/produit/{id}/live', [CreationController::class, 'toggleL
 Route::post  ('/gestion/rayon',        [CreationController::class, 'nvrayon'])        ->name('nvrayon');
 Route::delete('/gestion/rayon/{id}',   [CreationController::class, 'destroyRayon'])   ->name('rayon.destroy');
 Route::put('/gestion/rayon/{id}', [CreationController::class, 'updateRayon'])->name('rayon.update');
+Route::patch('/gestion/rayon/{id}/live', [CreationController::class, 'toggleLiveRayon'])->name('rayon.live');
 
 // Thèmes
 Route::post  ('/gestion/theme',        [CreationController::class, 'nvtheme'])        ->name('nvtheme');

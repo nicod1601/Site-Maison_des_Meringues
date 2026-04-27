@@ -78,22 +78,30 @@
 		</p>
 	</div>
 
+    {{-- ── VÉRIFICATION RAYONS ACTIFS ──────────────────────── --}}
+	@php
+		$rayonsActifs = $rayons->filter(fn($r) => $r->islive());
+		$rayonsActifsCount = $rayonsActifs->count();
+
+		// Si 1 seul rayon actif et aucun rayon sélectionné, le sélectionner automatiquement
+		$rayonSelectionne = request('rayon');
+		if ($rayonsActifsCount === 1 && !$rayonSelectionne) {
+			$rayonSelectionne = $rayonsActifs->first()->id_rayon;
+		}
+	@endphp
+
 	{{-- ── NAVIGATION DES RAYONS ───────────────────────────── --}}
 	<nav class="rayon-nav" aria-label="Rayons de la boutique">
 		<div class="rayon-nav__inner">
 
-			<a href="{{ route('shop', $boutique->id_boutique) }}"
-			   class="rayon-nav__item {{ !request('rayon') ? 'active' : '' }}">
-				Tous les produits
-				<span class="rayon-nav__count">{{ $totalProduits }}</span>
-			</a>
-
 			@foreach($rayons as $rayon)
-			<a href="{{ route('shop', ['id_boutique' => $boutique->id_boutique, 'rayon' => $rayon->id_rayon]) }}"
-			   class="rayon-nav__item {{ request('rayon') == $rayon->id_rayon ? 'active' : '' }}">
-				{{ $rayon->nom_rayon }}
-				<span class="rayon-nav__count">{{ $rayon->produits_count }}</span>
-			</a>
+				@if($rayon->islive())
+					<a href="{{ route('shop', ['id_boutique' => $boutique->id_boutique, 'rayon' => $rayon->id_rayon]) }}"
+					class="rayon-nav__item {{ $rayonSelectionne == $rayon->id_rayon ? 'active' : '' }}">
+						{{ $rayon->nom_rayon }}
+						<span class="rayon-nav__count">{{ $rayon->produits_count }}</span>
+					</a>
+				@endif
 			@endforeach
 
 		</div>
@@ -104,11 +112,22 @@
 {{-- ── CORPS ───────────────────────────────────────────────── --}}
 <main class="boutique-body" id="boutique-contenu">
 
+
+	@if($rayonsActifsCount === 0)
+		{{-- Aucun rayon actif --}}
+		<div class="boutique-empty">
+			<p class="boutique-empty__icon">⏳</p>
+			<p class="boutique-empty__title">En cours de traitement</p>
+			<p class="boutique-empty__text">Merci de patienter pour l'ajout des produits</p>
+		</div>
+	@else
+		{{-- Au moins un rayon actif --}}
+
 	{{-- ── BARRE D'OUTILS ─────────────────────────────────── --}}
 	@php
 		$baseParams = array_filter([
 			'id_boutique' => $boutique->id_boutique,
-			'rayon'       => request('rayon'),
+			'rayon'       => $rayonSelectionne,
 			'theme'       => request('theme'),
 			'tri'         => request('tri'),
 		]);
@@ -124,49 +143,6 @@
 				@endif
 			</span>
 
-			{{-- Filtres rapides --}}
-			<div class="boutique-toolbar__filters" role="group" aria-label="Filtres">
-				<a href="{{ route('shop', array_diff_key($baseParams, ['filtre' => ''])) }}"
-				   class="boutique-filter-chip {{ !request('filtre') ? 'active' : '' }}">Tous</a>
-				<a href="{{ route('shop', array_merge($baseParams, ['filtre' => 'nouveaute'])) }}"
-				   class="boutique-filter-chip {{ request('filtre') == 'nouveaute' ? 'active' : '' }}">Nouveautés</a>
-				<a href="{{ route('shop', array_merge($baseParams, ['filtre' => 'emporter'])) }}"
-				   class="boutique-filter-chip {{ request('filtre') == 'emporter' ? 'active' : '' }}">À emporter</a>
-				<a href="{{ route('shop', array_merge($baseParams, ['filtre' => 'expedition'])) }}"
-				   class="boutique-filter-chip {{ request('filtre') == 'expedition' ? 'active' : '' }}">Expédition</a>
-				<a href="{{ route('shop', array_merge($baseParams, ['filtre' => 'dispo'])) }}"
-				   class="boutique-filter-chip {{ request('filtre') == 'dispo' ? 'active' : '' }}">En stock</a>
-			</div>
-
-			{{-- Filtre par thème --}}
-			@if($themesDisponibles->isNotEmpty())
-			<div class="boutique-toolbar__filters" role="group" aria-label="Filtrer par thème">
-				<span class="boutique-toolbar__count" style="margin-right:4px;">Thème :</span>
-				@foreach($themesDisponibles as $th)
-				<a href="{{ route('shop', array_merge($baseParams, ['theme' => $th->id_theme])) }}"
-				   class="boutique-filter-chip {{ request('theme') == $th->id_theme ? 'active' : '' }}"
-				   @if($th->couleur)
-					   style="border-color:{{ $th->couleur }};{{ request('theme') == $th->id_theme ? 'background:' . $th->couleur . '22;color:' . $th->couleur . ';' : '' }}"
-				   @endif>
-					@if($th->icone)<span aria-hidden="true">{{ $th->icone }}</span> @endif
-					{{ $th->nom_theme }}
-				</a>
-				@endforeach
-			</div>
-			@endif
-
-		</div>
-
-		<div class="boutique-toolbar__right">
-			<div class="boutique-sort">
-				<label for="tri-select" class="text-small text-muted">Trier par</label>
-				<select id="tri-select" onchange="appliquerTri(this.value)">
-					<option value="nom_asc"    {{ request('tri', 'nom_asc') == 'nom_asc'    ? 'selected' : '' }}>Nom A → Z</option>
-					<option value="prix_asc"   {{ request('tri') == 'prix_asc'   ? 'selected' : '' }}>Prix croissant</option>
-					<option value="prix_desc"  {{ request('tri') == 'prix_desc'  ? 'selected' : '' }}>Prix décroissant</option>
-					<option value="nouveautes" {{ request('tri') == 'nouveautes' ? 'selected' : '' }}>Nouveautés d'abord</option>
-				</select>
-			</div>
 
 			<div class="boutique-view-toggle" role="group" aria-label="Mode d'affichage">
 				<button class="boutique-view-btn active" id="btn-grille"
@@ -331,6 +307,8 @@
 		</div>
 
 	@endforelse
+
+	@endif {{-- Fin vérification rayons actifs --}}
 
 </main>
 

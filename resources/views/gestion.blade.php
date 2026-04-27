@@ -39,38 +39,38 @@
 			</div>
 
 			{{-- Import fichier --}}
-            <div class="card">
-                <div class="card__body card--flex-column">
-                    <p class="card__tag">Importer un fichier</p>
-                    <form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data" id="import-form">
-                        @csrf
-                        <label for="file-input" class="drop-zone mt-md" id="drop-zone">
-                            <div class="drop-zone__icon">📥</div>
-                            <div class="drop-zone__label">
-                                <strong id="name-file">Choisir un fichier</strong>
-                                <span class="hint">.xlsx, .csv</span>
-                            </div>
-                            <input type="file" id="file-input" name="file" accept=".xlsx,.xls,.csv" hidden>
-                        </label>
-                        <div id="file-name-badge">
-                            <span class="file-icon">📄</span>
-                            <span id="file-name-text">fichier.xlsx</span>
-                            <span class="remove-file" id="remove-file" title="Retirer le fichier">✕</span>
-                        </div>
-                        <button type="submit" class="btn btn--primary btn--sm w-full btn-submit-modal">
-                            ↑ Importer
-                        </button>
-                    </form>
-                    <div class="flex gap-sm flex-spacer">
-                        <button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvrayon" title="Nouveau Rayon">
-                            ➕ Rayon
-                        </button>
-                        <button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvevent" title="Nouvel Event">
-                            🎉 Event
-                        </button>
-                    </div>
-                </div>
-            </div>
+			<div class="card">
+				<div class="card__body card--flex-column">
+					<p class="card__tag">Importer un fichier</p>
+					<form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data" id="import-form">
+						@csrf
+						<label for="file-input" class="drop-zone mt-md" id="drop-zone">
+							<div class="drop-zone__icon">📥</div>
+							<div class="drop-zone__label">
+								<strong id="name-file">Choisir un fichier</strong>
+								<span class="hint">.xlsx, .csv</span>
+							</div>
+							<input type="file" id="file-input" name="file" accept=".xlsx,.xls,.csv" hidden>
+						</label>
+						<div id="file-name-badge">
+							<span class="file-icon">📄</span>
+							<span id="file-name-text">fichier.xlsx</span>
+							<span class="remove-file" id="remove-file" title="Retirer le fichier">✕</span>
+						</div>
+						<button type="submit" class="btn btn--primary btn--sm w-full btn-submit-modal">
+							↑ Importer
+						</button>
+					</form>
+					<div class="flex gap-sm flex-spacer">
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvrayon" title="Nouveau Rayon">
+							➕ Rayon
+						</button>
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvevent" title="Nouvel Event">
+							🎉 Event
+						</button>
+					</div>
+				</div>
+			</div>
 
 		</div>
 
@@ -109,12 +109,30 @@
 						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
 						@if($rayonActif)
 							<span class="chip chip--gold">
-								{{-- ✅ Corrigé : ->themes → ->events (un rayon est lié à des events) --}}
 								@foreach($rayonActif->events as $e){{ $e->icone }} @endforeach {{ $rayonActif->nom_rayon }}
 							</span>
 						@endif
 					@endif
+
 					<input type="text" id="search-input" class="form-input form-input--sm" placeholder="Rechercher...">
+
+					@if($rayonId && $rayonId != '-1')
+						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
+						@if($rayonActif)
+							<form action="/gestion/rayon/{{ $rayonActif->id_rayon }}/live" method="POST">
+								@csrf @method('PATCH')
+								<label>
+									<input
+										type="checkbox"
+										name="live_rayon"
+										value="1"
+										{{ $rayonActif->live_rayon ? 'checked' : '' }}
+										onchange="this.form.submit()"
+									> Live
+								</label>
+							</form>
+						@endif
+					@endif
 				</h2>
 				<button class="btn btn--primary btn--sm" id="btn-nvproduit">+ Nouveau produit</button>
 			</div>
@@ -824,8 +842,8 @@
 	// ── Validation import ──
 	const submitBtn  = document.getElementById('import-form').querySelector('button[type="submit"]');
 	function updateSubmitState() {
-        submitBtn.disabled = !(inputFichier.files.length > 0);
-    }
+		submitBtn.disabled = !(inputFichier.files.length > 0);
+	}
 	inputFichier.addEventListener('change', updateSubmitState);
 	removeBtn.addEventListener('click', () => setTimeout(updateSubmitState, 10));
 	updateSubmitState();

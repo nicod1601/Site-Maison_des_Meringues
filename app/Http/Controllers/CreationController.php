@@ -9,7 +9,7 @@ use App\Models\Event;
 use App\Models\Boutique;
 use App\Models\Forme;
 use App\Models\Conditionnement;
-use App\Models\Forme_Condi; // ✅ Corrigé : FormeCondi → Forme_Condi
+use App\Models\Forme_Condi;
 use App\Models\Parfum;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -87,7 +87,6 @@ class CreationController extends Controller
 		$request->validate([
 			'nom_rayon'   => 'required|string|max:255',
 			'id_boutique' => 'required|exists:boutique,id_boutique',
-			// ✅ Corrigé : id_themes → id_events, table theme → event
 			'id_events'   => 'nullable|array',
 			'id_events.*' => 'exists:event,id_event',
 		]);
@@ -96,13 +95,14 @@ class CreationController extends Controller
 			'nom_rayon'         => $request->nom_rayon,
 			'id_boutique'       => $request->id_boutique,
 			'stock_total_rayon' => 0,
+			'live_rayon'        => false,
 		]);
 
 		if ($request->filled('id_events')) {
-			// ✅ Corrigé : themes()->sync → events()->sync
+			//themes()->sync → events()->sync
 			$rayon->events()->sync($request->id_events);
 
-			// ✅ Utilise la méthode du modèle pour lier les produits existants éligibles
+			//méthode du modèle pour lier les produits existants éligibles
 			$rayon->syncProduitsDepuisEvents();
 			$this->recalculerStockBoutique();
 		}
@@ -133,20 +133,16 @@ class CreationController extends Controller
 	{
 		$rayon = Rayon::findOrFail($id);
 
-		// Récupérer les produits avant de détacher
 		$produits = $rayon->produits()->get();
 
-		// Détacher tous les produits de ce rayon
 		$rayon->produits()->detach();
 
-		// Supprimer les produits orphelins (non liés à d'autres rayons)
 		foreach ($produits as $produit) {
 			if ($produit->rayons()->count() === 0) {
 				$produit->delete();
 			}
 		}
 
-		// ✅ Corrigé : themes()->detach() → events()->detach()
 		$rayon->events()->detach();
 		$rayon->delete();
 
@@ -154,6 +150,15 @@ class CreationController extends Controller
 
 		return redirect()->back()->with('success', 'Rayon supprimé.');
 	}
+
+    public function toggleLiveRayon(Request $request, int $id): RedirectResponse
+	{
+		$rayon = Rayon::findOrFail($id);
+		$rayon->live_rayon = $request->boolean('live_rayon');
+		$rayon->save();
+		return redirect()->back();
+	}
+
 
 	// ── THÈMES ───────────────────────────────────────────────────────────
 
@@ -177,8 +182,6 @@ class CreationController extends Controller
 	public function destroyTheme(int $id): RedirectResponse
 	{
 		$theme = Theme::findOrFail($id);
-		// ✅ Supprimé : $theme->rayons()->detach() — la relation rayons() n'existe plus sur Theme
-		// La suppression met null sur produit.id_theme via onDelete('set null') en BDD
 		$theme->delete();
 
 		return redirect()->back()->with('success', 'Thème supprimé.');
