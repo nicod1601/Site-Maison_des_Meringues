@@ -15,7 +15,7 @@ class AccueilController extends Controller
 
 		//images
 		foreach ($produits as $produit) {
-			if ($produit->forme_condi->forme->nom_forme == 'Mini') {
+			if ($produit->forme->nom_forme == 'Mini') {
 				$lien = public_path('fichier/image/meringues/mini/' . $produit->parfum->nom_parfum . '.png');
 				$url = 'fichier/image/meringues/mini/' . $produit->parfum->nom_parfum . '.png';
 			} else {
