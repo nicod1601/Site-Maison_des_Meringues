@@ -10,7 +10,7 @@ use App\Models\Parfum;
 use App\Models\Forme_Condi;
 use App\Models\Rayon;
 use App\Models\Theme;
-use App\Models\Event; // ✅ Ajouté
+use App\Models\Event;
 use Illuminate\Http\Request;
 
 class GestionController extends Controller
@@ -46,7 +46,7 @@ class GestionController extends Controller
 			});
 		}
 
-		$produits    = $query->get();
+		$produits    = Produit::all();
 		$nb_produits = $produits->count();
 
 		$formes           = Forme::all();

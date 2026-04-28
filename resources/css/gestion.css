@@ -6,52 +6,47 @@
 
 /* ── 0. LAYOUT PRINCIPAL & CLASSES UTILITAIRES ────────────── */
 
-/* Layout principal : sidebar + contenu */
 .gestion-layout {
     display: flex;
     gap: 2rem;
     align-items: flex-start;
 }
 
-/* Colonne gauche (sidebar) */
+/* ✅ Sidebar réduite pour laisser plus de place au tableau */
 .gestion-left-panel {
-    flex: 0 0 280px;
-    width: 280px;
-    min-width: 280px;
+    flex: 0 0 240px;
+    min-width: 300px;
 }
 
-/* Alias pour compatibilité */
 .left-column {
-    flex: 0 0 280px;
-    width: 280px;
-    min-width: 280px;
+    flex: 0 0 240px;
+    width: 240px;
+    min-width: 240px;
 }
 
-/* Colonne droite (contenu principal) */
+/* ✅ Panel droit : prend toute la place, scroll horizontal si besoin */
 .gestion-right-panel {
-    flex: 5;
-    min-width: 0;
+    flex: 1;
+    width: 1200px;
+    min-width: 1000px;
+    overflow-x: auto;
 }
 
-/* Cartes avec flex column et hauteur 100% */
 .card--flex-column {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-/* Badges & Chips — styles dynamiques */
 .chip--dynamic-color {
     display: inline-flex;
     align-items: center;
 }
 
-/* Couleur d'icône thème */
 .theme-icon {
     font-size: 1.4rem;
 }
 
-/* Color swatch circulaire */
 .color-swatch {
     display: inline-flex;
     align-items: center;
@@ -66,12 +61,10 @@
     display: inline-block;
 }
 
-/* Conteneur flexible avec auto margin */
 .flex-spacer {
     margin-top: auto;
 }
 
-/* Select avec auto margin */
 .select--right {
     margin-left: auto;
     max-width: 160px;
@@ -79,29 +72,24 @@
     flex-shrink: 0;
 }
 
-/* Tags avec texte normal (break word) */
 .card__tag--wrap {
     white-space: normal;
     word-break: break-word;
     font-size: var(--text-xs);
 }
 
-/* Button dans modal */
 .btn-submit-modal {
     margin-top: 16px;
 }
 
-/* Form group sans margin */
 .form-group--no-margin {
     margin-bottom: 0;
 }
 
-/* Buttons flexible-shrink pour empêcher l'expansion */
 .btn--flex-shrink {
     flex-shrink: 0;
 }
 
-/* Checkbox themes dans modal (multi-checkbox layout) */
 .themes-selector {
     display: flex;
     flex-wrap: wrap;
@@ -128,7 +116,6 @@
     display: none;
 }
 
-/* Preview produits */
 .preview-produits {
     margin-top: var(--space-lg);
     padding: var(--space-md);
@@ -196,7 +183,6 @@
     opacity: 0.65;
 }
 
-/* Badge fichier sélectionné */
 #file-name-badge {
     display: none;
     align-items: center;
@@ -232,13 +218,11 @@
     overflow: hidden;
 }
 
-/* Plus d'air dans les cartes de la sidebar */
 .gestion-left-panel .card__body,
 .left-column .card__body {
     padding: var(--space-xl) var(--space-lg);
 }
 
-/* Stat cards : valeur bien mise en avant */
 .stat-card {
     display: flex;
     flex-direction: column;
@@ -260,7 +244,6 @@
     line-height: 1.3;
 }
 
-/* Tag carte sidebar */
 .gestion-left-panel .card__tag,
 .left-column .card__tag {
     font-size: var(--text-xs);
@@ -274,7 +257,6 @@
     line-height: 1.4;
 }
 
-/* Séparateur aperçu */
 .section-title {
     display: flex;
     align-items: center;
@@ -293,7 +275,6 @@
     background: var(--color-border);
 }
 
-/* Tableau aperçu import */
 .data-table-wrapper {
     overflow-x: auto;
     max-height: 420px;
@@ -329,7 +310,6 @@
 .tab-panel.hidden  { display: none; }
 .tabs-panel.hidden { display: none; }
 
-/* Barre d'outils */
 .data-toolbar {
     display: flex;
     align-items: center;
@@ -348,7 +328,6 @@
     font-weight: 700;
 }
 
-/* Compteur badge dans le titre */
 .data-count {
     display: inline-flex;
     align-items: center;
@@ -369,24 +348,39 @@
 /* ── 4. WRAPPER TABLEAU ──────────────────────────────────── */
 
 .table-wrapper {
-    overflow-x: auto;
+    overflow-x: auto;          /* ✅ scroll horizontal */
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
     box-shadow: var(--shadow-sm);
     background: var(--color-white);
 }
 
-/* Reset des règles globales de style.css */
 .table-wrapper table {
     width: 100%;
+    min-width: 1100px;         /* ✅ largeur minimum — évite l'écrasement */
     border-collapse: collapse;
     table-layout: fixed;
 }
 
+/* ✅ Largeurs de colonnes précises pour le tableau produits */
+.table-wrapper thead th:nth-child(1)  { width: 36px;  } /* # */
+.table-wrapper thead th:nth-child(2)  { width: 72px;  } /* Article */
+.table-wrapper thead th:nth-child(3)  { width: 72px;  } /* Forme */
+.table-wrapper thead th:nth-child(4)  { width: 80px;  } /* Parfum */
+.table-wrapper thead th:nth-child(5)  { width: 120px; } /* Description */
+.table-wrapper thead th:nth-child(6)  { width: 72px;  } /* Rayons */
+.table-wrapper thead th:nth-child(7)  { width: 100px; } /* Thème */
+.table-wrapper thead th:nth-child(8)  { width: 55px;  } /* Stock */
+.table-wrapper thead th:nth-child(9)  { width: 60px;  } /* Nouveauté */
+.table-wrapper thead th:nth-child(10) { width: 60px;  } /* Emporter */
+.table-wrapper thead th:nth-child(11) { width: 65px;  } /* Expédition */
+.table-wrapper thead th:nth-child(12) { width: 55px;  } /* Live */
+.table-wrapper thead th:nth-child(13) { width: 55px;  } /* Actions */
+
 .table-wrapper thead th {
     background: var(--color-cream);
-    padding: 4px 8px;
-    font-size: 0.55rem;
+    padding: 6px 8px;
+    font-size: 0.58rem;
     text-transform: uppercase;
     letter-spacing: 0.07em;
     color: var(--color-text-muted);
@@ -397,26 +391,18 @@
     text-overflow: ellipsis;
 }
 
-/*
- * CORRECTIF CLÉ : vertical-align: middle sur TOUTES les cellules.
- * Quand la colonne Conditionnement ou Prix empile plusieurs chips,
- * la hauteur de ligne augmente. Sans ce correctif, le bouton 🗑️
- * se retrouve en haut de la grande cellule au lieu d'être centré.
- */
 .table-wrapper tbody td {
-    padding: 4px 6px;         /* padding ultra-compact */
-    height: 80px;             /* hauteur mini */
+    padding: 6px 8px;
+    height: 60px;
     border-bottom: 1px solid var(--color-border);
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     color: var(--color-text);
     vertical-align: middle;
-    line-height: 1.1;
+    line-height: 1.2;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Pour les cellules avec plusieurs chips empilés,
-   on laisse la hauteur s'adapter naturellement */
 .table-wrapper tbody td.td-multi {
     height: auto;
     padding: 10px 16px;
@@ -440,14 +426,15 @@
     max-width: 36px;
     font-variant-numeric: tabular-nums;
 }
+.td-namecode {
+    font-weight: 700;
+    color: var(--color-primary);
+}
 .td-name {
     font-weight: 600;
     color: var(--color-primary-dark);
-    min-width: 90px;
-    max-width: 100px;
 }
 .td-desc {
-    max-width: 180px;
     font-size: var(--text-xs);
     color: var(--color-text-muted);
     overflow: hidden;
@@ -461,7 +448,7 @@
 }
 
 
-/* ── 6. COLONNE ACTIONS — solution définitive ────────────── */
+/* ── 6. COLONNE ACTIONS ──────────────────────────────────── */
 
 .th-actions {
     text-align: center !important;
@@ -469,20 +456,14 @@
     min-width: 64px;
 }
 
-/*
- * Le <td> actions ne doit PAS être display:flex (casse le modèle table).
- * On le garde en display:table-cell avec text-align + vertical-align.
- * L'alignement flex est délégué au wrapper interne .actions-wrap.
- */
 td.td-actions {
     text-align: center;
     vertical-align: middle;
-    padding: 0 12px;
+    padding: 0 8px;
     width: 64px;
     min-width: 64px;
 }
 
-/* Wrapper flex INTERNE à la cellule */
 .actions-wrap {
     display: flex;
     align-items: center;
@@ -490,11 +471,6 @@ td.td-actions {
     gap: 6px;
 }
 
-/*
- * Le <form> de suppression ne doit avoir aucune hauteur parasite.
- * line-height:0 et font-size:0 suppriment le "strut" invisible
- * que le navigateur ajoute pour aligner le texte.
- */
 .form-delete {
     display: inline-flex;
     align-items: center;
@@ -506,7 +482,6 @@ td.td-actions {
     vertical-align: middle;
 }
 
-/* Bouton icône : taille fixe, zéro débordement */
 .btn-icon {
     display: inline-flex;
     align-items: center;
@@ -516,7 +491,7 @@ td.td-actions {
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
     background: var(--color-white);
-    font-size: 1rem;   /* taille emoji */
+    font-size: 1rem;
     cursor: pointer;
     transition: all var(--transition-fast);
     text-decoration: none;
@@ -541,9 +516,9 @@ td.td-actions {
 .chip {
     display: inline-flex;
     align-items: center;
-    padding: 3px 10px;
+    padding: 3px 8px;
     border-radius: var(--radius-full);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     background: var(--color-cream);
     color: var(--color-primary-dark);
     border: 1px solid var(--color-border);
@@ -560,7 +535,6 @@ td.td-actions {
     font-weight: 600;
 }
 
-/* Chips empilées : chacune sur sa propre ligne */
 .table-wrapper tbody td .chip + .chip {
     display: block;
     margin-top: 3px;
@@ -829,27 +803,29 @@ td.td-actions {
 }
 
 
-/* ══ CASE LIVE et Expédition ══ */
+/* ── 13. TOGGLES LIVE / EXPÉDITION / EMPORTER / NOUVEAUTÉ ── */
 
-/* ── Base commune aux deux toggles ─────────────────────────── */
 .actions-wrap input[type="checkbox"][name="live"],
-.actions-wrap input[type="checkbox"][name="dispo_expedition"] {
+.actions-wrap input[type="checkbox"][name="dispo_expedition"],
+.actions-wrap input[type="checkbox"][name="dispo_emporter"],
+.actions-wrap input[type="checkbox"][name="nouveaute"] {
     appearance: none;
     -webkit-appearance: none;
-    position: relative;          /* ← indispensable pour ::before */
+    position: relative;
     width: 30px;
     height: 18px;
     border-radius: 9px;
-    background: #d1d5db;
+    background: #ef2203;
     cursor: pointer;
     transition: background 0.25s ease;
     vertical-align: middle;
     flex-shrink: 0;
 }
 
-/* Le cercle blanc */
 .actions-wrap input[type="checkbox"][name="live"]::before,
-.actions-wrap input[type="checkbox"][name="dispo_expedition"]::before {
+.actions-wrap input[type="checkbox"][name="dispo_expedition"]::before,
+.actions-wrap input[type="checkbox"][name="dispo_emporter"]::before,
+.actions-wrap input[type="checkbox"][name="nouveaute"]::before {
     content: '';
     position: absolute;
     top: 3px;
@@ -862,18 +838,20 @@ td.td-actions {
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-/* État coché */
 .actions-wrap input[type="checkbox"][name="live"]:checked,
-.actions-wrap input[type="checkbox"][name="dispo_expedition"]:checked {
+.actions-wrap input[type="checkbox"][name="dispo_expedition"]:checked,
+.actions-wrap input[type="checkbox"][name="dispo_emporter"]:checked,
+.actions-wrap input[type="checkbox"][name="nouveaute"]:checked {
     background: #22c55e;
 }
 
 .actions-wrap input[type="checkbox"][name="live"]:checked::before,
-.actions-wrap input[type="checkbox"][name="dispo_expedition"]:checked::before {
+.actions-wrap input[type="checkbox"][name="dispo_expedition"]:checked::before,
+.actions-wrap input[type="checkbox"][name="dispo_emporter"]:checked::before,
+.actions-wrap input[type="checkbox"][name="nouveaute"]:checked::before {
     transform: translateX(12px);
 }
 
-/* Label */
 .actions-wrap label {
     display: inline-flex;
     align-items: center;
@@ -885,6 +863,59 @@ td.td-actions {
 }
 
 .actions-wrap:has(input[name="live"]:checked) label,
-.actions-wrap:has(input[name="dispo_expedition"]:checked) label {
+.actions-wrap:has(input[name="dispo_expedition"]:checked) label,
+.actions-wrap:has(input[name="dispo_emporter"]:checked) label,
+.actions-wrap:has(input[name="nouveaute"]:checked) label {
     color: #22c55e;
+}
+
+.container .gestion-layout {
+    max-width: 1600px; /* ← plus large que le 1280px par défaut */
+    padding-inline: var(--space-xl);
+}
+
+
+/* ── Pagination ── */
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm, 0.5rem);
+    padding: var(--spacing-md, 1rem) 0 var(--spacing-sm, 0.5rem);
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--spacing-sm, 0.5rem);
+}
+
+.pagination-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--color-cream, #fff);
+    color: var(--color-text, #333);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+    background: var(--color-primary, #C0395A);
+    border-color: var(--color-primary, #C0395A);
+    color: #fff;
+}
+
+.pagination-controls button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.pagination-controls span {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #888);
+    min-width: 120px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
 }

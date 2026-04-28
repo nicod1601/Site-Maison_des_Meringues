@@ -88,6 +88,26 @@ class CreationController extends Controller
 		return redirect()->back();
 	}
 
+	public function toggleEmporter(Request $request, int $id): RedirectResponse
+	{
+		$produit = Produit::findOrFail($id);
+		$produit->dispo_emporter = $request->boolean('dispo_emporter');
+		$produit->save();
+		return redirect()->back();
+	}
+
+	public function toggleNouveaute(Request $request, $id)
+	{
+		$produit = Produit::findOrFail($id);
+		$actif   = $request->input('nouveaute') === '1';
+
+		$produit->nouveaute       = $actif;
+		$produit->nouveaute_since = $actif ? now() : null;
+		$produit->save();
+
+		return redirect()->back();
+	}
+
 	// ── RAYONS ───────────────────────────────────────────────────────────
 
 	public function nvrayon(Request $request): RedirectResponse

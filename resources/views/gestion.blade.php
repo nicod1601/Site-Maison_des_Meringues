@@ -143,23 +143,28 @@
 						<thead>
 							<tr>
 								<th>#</th>
-								<th>Nom-Code</th>
 								<th>Article</th>
+								<th>Forme</th>
+								<th>Parfum</th>
 								<th>Description</th>
 								<th>Rayons</th>
 								<th>Thème</th>
-								<th>Forme</th>
 								<th>Stock</th>
+								<th>Nouveauté</th>
+								<th>Emporter</th>
 								<th>Expédition</th>
-								<th>Live</th>
+								<th class="th-actions">Live</th>
 								<th class="th-actions">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							@foreach($produits as $produit)
-							<tr>
+							<tr data-nouveaute-since="{{ $produit->nouveaute && $produit->nouveaute_since ? $produit->nouveaute_since->toISOString() : '' }}">
 								<td class="td-id">{{ $produit->id_produit }}</td>
 								<td class="td-namecode">{{ $produit->nom_produit ?? '—' }}</td>
+								<td>
+									<span class="chip">{{ $produit->forme->nom_forme ?? '—' }}</span>
+								</td>
 								<td class="td-name">{{ $produit->parfum->nom_parfum ?? '—' }}</td>
 								<td class="td-desc text-muted">{{ Str::limit($produit->description, 50) }}</td>
 
@@ -184,10 +189,6 @@
 								</td>
 
 								<td>
-									<span class="chip">{{ $produit->forme->nom_forme ?? '—' }}</span>
-								</td>
-
-								<td>
 									@if($produit->quantite > 0)
 										<span class="stock-badge stock-badge--ok">{{ $produit->quantite }}</span>
 									@else
@@ -197,15 +198,47 @@
 
 								<td>
 									<div class="actions-wrap">
+										<form action="/gestion/produit/{{ $produit->id_produit }}/nouveaute" method="POST">
+											@csrf @method('PATCH')
+											<label>
+												<input
+													type="checkbox"
+													name="nouveaute"
+													value="1"
+													{{ $produit->nouveaute ? 'checked' : '' }}
+												>
+											</label>
+										</form>
+									</div>
+								</td>
+
+								<td>
+									<div class="actions-wrap">
+										<form action="/gestion/produit/{{ $produit->id_produit }}/emporter" method="POST">
+											@csrf @method('PATCH')
+											<label>
+												<input
+													type="checkbox"
+													name="dispo_emporter"
+													value="1"
+													{{ $produit->dispo_emporter ? 'checked' : '' }}
+												>
+											</label>
+										</form>
+									</div>
+								</td>
+
+								<td>
+									<div class="actions-wrap">
 										<form action="/gestion/produit/{{ $produit->id_produit }}/expedition" method="POST">
 											@csrf @method('PATCH')
 											<label>
 												<input
-                                                    type="checkbox"
-                                                    name="dispo_expedition"
-                                                    value="1"
-                                                    {{ $produit->dispo_expedition ? 'checked' : '' }}
-                                                >
+													type="checkbox"
+													name="dispo_expedition"
+													value="1"
+													{{ $produit->dispo_expedition ? 'checked' : '' }}
+												>
 											</label>
 										</form>
 									</div>
@@ -312,7 +345,6 @@
 				<div class="table-wrapper">
 					<table>
 						<thead>
-							{{-- ✅ Corrigé : colonne "Rayons liés" supprimée (theme n'a plus de relation rayons) --}}
 							<tr><th>#</th><th>Thème</th><th>Icône</th><th>Couleur</th><th>Produits</th><th class="th-actions">Actions</th></tr>
 						</thead>
 						<tbody>
@@ -327,7 +359,7 @@
 										{{ $theme->couleur }}
 									</span>
 								</td>
-								{{-- ✅ Corrigé : $theme->rayons->count() supprimé → $produitsByTheme --}}
+
 								<td>
 									<span class="data-count">{{ $produitsByTheme[$theme->id_theme] ?? 0 }}</span>
 								</td>
@@ -351,7 +383,6 @@
 		</div>
 
 		{{-- ══ EVENTS ══ --}}
-		{{-- ✅ Onglet Events entièrement ajouté --}}
 		<div id="tab-events" class="tab-panel hidden">
 			<div class="data-toolbar">
 				<h2 class="data-toolbar__title">Events <span class="data-count">{{ count($events) }}</span></h2>
@@ -951,37 +982,84 @@
 		});
 	});
 
-    // ── Toggles Live & Expédition sans rechargement ──────────────
-    document.querySelectorAll('input[name="live"], input[name="dispo_expedition"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function () {
-            const form    = this.closest('form');
-            const url     = form.action;
-            const checked = this.checked;
-            const name    = this.name;
+	// ── Toggles Live & Expédition sans rechargement ──────────────
+	// Remplace le bloc générique existant par celui-ci
+		document.querySelectorAll('input[name="live"], input[name="dispo_expedition"], input[name="dispo_emporter"], input[name="nouveaute"]').forEach(checkbox => {
+		checkbox.addEventListener('change', function () {
+			const form    = this.closest('form');
+			const url     = form.action;
+			const checked = this.checked;
+			const name    = this.name;
 
-            // Construire le body
-            const body = new URLSearchParams();
-            body.append('_token', document.querySelector('meta[name="csrf-token"]')?.content
-                || '{{ csrf_token() }}');
-            body.append('_method', 'PATCH');
-            body.append(name, checked ? '1' : '0');
+			// Construire le body
+			const body = new URLSearchParams();
+			body.append('_token', document.querySelector('meta[name="csrf-token"]')?.content
+				|| '{{ csrf_token() }}');
+			body.append('_method', 'PATCH');
+			body.append(name, checked ? '1' : '0');
 
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: body.toString(),
-            })
-            .then(res => {
-                if (!res.ok) {
-                    // Annuler visuellement si erreur
-                    this.checked = !checked;
-                    console.error('Erreur toggle', name);
-                }
-            })
-            .catch(() => {
-                this.checked = !checked;
-            });
-        });
-    });
+			fetch(url, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: body.toString(),
+			})
+			.then(res => {
+				if (!res.ok) {
+					// Annuler visuellement si erreur
+					this.checked = !checked;
+					console.error('Erreur toggle', name);
+				}
+			})
+			.catch(() => {
+				this.checked = !checked;
+			});
+		});
+	});
+
+	//Pagination des Tableaux
+	document.querySelectorAll('.table-wrapper').forEach(wrapper => {
+		const table = wrapper.querySelector('table');
+		const rowsPerPage = 10;
+		let currentPage = 1;
+
+		const rows = Array.from(table.querySelectorAll('tbody tr'));
+		const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+		function renderTable() {
+			rows.forEach((row, index) => {
+				row.style.display = (index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage) ? '' : 'none';
+			});
+			pageInfo.textContent = `Page ${currentPage} sur ${totalPages}`;
+			prevBtn.disabled = currentPage === 1;
+			nextBtn.disabled = currentPage === totalPages;
+		}
+
+		const paginationControls = document.createElement('div');
+		paginationControls.className = 'pagination-controls';
+		const prevBtn = document.createElement('button');
+		prevBtn.textContent = 'Précédent';
+		const nextBtn = document.createElement('button');
+		nextBtn.textContent = 'Suivant';
+		const pageInfo = document.createElement('span');
+		paginationControls.appendChild(prevBtn);
+		paginationControls.appendChild(pageInfo);
+		paginationControls.appendChild(nextBtn);
+		wrapper.appendChild(paginationControls);
+
+		prevBtn.addEventListener('click', () => {
+			if (currentPage > 1) {
+				currentPage--;
+				renderTable();
+			}
+		});
+		nextBtn.addEventListener('click', () => {
+			if (currentPage < totalPages) {
+				currentPage++;
+				renderTable();
+			}
+		});
+
+		renderTable();
+	});
 
 </script>

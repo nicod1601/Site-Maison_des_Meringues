@@ -6,6 +6,7 @@ use App\Models\Boutique;
 use App\Models\Rayon;
 use App\Models\Theme;
 use App\Models\Produit;
+use App\Models\Image;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -140,6 +141,8 @@ class ShopController extends Controller
 		// ── 7. Thèmes disponibles pour le filtre ──────────────────
 		$themesDisponibles = $themes;
 
+        $images = Image::all();
+
 		return view('shop', compact(
 			'boutique',
 			'rayons',
@@ -148,6 +151,7 @@ class ShopController extends Controller
 			'themesDisponibles',
 			'totalProduits',
 			'produits',
+			'images',
 		));
 	}
 }

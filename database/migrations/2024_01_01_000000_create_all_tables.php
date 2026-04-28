@@ -87,7 +87,8 @@ return new class extends Migration
 			$table->boolean('live')->default(false);
 			$table->boolean('dispo_emporter')->default(true);
 			$table->boolean('dispo_expedition')->default(true);
-            $table->boolean(('special'))->default(false);
+			$table->boolean(('special'))->default(false);
+			$table->timestamp('nouveaute_since')->nullable()->after('nouveaute');
 
 			$table->foreign('id_forme')->references('id_forme')->on('forme')->onDelete('restrict');
 			$table->foreign('id_parfum')->references('id_parfum')->on('parfum')->onDelete('restrict');
@@ -127,11 +128,23 @@ return new class extends Migration
 			$table->foreign('id_produit')->references('id_produit')->on('produit')->onDelete('cascade');
 			$table->foreign('id_event')->references('id_event')->on('event')->onDelete('cascade');
 		});
+
+		//Images
+		Schema::create('image', function (Blueprint $table) {
+			$table->increments('id_image');
+			$table->unsignedInteger('id_produit');
+            $table->unsignedInteger('id_forme_condi');
+			$table->string('url');
+
+			$table->foreign('id_produit')->references('id_produit')->on('produit')->onDelete('cascade');
+			$table->foreign('id_forme_condi')->references('id_forme_condi')->on('forme_condi')->onDelete('cascade');
+		});
 	}
 
 	public function down(): void
 	{
 		// Suppression dans l'ordre inverse des dépendances
+		Schema::dropIfExists('image');
 		Schema::dropIfExists('produit_event');
 		Schema::dropIfExists('rayon_event');
 		Schema::dropIfExists('produit_rayon');

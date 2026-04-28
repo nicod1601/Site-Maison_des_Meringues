@@ -24,6 +24,8 @@ Route::post  ('/gestion/produit',      [CreationController::class, 'nvproduit'])
 Route::delete('/gestion/produit/{id}', [CreationController::class, 'destroy'])        ->name('produit.destroy');
 Route::patch ('/gestion/produit/{id}/live', [CreationController::class, 'toggleLive'])->name('produit.live');
 Route::patch('/gestion/produit/{id}/expedition', [CreationController::class, 'toggleExpedition'])->name('produit.expedition');
+Route::patch('/gestion/produit/{id}/emporter', [CreationController::class, 'toggleEmporter'])->name('produit.emporter');
+Route::patch('/gestion/produit/{id}/nouveaute', [CreationController::class, 'toggleNouveaute'])->name('produit.nouveaute');
 
 // Rayons
 Route::post  ('/gestion/rayon',        [CreationController::class, 'nvrayon'])        ->name('nvrayon');

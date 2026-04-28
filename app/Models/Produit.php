@@ -22,6 +22,15 @@ class Produit extends Model
 		'dispo_emporter',
 		'dispo_expedition',
 		'special',
+		'nouveaute_since',
+	];
+
+	protected $casts = [
+		'nouveaute'        => 'boolean',
+		'live'             => 'boolean',
+		'dispo_emporter'   => 'boolean',
+		'dispo_expedition' => 'boolean',
+		'nouveaute_since'  => 'datetime',
 	];
 
 	// Un produit appartient à plusieurs rayons (many-to-many)
@@ -64,6 +73,14 @@ class Produit extends Model
 		return $this->belongsTo(Parfum::class, 'id_parfum', 'id_parfum');
 	}
 
+	public function image($id_forme_condi)
+	{
+		$image = \App\Models\Image::where('id_produit', $this->id_produit)
+			->where('id_forme_condi', $id_forme_condi)
+			->first();
+
+		return $image ? $image->url : null;
+	}
 	public function isnouveaute(): bool        { return (bool) $this->nouveaute; }
 	public function islive(): bool             { return (bool) $this->live; }
 	public function isdispo_emporter(): bool   { return (bool) $this->dispo_emporter; }
