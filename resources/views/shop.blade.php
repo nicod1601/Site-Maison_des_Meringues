@@ -82,11 +82,7 @@
 	@php
 		$rayonsActifs      = $rayons->filter(fn($r) => $r->islive());
 		$rayonsActifsCount = $rayonsActifs->count();
-
-		$rayonSelectionne = request('rayon');
-		if ($rayonsActifsCount === 1 && !$rayonSelectionne) {
-			$rayonSelectionne = $rayonsActifs->first()->id_rayon;
-		}
+		$rayonSelectionne  = $rayonActif?->id_rayon; // ← vient du controller
 	@endphp
 
 	{{-- ── NAVIGATION DES RAYONS ───────────────────────────── --}}
@@ -173,107 +169,84 @@
 								@if($theme->couleur) style="background:{{ $theme->couleur }}" @endif></span>
 						</div>
 					</div>
-					<div class="theme-header__action">
-						<span class="badge badge--cream">
-							{{ $theme->produits_affiches->count() }}
-							produit{{ $theme->produits_affiches->count() > 1 ? 's' : '' }}
-						</span>
-					</div>
 				</div>
 
 				{{-- Grille produits --}}
 				<div class="products-grid" id="grille-theme-{{ $theme->id_theme ?? 'autres' }}">
 
 					@foreach($theme->produits_affiches as $produit)
-					{{-- ✅ On récupère le premier forme_condi de la forme du produit --}}
-					@php $fc = $produit->forme?->forme_condis->first() @endphp
+						@foreach($produit->forme->forme_condis as $fc)
+						<article class="boutique-card" aria-label="{{ $produit->nom_produit }}">
 
-					<article class="boutique-card" aria-label="{{ $produit->nom_produit }}">
-
-						{{-- Placeholder image --}}
-						<div class="boutique-card__img-wrap">
-							<div class="boutique-card__img-placeholder" aria-hidden="true"
-								@if($theme->couleur)
-									style="background:linear-gradient(135deg,{{ $theme->couleur }}22 0%,{{ $theme->couleur }}44 100%);"
-								@endif>
-								{{ $theme->icone ?? '🍬' }}
-							</div>
-							<div class="boutique-card__badges">
-								@if($produit->nouveaute)
-									<span class="badge badge--new">Nouveau</span>
-								@endif
-								@if($produit->quantite == 0)
-									<span class="badge badge--close">Épuisé</span>
-								@endif
-							</div>
-						</div>
-
-						{{-- Corps --}}
-						<div class="boutique-card__body">
-
-							@if($produit->parfum)
-								<p class="boutique-card__theme">{{ $produit->parfum->nom_parfum }}</p>
-							@endif
-
-							<h3 class="boutique-card__name">{{ $produit->nom_produit }}</h3>
-
-							{{-- ✅ Description : forme + conditionnement via $fc --}}
-							@if($produit->forme)
-								<p class="boutique-card__desc">
-									{{ $produit->forme->nom_forme }}
-									@if($fc?->conditionnement)
-										&mdash; {{ $fc->conditionnement->type }}
+							{{-- Placeholder image --}}
+							<div class="boutique-card__img-wrap">
+								<div class="boutique-card__img-placeholder" aria-hidden="true"
+									@if($theme->couleur)
+										style="background:linear-gradient(135deg,{{ $theme->couleur }}22 0%,{{ $theme->couleur }}44 100%);"
+									@endif>
+									{{ $theme->icone ?? '🍬' }}
+								</div>
+								<div class="boutique-card__badges">
+									@if($produit->nouveaute)
+										<span class="badge badge--new">Nouveau</span>
 									@endif
-								</p>
-							@endif
-
-							@if($produit->description)
-								<p class="boutique-card__desc" style="margin-top:.2rem;">
-									{{ Str::limit($produit->description, 80) }}
-								</p>
-							@endif
-
-							<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:var(--space-sm);">
-								@if($produit->dispo_emporter)
-									<span class="badge badge--cream" style="font-size:10px;">🛍 Emporter</span>
-								@endif
-								@if($produit->dispo_expedition)
-									<span class="badge badge--cream" style="font-size:10px;">📦 Expédition</span>
-								@endif
+									@if($produit->quantite == 0)
+										<span class="badge badge--close">Épuisé</span>
+									@endif
+								</div>
 							</div>
 
-							<div class="boutique-card__footer">
-								<div>
-									{{-- ✅ Prix via $fc --}}
-									@if($fc)
-										<p class="boutique-card__price">
-											{{ number_format($fc->prix, 2, ',', ' ') }} €
-										</p>
-									@else
-										<p class="boutique-card__price" style="color:var(--color-text-muted);">— €</p>
-									@endif
+							{{-- Corps --}}
+							<div class="boutique-card__body">
 
-									@if($produit->quantite > 0)
-										<p class="boutique-card__price-old">{{ $produit->quantite }} en stock</p>
-									@else
-										<p class="boutique-card__price-old" style="color:#c0392b;">Épuisé</p>
+								<p class="boutique-card__theme">
+									{{ $fc->conditionnement->type }}
+								</p>
+
+								<h3 class="boutique-card__name">{{ $produit->forme->nom_forme }} — {{ $produit->parfum->nom_parfum }}</h3>
+
+								@if($produit->description && $produit->description != 'Aucune description')
+									<p class="boutique-card__desc" style="margin-top:.2rem;">
+										{{ Str::limit($produit->description, 80) }}
+									</p>
+								@endif
+
+								<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:var(--space-sm);">
+									@if($produit->dispo_emporter)
+										<span class="badge badge--cream" style="font-size:10px;">🛍 Emporter</span>
+									@endif
+									@if($produit->dispo_expedition && $fc->conditionnement->type == 'individuelle')
+										<span class="badge badge--cream" style="font-size:10px;">📦 Expédition</span>
 									@endif
 								</div>
 
-								@if($produit->quantite > 0)
-									<button class="boutique-card__add-btn"
-											onclick="voirProduit({{ $produit->id_produit }})"
-											aria-label="Voir {{ $produit->nom_produit }}"
-											title="Voir le produit">→</button>
-								@else
-									<span class="boutique-card__add-btn"
-										  style="background:var(--color-border);cursor:not-allowed;"
-										  aria-disabled="true">✕</span>
-								@endif
-							</div>
+								<div class="boutique-card__footer">
+									<div>
+										{{-- Prix de CE conditionnement --}}
+										@if($fc->prix)
+											<p class="boutique-card__price">
+												{{ number_format($fc->prix, 2, ',', ' ') }} €
+											</p>
+										@else
+											<p class="boutique-card__price" style="color:var(--color-text-muted);">— €</p>
+										@endif
+									</div>
 
-						</div>
-					</article>
+									@if($produit->quantite > 0)
+										<button class="boutique-card__add-btn"
+												onclick="voirProduit({{ $produit->id_produit }})"
+												aria-label="Voir {{ $produit->nom_produit }}"
+												title="Voir le produit">V</button>
+									@else
+										<span class="boutique-card__add-btn"
+											style="background:var(--color-border);cursor:not-allowed;"
+											aria-disabled="true">✕</span>
+									@endif
+								</div>
+
+							</div>
+						</article>
+						@endforeach
 					@endforeach
 
 				</div>

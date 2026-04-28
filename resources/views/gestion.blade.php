@@ -149,9 +149,9 @@
 								<th>Rayons</th>
 								<th>Thème</th>
 								<th>Forme</th>
-								<th>Conditionnement</th>
-								<th>Prix (€)</th>
 								<th>Stock</th>
+								<th>Expédition</th>
+								<th>Live</th>
 								<th class="th-actions">Actions</th>
 							</tr>
 						</thead>
@@ -188,18 +188,6 @@
 								</td>
 
 								<td>
-									@foreach($produit->forme->forme_condis as $fc)
-										<span class="chip">{{ $fc->conditionnement->type ?? '—' }}</span>
-									@endforeach
-								</td>
-
-								<td>
-									@foreach($produit->forme->forme_condis as $fc)
-										<span class="chip">{{ $fc->prix ?? '—' }} €</span>
-									@endforeach
-								</td>
-
-								<td>
 									@if($produit->quantite > 0)
 										<span class="stock-badge stock-badge--ok">{{ $produit->quantite }}</span>
 									@else
@@ -207,16 +195,25 @@
 									@endif
 								</td>
 
-								<td class="td-actions">
+								<td>
 									<div class="actions-wrap">
-										<form action="{{ route('produit.destroy', $produit->id_produit) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce produit')">
-											@csrf @method('DELETE')
-											<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+										<form action="/gestion/produit/{{ $produit->id_produit }}/expedition" method="POST">
+											@csrf @method('PATCH')
+											<label>
+												<input
+                                                    type="checkbox"
+                                                    name="dispo_expedition"
+                                                    value="1"
+                                                    {{ $produit->dispo_expedition ? 'checked' : '' }}
+                                                >
+											</label>
 										</form>
 									</div>
+								</td>
 
+								<td>
 									<div class="actions-wrap">
-										<form action="{{ route('produit.live', $produit->id_produit) }}" method="POST">
+										<form action="/gestion/produit/{{ $produit->id_produit }}/live" method="POST">
 											@csrf @method('PATCH')
 											<label>
 												<input
@@ -224,9 +221,17 @@
 													name="live"
 													value="1"
 													{{ $produit->live ? 'checked' : '' }}
-													onchange="this.form.submit()"
-												> Live
+												>
 											</label>
+										</form>
+									</div>
+								</td>
+
+								<td class="td-actions">
+									<div class="actions-wrap">
+										<form action="{{ route('produit.destroy', $produit->id_produit) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce produit')">
+											@csrf @method('DELETE')
+											<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
 										</form>
 									</div>
 								</td>
@@ -945,5 +950,38 @@
 			}
 		});
 	});
+
+    // ── Toggles Live & Expédition sans rechargement ──────────────
+    document.querySelectorAll('input[name="live"], input[name="dispo_expedition"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            const form    = this.closest('form');
+            const url     = form.action;
+            const checked = this.checked;
+            const name    = this.name;
+
+            // Construire le body
+            const body = new URLSearchParams();
+            body.append('_token', document.querySelector('meta[name="csrf-token"]')?.content
+                || '{{ csrf_token() }}');
+            body.append('_method', 'PATCH');
+            body.append(name, checked ? '1' : '0');
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body.toString(),
+            })
+            .then(res => {
+                if (!res.ok) {
+                    // Annuler visuellement si erreur
+                    this.checked = !checked;
+                    console.error('Erreur toggle', name);
+                }
+            })
+            .catch(() => {
+                this.checked = !checked;
+            });
+        });
+    });
 
 </script>

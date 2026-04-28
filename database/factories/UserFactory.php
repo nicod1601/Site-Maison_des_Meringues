@@ -52,6 +52,7 @@ class UsersImport implements ToCollection
 			$nouveaute   = strtolower($row[4] ?? '') === 'oui';
 			$live        = strtolower($row[5] ?? '') === 'oui';
 			$expedition  = in_array(strtolower($forme->nom_forme), ['mini']);
+            $special     = strtolower($row[9] ?? '') === 'oui';
 
 			// ── Colonne G (index 6) : nom du thème (optionnel) ──
 			$nomTheme = trim($row[6] ?? '');
@@ -79,6 +80,7 @@ class UsersImport implements ToCollection
 				'live'             => $live,
 				'dispo_emporter'   => false,
 				'dispo_expedition' => $expedition,
+				'special'          => $special,
 			]);
 		}
 

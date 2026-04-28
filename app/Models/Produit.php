@@ -21,6 +21,7 @@ class Produit extends Model
 		'live',
 		'dispo_emporter',
 		'dispo_expedition',
+		'special',
 	];
 
 	// Un produit appartient à plusieurs rayons (many-to-many)

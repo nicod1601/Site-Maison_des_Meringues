@@ -23,6 +23,7 @@ Route::get ('/import/clear', [ImportController::class, 'clear']) ->name('import.
 Route::post  ('/gestion/produit',      [CreationController::class, 'nvproduit'])      ->name('produit.store');
 Route::delete('/gestion/produit/{id}', [CreationController::class, 'destroy'])        ->name('produit.destroy');
 Route::patch ('/gestion/produit/{id}/live', [CreationController::class, 'toggleLive'])->name('produit.live');
+Route::patch('/gestion/produit/{id}/expedition', [CreationController::class, 'toggleExpedition'])->name('produit.expedition');
 
 // Rayons
 Route::post  ('/gestion/rayon',        [CreationController::class, 'nvrayon'])        ->name('nvrayon');

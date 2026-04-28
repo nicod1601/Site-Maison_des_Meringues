@@ -829,38 +829,27 @@ td.td-actions {
 }
 
 
-/* ══ CASE LIVE ══ */
+/* ══ CASE LIVE et Expédition ══ */
 
-/* Wrapper du label */
-.actions-wrap label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-text-muted, #888);
-    user-select: none;
-    transition: color 0.2s ease;
-}
-
-/* Cache la checkbox native */
-.actions-wrap input[type="checkbox"][name="live"] {
+/* ── Base commune aux deux toggles ─────────────────────────── */
+.actions-wrap input[type="checkbox"][name="live"],
+.actions-wrap input[type="checkbox"][name="dispo_expedition"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 32px;
+    position: relative;          /* ← indispensable pour ::before */
+    width: 30px;
     height: 18px;
-    border-radius: 999px;
-    background: var(--color-border, #ddd);
-    border: none;
+    border-radius: 9px;
+    background: #d1d5db;
     cursor: pointer;
-    position: relative;
     transition: background 0.25s ease;
+    vertical-align: middle;
     flex-shrink: 0;
 }
 
-/* Le petit cercle du toggle */
-.actions-wrap input[type="checkbox"][name="live"]::before {
+/* Le cercle blanc */
+.actions-wrap input[type="checkbox"][name="live"]::before,
+.actions-wrap input[type="checkbox"][name="dispo_expedition"]::before {
     content: '';
     position: absolute;
     top: 3px;
@@ -873,16 +862,29 @@ td.td-actions {
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-/* État coché — toggle vert + cercle décalé */
-.actions-wrap input[type="checkbox"][name="live"]:checked {
+/* État coché */
+.actions-wrap input[type="checkbox"][name="live"]:checked,
+.actions-wrap input[type="checkbox"][name="dispo_expedition"]:checked {
     background: #22c55e;
 }
 
-.actions-wrap input[type="checkbox"][name="live"]:checked::before {
-    transform: translateX(14px);
+.actions-wrap input[type="checkbox"][name="live"]:checked::before,
+.actions-wrap input[type="checkbox"][name="dispo_expedition"]:checked::before {
+    transform: translateX(12px);
 }
 
-/* Label devient vert quand coché */
-.actions-wrap:has(input[name="live"]:checked) label {
+/* Label */
+.actions-wrap label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--color-text-muted, #6b7280);
+    transition: color 0.2s;
+}
+
+.actions-wrap:has(input[name="live"]:checked) label,
+.actions-wrap:has(input[name="dispo_expedition"]:checked) label {
     color: #22c55e;
 }

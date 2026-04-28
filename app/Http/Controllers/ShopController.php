@@ -31,32 +31,39 @@ class ShopController extends Controller
 			->get();
 
 		// ── 3. Rayon actif ────────────────────────────────────────
-		$rayonActif = null;
+		// Si un rayon est explicitement demandé dans l'URL, on l'utilise.
+		// Sinon, on sélectionne automatiquement le premier rayon actif.
 		if ($request->filled('rayon')) {
 			$rayonActif = Rayon::where('id_rayon', $request->rayon)
 				->where('id_boutique', $id_boutique)
 				->firstOrFail();
+		} else {
+			$rayonActif = $rayons->first(fn($r) => $r->islive());
 		}
 
-		// ── 4. Construction de la requête produits ────────────────
+		// ── 4. Aucun rayon actif → retour anticipé ────────────────
+		if (!$rayonActif) {
+			return view('shop', [
+				'boutique'          => $boutique,
+				'rayons'            => $rayons,
+				'rayonActif'        => null,
+				'themesAffiches'    => collect(),
+				'themesDisponibles' => collect(),
+				'totalProduits'     => 0,
+				'produits'          => collect(),
+			]);
+		}
+
+		// ── 5. Construction de la requête produits ────────────────
 		$query = Produit::with([
 				'theme',
-				'forme.forme_condis.conditionnement', // ✅ chemin correct via forme
+				'forme.forme_condis.conditionnement',
 				'parfum',
 			])
-			->where('live', true);
-
-		// Filtre par rayon
-		if ($rayonActif) {
-			$query->whereHas('rayons', fn($q) =>
+			->where('live', true)
+			->whereHas('rayons', fn($q) =>
 				$q->where('rayon.id_rayon', $rayonActif->id_rayon)
 			);
-		} else {
-			// Tous les rayons de cette boutique
-			$query->whereHas('rayons', fn($q) =>
-				$q->where('rayon.id_boutique', $id_boutique)
-			);
-		}
 
 		// Filtre par thème
 		if ($request->filled('theme')) {
@@ -93,8 +100,7 @@ class ShopController extends Controller
 
 		$produits = $query->get();
 
-		// ✅ Tri par prix en PHP (le prix vient du premier forme_condi de la forme)
-		// produit.id_forme_condi n'existe pas → on trie après le get()
+		// Tri par prix en PHP (prix = premier forme_condi de la forme du produit)
 		if (in_array($request->tri, ['prix_asc', 'prix_desc'])) {
 			$produits = $produits->sortBy(
 				fn($p) => $p->forme?->forme_condis->first()?->prix ?? PHP_INT_MAX,
@@ -105,12 +111,11 @@ class ShopController extends Controller
 
 		$totalProduits = $produits->count();
 
-		// ── 5. Regroupement par thème ─────────────────────────────
+		// ── 6. Regroupement par thème ─────────────────────────────
 		$produitsParTheme = $produits->groupBy(fn($p) => $p->id_theme ?? 0);
 
 		$themesAffiches = collect();
 
-		// D'abord les produits avec thème (triés par nom_theme)
 		$themes = Theme::whereIn('id_theme', $produits->pluck('id_theme')->filter()->unique())
 			->orderBy('nom_theme')
 			->get();
@@ -120,7 +125,7 @@ class ShopController extends Controller
 			$themesAffiches->push($theme);
 		}
 
-		// Ensuite les produits sans thème
+		// Produits sans thème
 		$sanTheme = $produitsParTheme->get(0, collect());
 		if ($sanTheme->isNotEmpty()) {
 			$themesAffiches->push((object)[
@@ -132,7 +137,7 @@ class ShopController extends Controller
 			]);
 		}
 
-		// ── 6. Thèmes disponibles pour le filtre ──────────────────
+		// ── 7. Thèmes disponibles pour le filtre ──────────────────
 		$themesDisponibles = $themes;
 
 		return view('shop', compact(
@@ -142,7 +147,7 @@ class ShopController extends Controller
 			'themesAffiches',
 			'themesDisponibles',
 			'totalProduits',
-			'produits'
+			'produits',
 		));
 	}
 }

@@ -23,7 +23,7 @@ class CreationController extends Controller
 		$request->validate([
 			'nom_produit'    => 'required|string|max:255',
 			'id_parfum'      => 'required|exists:parfum,id_parfum',
-			'id_forme_condi' => 'required|exists:forme_condi,id_forme_condi',
+			'id_forme' => 'required|exists:forme,id_forme',
 			'id_rayon'       => 'required|exists:rayon,id_rayon',
 			'id_theme'       => 'nullable|exists:theme,id_theme',
 			'quantite'       => 'required|integer|min:0',
@@ -33,7 +33,7 @@ class CreationController extends Controller
 		$produit = Produit::create([
 			'nom_produit'      => $request->nom_produit,
 			'id_parfum'        => $request->id_parfum,
-			'id_forme_condi'   => $request->id_forme_condi,
+			'id_forme'         => $request->id_forme,
 			'id_theme'         => $request->id_theme,
 			'description'      => $request->description ?? 'Aucune description',
 			'quantite'         => $request->quantite,
@@ -76,6 +76,14 @@ class CreationController extends Controller
 	{
 		$produit = Produit::findOrFail($id);
 		$produit->live = $request->boolean('live');
+		$produit->save();
+		return redirect()->back();
+	}
+
+	public function toggleExpedition(Request $request, int $id): RedirectResponse
+	{
+		$produit = Produit::findOrFail($id);
+		$produit->dispo_expedition = $request->boolean('dispo_expedition');
 		$produit->save();
 		return redirect()->back();
 	}
@@ -151,7 +159,7 @@ class CreationController extends Controller
 		return redirect()->back()->with('success', 'Rayon supprimé.');
 	}
 
-    public function toggleLiveRayon(Request $request, int $id): RedirectResponse
+	public function toggleLiveRayon(Request $request, int $id): RedirectResponse
 	{
 		$rayon = Rayon::findOrFail($id);
 		$rayon->live_rayon = $request->boolean('live_rayon');

@@ -58,6 +58,7 @@ class UsersImport implements ToCollection
 			$nouveaute   = strtolower(trim($row[5] ?? '')) === 'oui';
 			$live        = strtolower(trim($row[6] ?? '')) === 'oui';
 			$expedition  = strtolower($forme->nom_forme) === 'mini';
+			$special     = strtolower(trim($row[9] ?? '')) === 'oui';
 
 			// ── Thème (optionnel) ──────────────────────────────────────────
 			$nomTheme = trim($row[7] ?? '');
@@ -86,34 +87,59 @@ class UsersImport implements ToCollection
 			}
 
 			// ── Créer ou mettre à jour le produit ─────────────────────────
-			$produit = Produit::updateOrCreate(
-				[
-					'nom_produit'    => $nomProduit,
-					'id_forme' => $forme->id_forme,
-					'id_parfum'      => $parfum->id_parfum,
-				],
-				[
-					'id_theme'         => $idTheme,
-					'description'      => $description,
-					'quantite'         => $quantite,
-					'nouveaute'        => $nouveaute,
-					'live'             => $live,
-					'dispo_emporter'   => false,
-					'dispo_expedition' => $expedition,
-				]
-			);
+            $produit = Produit::updateOrCreate(
+                [
+                    'nom_produit' => $nomProduit,
+                    'id_forme'    => $forme->id_forme,
+                    'id_parfum'   => $parfum->id_parfum,
+                ],
+                [
+                    'id_theme'         => $idTheme,
+                    'description'      => $description,
+                    'quantite'         => $quantite,
+                    'nouveaute'        => $nouveaute,
+                    'live'             => $live,
+                    'dispo_emporter'   => false,
+                    'dispo_expedition' => $expedition,
+                    'special'          => $special,
+                ]
+            );
 
-			// Synchroniser les events du produit
-			if (!empty($eventIds)) {
-				$produit->events()->sync($eventIds);
-			} else {
-				$produit->events()->detach();
-			}
+            // ── Synchroniser les events du produit ────────────────────────
+            if (!empty($eventIds)) {
+                $produit->events()->sync($eventIds);
+            } else {
+                $produit->events()->detach();
+            }
 
-			// Lier uniquement au rayon Base
-			$produit->rayons()->syncWithoutDetaching([self::RAYON_BASE_ID]);
+			// ── Lier aux rayons selon special ─────────────────────────────
+            if ($produit->special && !empty($eventIds)) {
+                // Trouver tous les rayons liés à ses events
+                $rayonIds = Rayon::whereHas('events', function ($q) use ($eventIds) {
+                        $q->whereIn('event.id_event', $eventIds);
+                    })
+                    ->where('id_boutique', $boutique->id_boutique)
+                    ->pluck('id_rayon')
+                    ->toArray();
 
-			$produitsImportesIds[] = $produit->id_produit;
+                if (!empty($rayonIds)) {
+                    // Détacher le rayon Base si présent, attacher les rayons events
+                    $produit->rayons()->detach(self::RAYON_BASE_ID);
+                    $produit->rayons()->syncWithoutDetaching($rayonIds);
+                }
+            } else {
+                // Produit normal → rayon Base uniquement
+                // Détacher les rayons events au cas où il ne serait plus special
+                $rayonsEvents = Rayon::whereHas('events')
+                    ->where('id_boutique', $boutique->id_boutique)
+                    ->pluck('id_rayon')
+                    ->toArray();
+
+                $produit->rayons()->detach($rayonsEvents);
+                $produit->rayons()->syncWithoutDetaching([self::RAYON_BASE_ID]);
+            }
+
+            $produitsImportesIds[] = $produit->id_produit;
 		}
 
 		// ── Détacher du rayon Base les produits absents du fichier ────────

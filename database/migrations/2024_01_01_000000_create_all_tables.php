@@ -87,6 +87,7 @@ return new class extends Migration
 			$table->boolean('live')->default(false);
 			$table->boolean('dispo_emporter')->default(true);
 			$table->boolean('dispo_expedition')->default(true);
+            $table->boolean(('special'))->default(false);
 
 			$table->foreign('id_forme')->references('id_forme')->on('forme')->onDelete('restrict');
 			$table->foreign('id_parfum')->references('id_parfum')->on('parfum')->onDelete('restrict');
