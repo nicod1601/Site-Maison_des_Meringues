@@ -46,7 +46,7 @@ class GestionController extends Controller
 			});
 		}
 
-		$produits    = Produit::all();
+		$produits    = $query->get();
 		$nb_produits = $produits->count();
 
 		$formes           = Forme::all();

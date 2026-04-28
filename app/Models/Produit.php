@@ -75,11 +75,11 @@ class Produit extends Model
 
 	public function image($id_forme_condi)
 	{
-		$image = \App\Models\Image::where('id_produit', $this->id_produit)
+		$image = Image::where('id_produit', $this->id_produit)
 			->where('id_forme_condi', $id_forme_condi)
 			->first();
 
-		return $image ? $image->url : null;
+		return $image->url;
 	}
 	public function isnouveaute(): bool        { return (bool) $this->nouveaute; }
 	public function islive(): bool             { return (bool) $this->live; }

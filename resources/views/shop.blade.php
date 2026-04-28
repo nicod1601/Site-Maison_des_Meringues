@@ -184,9 +184,9 @@
 									@if($theme->couleur)
 										style="background:linear-gradient(135deg,{{ $theme->couleur }}22 0%,{{ $theme->couleur }}44 100%);"
 									@endif>
-									<img src="{{ asset($produit->image($fc->id_forme_condi) ?? 'fichier/image/placeholder.png') }}"
-										alt="{{ $produit->nom_produit }}"
+									<img src="{{ asset($produit->image($fc->id_forme_condi)) }}"
 										class="boutique-card__img">
+
 								</div>
 								<div class="boutique-card__badges">
 									@if($produit->nouveaute)
