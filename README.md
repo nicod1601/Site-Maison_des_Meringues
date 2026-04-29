@@ -19,11 +19,13 @@ Site web artisanal pour la vente en ligne de meringues — boutique, gestion des
 
 | Technologie | Version |
 |-------------|---------|
-| PHP | 8.2+ |
-| Laravel | 11.x |
+| PHP | ^8.2 |
+| Laravel | ^12.0 |
+| Node.js | ^20.19 ou ≥22.12 |
 | PostgreSQL | 15+ |
-| Vite | 5.x |
-| Maatwebsite/Excel | 3.x |
+| Vite | ^7.0 |
+| Maatwebsite/Excel | ^3.1 |
+| TailwindCSS | ^4.0 |
 
 ---
 
