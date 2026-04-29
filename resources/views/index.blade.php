@@ -3,6 +3,8 @@
 ])
 @vite('resources/css/index.css')
 
+<main class="container section"></div>
+
 <div class="container">
 
 	{{-- ── ACTIVITÉS ── --}}
@@ -57,8 +59,8 @@
 				<p class="subtitle">Nos créations</p>
 				<h2>Produits phares</h2>
 			</div>
-			<div class="produits-carousel">
-			</div>
+			<div class="produits-carousel"></div>
+		</div>
 	</section>
 
 	{{-- ── HORAIRES + CARTE ── --}}
@@ -85,6 +87,8 @@
 								<tr><td>Dimanch</td><td><span class="badge badge--close">Fermer</span></td></div></tr>
 							</tbody>
 						</table>
+						<p class="text-muted text-small mt-md">Cependant, nous somme disponible tous les jours, vous pouvez toujours
+							nous envoyer un message ou nous appeler même si c'est écrit que nous somme fermer.</p>
 					</div>
 				</div>
 
@@ -159,22 +163,35 @@
 @include('templet.footer')
 
 <script>
-	const carousel = document.querySelector('.produits-carousel');
+	const carousel  = document.querySelector('.produits-carousel');
 	const listImages = @json($images);
-	const produits = @json($produits);
+	const produits   = @json($produits);
 
-	console.log(listImages);
+	// Indexer les produits par id_produit pour accès rapide
+	const produitsMap = {};
+	produits.forEach(p => { produitsMap[p.id_produit] = p; });
 
+	listImages.forEach(img => {
+		const produit = produitsMap[img.id_produit];
+		const nom     = produit
+			? (produit.forme?.nom_forme ?? '') + ' — ' + (produit.parfum?.nom_parfum ?? '')
+			: 'Produit';
+		const desc    = produit?.description && produit.description !== 'Aucune description'
+			? produit.description
+			: '';
 
-	produits.forEach(p => {
 		const div = document.createElement('div');
-		div.classList.add('product-card', 'produit-item');
-
+		div.classList.add('produit-item');
 		div.innerHTML = `
-			<img src="${listImages[p.id_produit] ?? ''}" class="product-card__img">
-			<h3 class="card__title">Meringue ${p.parfum.nom_parfum}</h3>
+			<div class="produit-item__infos">
+				<p class="produit-item__nom">${nom}</p>
+				${desc ? `<p class="produit-item__desc">${desc}</p>` : ''}
+			</div>
+			<div class="produit-item__img-wrap">
+				<span class="produit-item__label">${nom}</span>
+				<img src="${img.url}" class="produit-item__img" alt="${nom}">
+			</div>
 		`;
-
 		carousel.appendChild(div);
 	});
 
@@ -188,11 +205,9 @@
 	}
 
 	setInterval(() => {
-		index++;
-		if (index >= items.length) index = 0;
+		index = (index + 1) % items.length;
 		showSlide(index);
 	}, 5000);
-
 </script>
 </html>
 

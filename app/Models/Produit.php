@@ -44,9 +44,6 @@ class Produit extends Model
 		);
 	}
 
-	// Un produit est éligible à plusieurs events (many-to-many)
-	// → l'event indique dans quel(s) rayon(s) événementiel(s) ce produit peut apparaître
-	// → une fois dans le rayon, il est trié/filtré par son thème
 	public function events()
 	{
 		return $this->belongsToMany(
@@ -57,7 +54,6 @@ class Produit extends Model
 		);
 	}
 
-	// Un produit peut avoir un thème (optionnel) — sert uniquement au tri et au filtrage
 	public function theme()
 	{
 		return $this->belongsTo(Theme::class, 'id_theme', 'id_theme')->withDefault();

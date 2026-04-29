@@ -106,8 +106,6 @@ return new class extends Migration
 		});
 
 		// ─── Pivot : rayon ↔ event ────────────────────────────────────────────
-		// Un rayon événementiel (ex : rayon "Noël") est rattaché à un event.
-		// Un event peut couvrir plusieurs rayons.
 		Schema::create('rayon_event', function (Blueprint $table) {
 			$table->unsignedInteger('id_rayon');
 			$table->unsignedInteger('id_event');
@@ -118,8 +116,6 @@ return new class extends Migration
 		});
 
 		// ─── Pivot : produit ↔ event ──────────────────────────────────────────
-		// Indique qu'un produit peut apparaître dans les rayons de cet event.
-		// Une fois dans le rayon événementiel, il est trié par son thème.
 		Schema::create('produit_event', function (Blueprint $table) {
 			$table->unsignedInteger('id_produit');
 			$table->unsignedInteger('id_event');
@@ -133,7 +129,7 @@ return new class extends Migration
 		Schema::create('image', function (Blueprint $table) {
 			$table->increments('id_image');
 			$table->unsignedInteger('id_produit');
-            $table->unsignedInteger('id_forme_condi');
+			$table->unsignedInteger('id_forme_condi');
 			$table->string('url');
 
 			$table->foreign('id_produit')->references('id_produit')->on('produit')->onDelete('cascade');

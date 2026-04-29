@@ -1,105 +1,32 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	@vite(['resources/css/style.css', 'resources/css/boutique.css'])
-	<title>{{ $boutique->nom_boutique }} — La Maison des Meringues</title>
-</head>
-<body>
+@include('templet.header', [
+	'titre' => $boutique->nom_boutique ,
+	'note'  => 'Meringues &amp; Douceurs Artisanales',
+	'title' => 'Shop'
+])
 
-{{-- ── NAVBAR ──────────────────────────────────────────────── --}}
-<nav class="navbar">
-	<div class="navbar__inner">
+@vite('resources/css/boutique.css')
 
-		<a href="/" class="navbar__logo-zone">
-			<img src="{{ asset('fichier/image/La_Maison_des_Meringues_logo.png') }}"
-				 alt="Logo La Maison des Meringues"
-				 class="navbar__logo-img">
-			<span class="navbar__logo-text">
-				Maison des<br><span>Meringues</span>
-			</span>
-		</a>
 
-		<span class="navbar__divider"></span>
+{{-- ── VÉRIFICATION RAYONS ACTIFS ──────────────────────── --}}
+@php
+	$rayonsActifs      = $rayons->filter(fn($r) => $r->islive());
+	$rayonsActifsCount = $rayonsActifs->count();
+	$rayonSelectionne  = $rayonActif?->id_rayon;
+@endphp
 
-		<nav class="navbar__links" aria-label="Navigation principale">
-			<a href="/"        class="navbar__link {{ request()->is('/') ? 'active' : '' }}">Accueil</a>
-			<a href="/news"    class="navbar__link {{ request()->is('news') ? 'active' : '' }}">Catalogue</a>
-			<a href="/gestion" class="navbar__link {{ request()->is('gestion') ? 'active' : '' }}">Importation</a>
-			<a href="/shop/1"  class="navbar__cta active">Boutique</a>
-		</nav>
-
-		<div class="navbar__profile" aria-expanded="false">
-			<div class="navbar__avatar">OR</div>
-			<span class="navbar__username">Olivia Rhye</span>
-			<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-				 stroke="currentColor" stroke-width="1.5">
-				<path d="M3.5 5.5l3.5 3.5 3.5-3.5"/>
-			</svg>
-			<div class="navbar__dropdown">
-				<a href="/profil" class="navbar__dropdown-item">
-					<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
-						<circle cx="7" cy="5" r="3"/><path d="M2 12c0-2.8 2.2-4 5-4s5 1.2 5 4"/>
-					</svg>
-					Mon profil
+{{-- ── NAVIGATION DES RAYONS ───────────────────────────── --}}
+<nav class="rayon-nav" aria-label="Rayons de la boutique">
+	<div class="rayon-nav__inner">
+		@foreach($rayons as $rayon)
+			@if($rayon->islive())
+				<a href="{{ route('shop', ['id_boutique' => $boutique->id_boutique, 'rayon' => $rayon->id_rayon]) }}"
+					class="rayon-nav__item {{ $rayonSelectionne == $rayon->id_rayon ? 'active' : '' }}">
+					{{ $rayon->nom_rayon }}
 				</a>
-				<a href="/settings" class="navbar__dropdown-item">
-					<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
-						<circle cx="7" cy="7" r="5"/><path d="M7 4v3l2 1.5"/>
-					</svg>
-					Paramètres
-				</a>
-				<hr class="navbar__dropdown-sep">
-				<a href="/logout" class="navbar__dropdown-item navbar__dropdown-item--danger">
-					<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
-						<path d="M5 2H2v10h3M9 9l3-2-3-2M6 7h6"/>
-					</svg>
-					Se déconnecter
-				</a>
-			</div>
-		</div>
-
+			@endif
+		@endforeach
 	</div>
 </nav>
-
-
-{{-- ── HERO BOUTIQUE ───────────────────────────────────────── --}}
-<div class="boutique-hero">
-	<div class="boutique-hero__inner">
-		<p class="boutique-hero__eyebrow">Nos créations</p>
-		<h1 class="boutique-hero__title">
-			{{ $boutique->nom_boutique }}
-			<em>Meringues &amp; Douceurs Artisanales</em>
-		</h1>
-		<p class="boutique-hero__desc">
-			{{ $totalProduits }} produit{{ $totalProduits > 1 ? 's' : '' }}
-			disponible{{ $totalProduits > 1 ? 's' : '' }}
-		</p>
-	</div>
-
-	{{-- ── VÉRIFICATION RAYONS ACTIFS ──────────────────────── --}}
-	@php
-		$rayonsActifs      = $rayons->filter(fn($r) => $r->islive());
-		$rayonsActifsCount = $rayonsActifs->count();
-		$rayonSelectionne  = $rayonActif?->id_rayon; // ← vient du controller
-	@endphp
-
-	{{-- ── NAVIGATION DES RAYONS ───────────────────────────── --}}
-	<nav class="rayon-nav" aria-label="Rayons de la boutique">
-		<div class="rayon-nav__inner">
-			@foreach($rayons as $rayon)
-				@if($rayon->islive())
-					<a href="{{ route('shop', ['id_boutique' => $boutique->id_boutique, 'rayon' => $rayon->id_rayon]) }}"
-					   class="rayon-nav__item {{ $rayonSelectionne == $rayon->id_rayon ? 'active' : '' }}">
-						{{ $rayon->nom_rayon }}
-						<span class="rayon-nav__count">{{ $rayon->produits_count }}</span>
-					</a>
-				@endif
-			@endforeach
-		</div>
-	</nav>
-</div>
 
 
 {{-- ── CORPS ───────────────────────────────────────────────── --}}

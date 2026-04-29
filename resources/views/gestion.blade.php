@@ -1,7 +1,11 @@
-@include('templet.header',
-	['titre' => 'Gestion des Données'],
-	['note'  => 'Importer et gérer vos données'])
+@include('templet.header', [
+	'titre' => 'Gestion des Données',
+	'note'  => 'Importer et gérer vos données',
+	'title' => 'Gestion'
+])
 @vite('resources/css/gestion.css')
+
+<main class="container section">
 
 <div class="container gestion-layout">
 
@@ -134,7 +138,7 @@
 						@endif
 					@endif
 				</h2>
-				<button class="btn btn--primary btn--sm" id="btn-nvproduit">+ Nouveau produit</button>
+				<button class="btn btn--primary btn--sm" id="btn-nvproduit" disabled>+ Nouveau produit</button>
 			</div>
 
 			@if(count($produits) > 0)
@@ -529,7 +533,9 @@
 		{{-- ══ PARFUMS ══ --}}
 		<div id="tab-parfums" class="tab-panel hidden">
 			<div class="data-toolbar">
-				<h2 class="data-toolbar__title">Parfums <span class="data-count">{{ count($parfums) }}</span></h2>
+				<h2 class="data-toolbar__title">Parfums <span class="data-count">{{ count($parfums) }}</span>
+					<input type="text" id="search-input-parfums" class="form-input form-input--sm" placeholder="Rechercher...">
+				</h2>
 				<button class="btn btn--primary btn--sm" id="btn-nvparfum">+ Nouveau parfum</button>
 			</div>
 			@if(count($parfums) > 0)
@@ -562,50 +568,7 @@
 
 {{-- ══ MODAL NOUVEAU PRODUIT ══ --}}
 <div id="modal-produit" class="data-modal hidden">
-	<div class="data-modal-content">
-		<h2>Nouveau produit</h2>
-		<form action="{{ route('produit.store') }}" method="POST">
-			@csrf
-			<label>Parfum</label>
-			<select name="id_parfum" required>
-				@foreach($parfums as $p)
-					<option value="{{ $p->id_parfum }}">{{ $p->nom_parfum }}</option>
-				@endforeach
-			</select>
-			<label>Forme / Conditionnement</label>
-			<select name="id_forme_condi" required>
-				@foreach($forme_condi as $fc)
-					<option value="{{ $fc->id_forme_condi }}">{{ $fc->forme->nom_forme }} — {{ $fc->conditionnement->type }} ({{ $fc->prix }} €)</option>
-				@endforeach
-			</select>
-			<label>Thème <span style="font-weight:400;">(optionnel — indicateur de tri)</span></label>
-			<select name="id_theme">
-				<option value="">— Aucun thème —</option>
-				@foreach($themes as $theme)
-					<option value="{{ $theme->id_theme }}">{{ $theme->icone }} {{ $theme->nom_theme }}</option>
-				@endforeach
-			</select>
-			<label>Rayon</label>
-			<select name="id_rayon" required>
-				@foreach($rayons as $rayon)
-					<option value="{{ $rayon->id_rayon }}" {{ $rayonId == $rayon->id_rayon ? 'selected' : '' }}>
-						{{-- ✅ Corrigé : ->themes → ->events --}}
-						@foreach($rayon->events as $e){{ $e->icone }} @endforeach {{ $rayon->nom_rayon }}
-					</option>
-				@endforeach
-			</select>
-			<label>Nom du produit</label>
-			<input type="text" name="nom_produit" placeholder="Nom du produit" required>
-			<label>Description</label>
-			<input type="text" name="description" placeholder="Description courte">
-			<label>Quantité</label>
-			<input type="number" name="quantite" min="0" value="0">
-			<div class="modal-actions">
-				<button type="button" class="btn-close-modal">Annuler</button>
-				<button type="submit" class="btn btn--primary">Créer</button>
-			</div>
-		</form>
-	</div>
+
 </div>
 
 {{-- ══ MODAL NOUVEAU RAYON ══ --}}
@@ -937,7 +900,16 @@
 		document.querySelectorAll('#tab-produits tbody tr').forEach(row => {
 			const namecode = row.querySelector('.td-namecode').textContent.toLowerCase();
 			const name     = row.querySelector('.td-name').textContent.toLowerCase();
-			row.style.display = (namecode.includes(query) || name.includes(query)) ? '' : 'none';
+			const id       = row.querySelector('.td-id').textContent.toLowerCase();
+			row.style.display = (namecode.includes(query) || name.includes(query) || id.includes(query)) ? '' : 'none';
+		});
+	});
+
+	document.getElementById('search-input-parfums').addEventListener('input', function () {
+		const query = this.value.toLowerCase();
+		document.querySelectorAll('#tab-parfums tbody tr').forEach(row => {
+			const name = row.querySelector('.td-name').textContent.toLowerCase();
+			row.style.display = (name.includes(query)) ? '' : 'none';
 		});
 	});
 

@@ -24,11 +24,9 @@ class GestionController extends Controller
 		$stock_total  = $boutique->stock_total;
 		$nom_boutique = $boutique->nom_boutique;
 
-		// ✅ Corrigé : Rayon::with('themes') → with('events')
-		// Les rayons sont liés à des events (many-to-many), plus à des themes
 		$rayons = Rayon::with('events')->get();
 		$themes = Theme::all();
-		$events = Event::all(); // ✅ Ajouté : nécessaire pour le tab Events et le modal Rayon
+		$events = Event::all();
 
 		$rayonId = $request->query('rayon');
 
@@ -54,14 +52,12 @@ class GestionController extends Controller
 		$parfums          = Parfum::all();
 		$forme_condi      = Forme_Condi::with(['forme', 'conditionnement'])->get();
 
-		// Nombre de produits par thème (pour l'affichage dans le tab Thèmes)
 		$produitsByTheme = $themes->mapWithKeys(function ($theme) {
 			return [
 				$theme->id_theme => Produit::where('id_theme', $theme->id_theme)->count()
 			];
 		});
 
-		// ✅ Ajouté : nombre de produits par event (pour l'affichage dans le tab Events)
 		$produitsByEvent = $events->mapWithKeys(function ($event) {
 			return [
 				$event->id_event => $event->produits()->count()

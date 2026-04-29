@@ -13,7 +13,7 @@ class Conditionnement extends Model
 	public $timestamps = false;
 
 	protected $fillable = [
-        'id_condi',
-        'type',
+		'id_condi',
+		'type',
 	];
 }
