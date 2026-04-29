@@ -25,6 +25,7 @@
 					<a href="/"        class="navbar__link {{ request()->is('/') ? 'active' : '' }}">Accueil</a>
 					<a href="/news"    class="navbar__link {{ request()->is('news') ? 'active' : '' }}">Catalogue</a>
 					<a href="/shop/{{ 1}}"    class="navbar__cta">Boutique</a>
+					<a href="/login"    class="navbar__link {{ request()->is('login') ? 'active' : '' }}">Connexion</a>
 				</nav>
 
 				<div class="navbar__profile" aria-expanded="false">

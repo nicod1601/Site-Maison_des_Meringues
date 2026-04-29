@@ -7,6 +7,7 @@ use App\Http\Controllers\AccueilController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\CreationController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\LoginController;
 
 // Menu Accueil
 
@@ -14,6 +15,7 @@ Route::get('/',        [AccueilController::class, 'index'])->name('index');
 Route::get('/news',    [NewsController::class,    'index'])->name('news');
 Route::get('/gestion', [GestionController::class, 'index'])->name('gestion');
 Route::get('/shop/{id_boutique}', [ShopController::class, 'index'])->name('shop');
+Route::get('/login', [LoginController::class, 'index'])->name('login');
 
 // Import
 Route::post('/import/excel', [ImportController::class, 'import'])->name('import.excel');
