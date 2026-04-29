@@ -19,7 +19,7 @@
 	<div class="rayon-nav__inner">
 		@foreach($rayons as $rayon)
 			@if($rayon->islive())
-				<a href="{{ route('shop', ['id_boutique' => $boutique->id_boutique, 'rayon' => $rayon->id_rayon]) }}"
+				<a href="/shop/{{ $boutique->id_boutique }}?rayon={{ $rayon->id_rayon }}"
 					class="rayon-nav__item {{ $rayonSelectionne == $rayon->id_rayon ? 'active' : '' }}">
 					{{ $rayon->nom_rayon }}
 				</a>
