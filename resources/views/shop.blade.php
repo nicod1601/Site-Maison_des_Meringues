@@ -44,22 +44,14 @@
 		{{-- ── BARRE D'OUTILS ─────────────────────────────────── --}}
 		<div class="boutique-toolbar">
 			<div class="boutique-toolbar__left">
-				<span class="boutique-toolbar__count">
-					{{ $totalProduits }} produit{{ $totalProduits > 1 ? 's' : '' }}
-					@if($rayonActif)
-						dans <strong>{{ $rayonActif->nom_rayon }}</strong>
-					@endif
-				</span>
-
-				<div class="boutique-view-toggle" role="group" aria-label="Mode d'affichage">
+				<!--<div class="boutique-view-toggle" role="group" aria-label="Mode d'affichage">
 					<button class="boutique-view-btn active" id="btn-grille"
 							aria-label="Vue grille" onclick="switchView('grille')">⊞</button>
 					<button class="boutique-view-btn" id="btn-liste"
 							aria-label="Vue liste"  onclick="switchView('liste')">☰</button>
-				</div>
+				</div>-->
 			</div>
 		</div>
-		{{-- /boutique-toolbar --}}
 
 
 		{{-- ── SECTIONS PAR THÈME ──────────────────────────────── --}}

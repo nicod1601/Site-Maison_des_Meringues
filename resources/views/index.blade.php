@@ -34,7 +34,7 @@
 							<circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
 						</svg>
 					</div>
-					<h3 class="card__title mt-md">Livraison à domicile</h3>
+					<h3 class="card__title mt-md">Expédition à domicile</h3>
 					<p class="text-muted text-small">Recevez vos commandes chez vous en 24 à 48h. Emballage soigné pour une arrivée parfaite.</p>
 				</div>
 
