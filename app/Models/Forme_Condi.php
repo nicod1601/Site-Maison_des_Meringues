@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Forme_Condi extends Model
 {
 	protected $table = 'forme_condi';
+
+    protected $primaryKey = 'id_forme_condi';
 	public $timestamps = false;
 
 	protected $fillable = [

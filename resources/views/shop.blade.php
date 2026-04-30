@@ -143,7 +143,6 @@
 
 								<div class="boutique-card__footer">
 									<div>
-										{{-- Prix de CE conditionnement --}}
 										@if($fc->prix)
 											<p class="boutique-card__price">
 												{{ number_format($fc->prix, 2, ',', ' ') }} €
@@ -153,16 +152,32 @@
 										@endif
 									</div>
 
-									@if($produit->quantite > 0)
-										<button class="boutique-card__add-btn"
-												onclick="voirProduit({{ $produit->id_produit }})"
-												aria-label="Voir {{ $produit->nom_produit }}"
-												title="Voir le produit">V</button>
+									@php
+										$dispo = match($fc->conditionnement->type) {
+											'individuelle'  => $produit->quantite > 0,
+											'sachet_de_10'  => $produit->quantite >= 10,
+											'sachet_de_4'   => $produit->quantite >= 4,
+											'boite_de_8'    => $produit->quantite >= 8,
+											default         => false,
+										};
+									@endphp
+
+									@if($dispo)
+										<form action="{{ route('panier.ajouter') }}" method="POST">
+											@csrf
+											<input type="hidden" name="id_produit"     value="{{ $produit->id_produit }}">
+											<input type="hidden" name="id_forme_condi" value="{{ $fc->id_forme_condi }}">
+											<input type="hidden" name="quantite"       value="1">
+											<button type="submit" class="boutique-card__add-btn"
+													aria-label="Ajouter {{ $produit->nom_produit }} au panier"
+													title="Ajouter au panier">+</button>
+										</form>
 									@else
 										<span class="boutique-card__add-btn"
 											style="background:var(--color-border);cursor:not-allowed;"
 											aria-disabled="true">✕</span>
 									@endif
+
 								</div>
 
 							</div>
