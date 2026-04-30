@@ -1,6 +1,6 @@
 # 🍬 La Maison des Meringues
 
-Site web artisanal pour la vente en ligne de meringues — boutique, gestion des produits et importation via fichier Excel.
+Site web artisanal pour la vente en ligne de meringues — boutique, gestion des produits, système de panier et authentification client.
 
 ---
 
@@ -12,6 +12,9 @@ Site web artisanal pour la vente en ligne de meringues — boutique, gestion des
 - De gérer les produits, formes, parfums, conditionnements et prix via une interface d'administration
 - D'importer des produits en masse via un fichier **Excel / CSV**
 - D'organiser les produits selon des **events** (Noël, Anniversaire, Printemps…)
+- D'ajouter des produits au **panier** sans être connecté (session)
+- De créer un **compte client** et de passer commande
+- De séparer les rôles **admin** et **client**
 
 ---
 
@@ -25,7 +28,8 @@ Site web artisanal pour la vente en ligne de meringues — boutique, gestion des
 | PostgreSQL | 15+ |
 | Vite | ^7.0 |
 | Maatwebsite/Excel | ^3.1 |
-| TailwindCSS | ^4.0 |
+| Laravel Breeze | ^2.4 |
+| CSS | Fait main + assistance IA |
 
 ---
 
@@ -33,12 +37,17 @@ Site web artisanal pour la vente en ligne de meringues — boutique, gestion des
 
 ```
 app/
-├── Http/Controllers/
-│   ├── AccueilController.php       # Page d'accueil
-│   ├── ShopController.php          # Boutique (rayons, thèmes, produits)
-│   ├── GestionController.php       # Interface d'administration
-│   ├── CreationController.php      # CRUD produits, rayons, events…
-│   └── ImportController.php        # Import Excel/CSV
+├── Http/
+│   ├── Controllers/
+│   │   ├── AccueilController.php       # Page d'accueil
+│   │   ├── ShopController.php          # Boutique (rayons, thèmes, produits)
+│   │   ├── GestionController.php       # Interface d'administration
+│   │   ├── CreationController.php      # CRUD produits, rayons, events…
+│   │   ├── ImportController.php        # Import Excel/CSV
+│   │   ├── PanierController.php        # Gestion du panier
+│   │   └── Auth/                       # Controllers Breeze (login, register…)
+│   └── Middleware/
+│       └── IsAdmin.php                 # Protection routes admin
 ├── Models/
 │   ├── Produit.php
 │   ├── Forme.php / Forme_Condi.php
@@ -48,22 +57,32 @@ app/
 │   ├── Theme.php
 │   ├── Event.php
 │   ├── Image.php
-│   └── Boutique.php
-├── Imports/
-│   └── UsersImport.php             # Logique d'import Excel
+│   ├── Boutique.php
+│   ├── Panier.php                      # Panier (session ou compte)
+│   ├── PanierLigne.php                 # Lignes du panier
+│   └── User.php                        # Utilisateur (role: admin/client)
+├── Listeners/
+│   └── TransfererPanierApresLogin.php  # Fusion panier session → compte
+└── Imports/
+    └── UsersImport.php                 # Logique d'import Excel
 resources/
 ├── views/
-│   ├── index.blade.php             # Accueil
-│   ├── shop.blade.php              # Boutique
-│   ├── gestion.blade.php           # Administration
+│   ├── index.blade.php                 # Accueil
+│   ├── shop.blade.php                  # Boutique
+│   ├── panier.blade.php                # Panier client
+│   ├── gestion.blade.php              # Administration
+│   ├── auth/
+│   │   ├── login.blade.php            # Connexion (design personnalisé)
+│   │   └── register.blade.php         # Inscription (design personnalisé)
 │   └── templet/
 │       ├── header.blade.php
 │       └── footer.blade.php
 ├── css/
-│   ├── style.css                   # Design system global
-│   ├── boutique.css                # Styles boutique
-│   ├── gestion.css                 # Styles administration
-│   └── index.css                   # Styles accueil
+│   ├── style.css                       # Design system global
+│   ├── boutique.css                    # Styles boutique
+│   ├── gestion.css                     # Styles administration
+│   ├── login.css                       # Styles login/register
+│   └── index.css                       # Styles accueil
 public/
 └── fichier/image/meringues/
     ├── Mini/
@@ -80,6 +99,10 @@ public/
 ## 🗄 Modèle de données
 
 ```
+users
+    ├── role (admin / client)
+    └── panier (via user_id)
+
 boutique
     └── rayon (many)
             └── produit (many-to-many via produit_rayon)
@@ -93,6 +116,15 @@ produit
 
 rayon
     └── events (many-to-many via rayon_event)
+
+panier
+    ├── user_id (nullable — null = visiteur anonyme)
+    ├── session_id (pour les visiteurs)
+    └── panier_ligne (many)
+            ├── id_produit
+            ├── id_forme_condi
+            ├── quantite
+            └── prix_unitaire
 
 image
     ├── id_produit
@@ -134,6 +166,9 @@ DB_PORT=5432
 DB_DATABASE=meringue
 DB_USERNAME=votre_user
 DB_PASSWORD=votre_password
+
+CACHE_STORE=file
+SESSION_DRIVER=file
 ```
 
 ### 4. Migrations et seeders
@@ -159,6 +194,36 @@ npm run dev
 php artisan serve
 ```
 
+### 6. Créer le premier compte admin
+
+```bash
+php artisan tinker
+```
+
+```php
+$user = App\Models\User::where('email', 'votre@email.com')->first();
+$user->role = 'admin';
+$user->save();
+```
+
+---
+
+## 👤 Système d'authentification
+
+- **Inscription** : `/register` — compte créé avec rôle `client` par défaut
+- **Connexion** : `/login` — redirige vers l'accueil après connexion
+- **Déconnexion** : bouton dans le menu navbar (formulaire POST)
+- **Rôles** : `admin` (accès gestion) / `client` (accès boutique + panier)
+
+---
+
+## 🛒 Système de panier
+
+- Panier accessible **sans compte** (stocké en session)
+- Au moment du checkout → **connexion obligatoire**
+- Après connexion → panier de session **fusionné** avec le compte
+- Un article du panier = `Produit` + `Forme_Condi` (ex: Mini Framboise en sachet de 10)
+
 ---
 
 ## 📦 Import des produits
@@ -182,13 +247,6 @@ L'interface `/gestion` permet d'importer les produits via un fichier `.xlsx` ou 
 
 > La première ligne est ignorée (en-tête).
 
-### Logique d'import
-
-- Les produits sont **créés ou mis à jour** (`updateOrCreate`) selon nom + forme + parfum
-- Les **images** sont générées automatiquement selon la forme et le parfum
-- Les produits `special` sont rattachés aux **rayons événementiels** correspondants
-- Les produits normaux vont dans le **rayon Base** (id=1)
-
 ---
 
 ## 🖼 Images des produits
@@ -205,8 +263,6 @@ Nid/
   individuelle/Ananas.jpg
 ```
 
-> ⚠️ Les noms de fichiers doivent correspondre exactement aux noms de parfums en base (sensible à la casse, sans accents si possible).
-
 ---
 
 ## 🛍 Boutique
@@ -215,14 +271,14 @@ URL : `/shop/1`
 
 - Navigation par **rayons** (visible uniquement si `live_rayon = true`)
 - Produits organisés par **thèmes**
-- Vue **grille** ou **liste**
+- Bouton **Ajouter au panier** selon disponibilité du stock
 - Badges : Nouveau, Épuisé, Emporter, Expédition
 
 ---
 
 ## ⚙️ Interface de gestion
 
-URL : `/gestion`
+URL : `/gestion` — **accès admin uniquement**
 
 Onglets disponibles :
 - **Produits** — liste avec toggles Live, Emporter, Expédition, Nouveauté
@@ -233,8 +289,6 @@ Onglets disponibles :
 - **Thèmes** — avec icône et couleur
 - **Events** — occasions spéciales
 - **Prix** — combinaisons forme × conditionnement
-
-Filtrage des produits par rayon via le sélecteur en haut à droite.
 
 ---
 
