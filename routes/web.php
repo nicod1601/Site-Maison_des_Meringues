@@ -11,51 +11,51 @@ use App\Http\Controllers\CreationController;
 use App\Http\Controllers\ShopController;
 
 // ── Pages publiques ───────────────────────────────────────────────────────────
-Route::get('/',    [AccueilController::class, 'index'])->name('index');
-Route::get('/news', [NewsController::class,   'index'])->name('news');
+Route::get('/',     [AccueilController::class, 'index'])->name('index');
+Route::get('/news', [NewsController::class,    'index'])->name('news');
 Route::get('/shop/{id}', [ShopController::class, 'index'])->name('shop.index');
 
 // ── Panier (accessible sans compte) ──────────────────────────────────────────
-Route::get   ('/panier',              [PanierController::class, 'index'])   ->name('panier.index');
-Route::post  ('/panier/ajouter',      [PanierController::class, 'ajouter']) ->name('panier.ajouter');
-Route::patch ('/panier/ligne/{id}',   [PanierController::class, 'modifier'])->name('panier.modifier');
-Route::delete('/panier/ligne/{id}',   [PanierController::class, 'supprimer'])->name('panier.supprimer');
-Route::post  ('/panier/vider',        [PanierController::class, 'vider'])   ->name('panier.vider');
+Route::get   ('/panier',            [PanierController::class, 'index'])    ->name('panier.index');
+Route::post  ('/panier/ajouter',    [PanierController::class, 'ajouter'])  ->name('panier.ajouter');
+Route::patch ('/panier/ligne/{id}', [PanierController::class, 'modifier']) ->name('panier.modifier');
+Route::delete('/panier/ligne/{id}', [PanierController::class, 'supprimer'])->name('panier.supprimer');
+Route::post  ('/panier/vider',      [PanierController::class, 'vider'])    ->name('panier.vider');
 
 // ── Checkout (compte obligatoire) ─────────────────────────────────────────────
-Route::get('/checkout', function () {
-    return view('checkout'); // on fera la vraie vue plus tard
-})->name('checkout.index');
-
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/checkout', function () {
+        return view('checkout');
+    })->name('checkout.index');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])   ->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'edit'])    ->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ── Gestion (admin) ───────────────────────────────────────────────────────────
-Route::get('/gestion', [GestionController::class, 'index'])->name('gestion');
+// ── Gestion (admin uniquement) ────────────────────────────────
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/gestion', [GestionController::class, 'index'])->name('gestion');
 
-Route::post('/import/excel', [ImportController::class, 'import'])->name('import.excel');
-Route::get ('/import/clear', [ImportController::class, 'clear']) ->name('import.clear');
+    Route::post('/import/excel', [ImportController::class, 'import'])->name('import.excel');
+    Route::get ('/import/clear', [ImportController::class, 'clear']) ->name('import.clear');
+
+    // Produits, Rayons, Thèmes, etc...
+});
 
 // Produits
-Route::post  ('/gestion/produit',                    [CreationController::class, 'nvproduit'])       ->name('produit.store');
-Route::delete('/gestion/produit/{id}',               [CreationController::class, 'destroy'])         ->name('produit.destroy');
-Route::patch ('/gestion/produit/{id}/live',          [CreationController::class, 'toggleLive'])      ->name('produit.live');
-Route::patch ('/gestion/produit/{id}/expedition',    [CreationController::class, 'toggleExpedition'])->name('produit.expedition');
-Route::patch ('/gestion/produit/{id}/emporter',      [CreationController::class, 'toggleEmporter'])  ->name('produit.emporter');
-Route::patch ('/gestion/produit/{id}/nouveaute',     [CreationController::class, 'toggleNouveaute']) ->name('produit.nouveaute');
+Route::post  ('/gestion/produit',                 [CreationController::class, 'nvproduit'])       ->name('produit.store');
+Route::delete('/gestion/produit/{id}',            [CreationController::class, 'destroy'])         ->name('produit.destroy');
+Route::patch ('/gestion/produit/{id}/live',       [CreationController::class, 'toggleLive'])      ->name('produit.live');
+Route::patch ('/gestion/produit/{id}/expedition', [CreationController::class, 'toggleExpedition'])->name('produit.expedition');
+Route::patch ('/gestion/produit/{id}/emporter',   [CreationController::class, 'toggleEmporter'])  ->name('produit.emporter');
+Route::patch ('/gestion/produit/{id}/nouveaute',  [CreationController::class, 'toggleNouveaute']) ->name('produit.nouveaute');
 
 // Rayons
-Route::post  ('/gestion/rayon',          [CreationController::class, 'nvrayon'])       ->name('nvrayon');
-Route::delete('/gestion/rayon/{id}',     [CreationController::class, 'destroyRayon'])  ->name('rayon.destroy');
-Route::put   ('/gestion/rayon/{id}',     [CreationController::class, 'updateRayon'])   ->name('rayon.update');
-Route::patch ('/gestion/rayon/{id}/live',[CreationController::class, 'toggleLiveRayon'])->name('rayon.live');
+Route::post  ('/gestion/rayon',           [CreationController::class, 'nvrayon'])        ->name('nvrayon');
+Route::delete('/gestion/rayon/{id}',      [CreationController::class, 'destroyRayon'])   ->name('rayon.destroy');
+Route::put   ('/gestion/rayon/{id}',      [CreationController::class, 'updateRayon'])    ->name('rayon.update');
+Route::patch ('/gestion/rayon/{id}/live', [CreationController::class, 'toggleLiveRayon'])->name('rayon.live');
 
 // Thèmes
 Route::post  ('/gestion/theme',      [CreationController::class, 'nvtheme'])      ->name('nvtheme');

@@ -8,10 +8,8 @@ class AccueilController extends Controller
 {
 	public function index()
 	{
-		$produits = Produit::all();
-		$lien = "";
-		$images = Image::all();
-		$trouve = false;
+		$produits = Produit::with(['forme', 'parfum'])->get();
+		$images   = Image::all();
 
 		return view('index', compact('produits', 'images'));
 	}
