@@ -176,8 +176,8 @@
 		const nom     = produit
 			? (produit.forme?.nom_forme ?? '') + ' — ' + (produit.parfum?.nom_parfum ?? '')
 			: 'Produit';
-		const desc    = produit?.description && produit.description !== 'Aucune description'
-			? produit.description
+		const desc    = (produit?.description) && (produit.description) !== 'Aucune description'
+			? (produit.description)
 			: '';
 
 		const div = document.createElement('div');

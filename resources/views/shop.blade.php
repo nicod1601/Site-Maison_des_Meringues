@@ -1,5 +1,5 @@
 @include('templet.header', [
-	'titre' => $boutique->nom_boutique ,
+	'titre' => $boutique->nom_boutique,
 	'note'  => 'Meringues &amp; Douceurs Artisanales',
 	'title' => 'Shop'
 ])
@@ -12,7 +12,18 @@
 	$rayonsActifs      = $rayons->filter(fn($r) => $r->islive());
 	$rayonsActifsCount = $rayonsActifs->count();
 	$rayonSelectionne  = $rayonActif?->id_rayon;
+
 @endphp
+
+{{-- ── EVENT CSS ──────────────────────────────────────────── --}}
+@php
+	$isNoel = $rayonActif?->events->contains(fn($e) => strtolower($e->nom_event) === 'noël') ?? false;
+@endphp
+
+@if($isNoel)
+	@vite('resources/css/event/noel.css')
+@endif
+
 
 {{-- ── NAVIGATION DES RAYONS ───────────────────────────── --}}
 <nav class="rayon-nav" aria-label="Rayons de la boutique">
@@ -26,11 +37,52 @@
 			@endif
 		@endforeach
 	</div>
+
+	{{-- PANIER À DROITE --}}
+	<div class="cart-bubble" id="cart-bubble" aria-expanded="false">
+		<span>🛒 Mon Panier</span>
+			<div class="cart-dropdown" id="cart-dropdown">
+
+				@if($ListeProduits->isEmpty())
+					<p class="cart-dropdown__empty">🛒 Votre panier est vide</p>
+				@else
+
+					<ul class="cart-dropdown__list">
+						@foreach($ListeProduits as $ligne)
+							<li class="cart-dropdown__item">
+
+								<span class="cart-dropdown__item-name">
+									{{ $ligne->produit->nom_produit }}
+								</span>
+
+								<span class="cart-dropdown__item-qty">
+									× {{ $ligne->quantite }}
+								</span>
+
+								<span class="cart-dropdown__item-price">
+									{{ number_format($ligne->prix_unitaire * $ligne->quantite, 2, ',', ' ') }} €
+								</span>
+
+							</li>
+						@endforeach
+					</ul>
+
+					<div class="cart-dropdown__footer">
+						<a href="/panier" class="btn btn--primary btn--sm" style="width:100%;text-align:center;">
+							Voir mon panier →
+						</a>
+					</div>
+
+				@endif
+
+			</div>
+	</div>
+
 </nav>
 
 
 {{-- ── CORPS ───────────────────────────────────────────────── --}}
-<main class="boutique-body" id="boutique-contenu">
+<main class="boutique-body {{ $isNoel ? 'event--noel' : '' }}" id="boutique-contenu">
 
 	@if($rayonsActifsCount === 0)
 		{{-- Aucun rayon actif --}}
@@ -40,19 +92,6 @@
 			<p class="boutique-empty__text">Merci de patienter pour l'ajout des produits</p>
 		</div>
 	@else
-
-		{{-- ── BARRE D'OUTILS ─────────────────────────────────── --}}
-		<div class="boutique-toolbar">
-			<div class="boutique-toolbar__left">
-				<!--<div class="boutique-view-toggle" role="group" aria-label="Mode d'affichage">
-					<button class="boutique-view-btn active" id="btn-grille"
-							aria-label="Vue grille" onclick="switchView('grille')">⊞</button>
-					<button class="boutique-view-btn" id="btn-liste"
-							aria-label="Vue liste"  onclick="switchView('liste')">☰</button>
-				</div>-->
-			</div>
-		</div>
-
 
 		{{-- ── SECTIONS PAR THÈME ──────────────────────────────── --}}
 		@forelse($themesAffiches as $themeIndex => $theme)
@@ -97,7 +136,7 @@
 						@foreach($produit->forme->forme_condis as $fc)
 						<article class="boutique-card" aria-label="{{ $produit->nom_produit }}">
 
-							{{-- Placeholder image --}}
+							{{-- Image --}}
 							<div class="boutique-card__img-wrap">
 								<div class="boutique-card__img-placeholder" aria-hidden="true"
 									@if($theme->couleur)
@@ -105,7 +144,6 @@
 									@endif>
 									<img src="{{ asset($produit->image($fc->id_forme_condi)) }}"
 										class="boutique-card__img">
-
 								</div>
 								<div class="boutique-card__badges">
 									@if($produit->nouveaute)
@@ -124,7 +162,9 @@
 									{{ $fc->conditionnement->type }}
 								</p>
 
-								<h3 class="boutique-card__name">{{ $produit->forme->nom_forme }} — {{ $produit->parfum->nom_parfum }}</h3>
+								<h3 class="boutique-card__name">
+									{{ $produit->forme->nom_forme }} — {{ $produit->parfum->nom_parfum }}
+								</h3>
 
 								@if($produit->description && $produit->description != 'Aucune description')
 									<p class="boutique-card__desc" style="margin-top:.2rem;">
@@ -154,11 +194,11 @@
 
 									@php
 										$dispo = match($fc->conditionnement->type) {
-											'individuelle'  => $produit->quantite > 0,
-											'sachet_de_10'  => $produit->quantite >= 10,
-											'sachet_de_4'   => $produit->quantite >= 4,
-											'boite_de_8'    => $produit->quantite >= 8,
-											default         => false,
+											'individuelle' => $produit->quantite > 0,
+											'sachet_de_10' => $produit->quantite >= 10,
+											'sachet_de_4'  => $produit->quantite >= 4,
+											'boite_de_8'   => $produit->quantite >= 8,
+											default        => false,
 										};
 									@endphp
 
@@ -179,7 +219,6 @@
 									@endif
 
 								</div>
-
 							</div>
 						</article>
 						@endforeach
@@ -219,7 +258,7 @@
 
 {{-- ── SCRIPTS ─────────────────────────────────────────────── --}}
 <script>
-	// Navbar dropdown
+	// ── Navbar dropdown ──
 	const profileBtn = document.querySelector('.navbar__profile');
 	const dropdown   = document.querySelector('.navbar__dropdown');
 	profileBtn.addEventListener('click', function () {
@@ -234,30 +273,30 @@
 		}
 	});
 
-	// Vue grille / liste
-	function switchView(mode) {
-		document.querySelectorAll('.products-grid').forEach(g => {
-			g.classList.toggle('list-view', mode === 'liste');
-		});
-		document.getElementById('btn-grille').classList.toggle('active', mode === 'grille');
-		document.getElementById('btn-liste').classList.toggle('active',  mode === 'liste');
-		localStorage.setItem('boutique_view', mode);
-	}
-	document.addEventListener('DOMContentLoaded', () => {
-		if (localStorage.getItem('boutique_view') === 'liste') switchView('liste');
-	});
-
-	// Tri
+	// ── Tri ──
 	function appliquerTri(valeur) {
 		const url = new URL(window.location.href);
 		url.searchParams.set('tri', valeur);
 		window.location.href = url.toString();
 	}
 
-	// Voir fiche produit
+	// ── Voir fiche produit ──
 	function voirProduit(id) {
 		window.location.href = '/produit/' + id;
 	}
+
+	// ── Cart bubble toggle ──
+	const cartBubble = document.getElementById('cart-bubble');
+	cartBubble.addEventListener('click', function(e) {
+		e.stopPropagation();
+		const isOpen = this.getAttribute('aria-expanded') === 'true';
+		this.setAttribute('aria-expanded', String(!isOpen));
+	});
+	document.addEventListener('click', function(e) {
+		if (!cartBubble.contains(e.target)) {
+			cartBubble.setAttribute('aria-expanded', 'false');
+		}
+	});
 </script>
 
 </body>

@@ -2,17 +2,40 @@
 
 namespace App\Providers;
 
+use App\Models\Panier;
+use App\Listeners\TransfererPanierApresLogin;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use App\Listeners\TransfererPanierApresLogin;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+	public function register(): void {}
 
-    public function boot(): void
-    {
-        Event::listen(Login::class, TransfererPanierApresLogin::class);
-    }
+	public function boot(): void
+	{
+		Event::listen(Login::class, TransfererPanierApresLogin::class);
+
+		View::composer('*', function ($view) {
+			static $panier = null;
+
+			if ($panier === null) {
+				if (auth()->check()) {
+					$panier = Panier::with('lignes.produit', 'lignes.formeCondi')
+						->where('user_id', auth()->id())
+						->first()
+						?? Panier::create(['user_id' => auth()->id()]);
+				} else {
+					$sessionId = session()->getId();
+					$panier = Panier::with('lignes.produit', 'lignes.formeCondi')
+						->where('session_id', $sessionId)
+						->first()
+						?? Panier::create(['session_id' => $sessionId]);
+				}
+			}
+
+			$view->with('panier', $panier);
+		});
+	}
 }

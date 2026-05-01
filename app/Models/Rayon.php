@@ -21,16 +21,6 @@ class Rayon extends Model
 		return $this->belongsTo(Boutique::class, 'id_boutique', 'id_boutique');
 	}
 
-	public function events()
-	{
-		return $this->belongsToMany(
-			Event::class,
-			'rayon_event',
-			'id_rayon',
-			'id_event'
-		);
-	}
-
 	public function produits()
 	{
 		return $this->belongsToMany(
@@ -76,4 +66,9 @@ class Rayon extends Model
 		$this->live_rayon = $live;
 		$this->save();
 	}
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'rayon_event', 'id_rayon', 'id_event');
+    }
 }

@@ -1,0 +1,619 @@
+/* ============================================================
+   🎄 EVENT NOËL — resources/css/event/noel.css
+   Override du thème de base boutique.css
+   Ambiance : Noël de luxe, velours & or, magie artisanale
+   ============================================================ */
+
+/* ── POLICES NOËL ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+/* ── VARIABLES NOËL ───────────────────────────────────────── */
+.event--noel {
+  /* Palette */
+  --noel-rouge:         #7A1C2E;
+  --noel-rouge-vif:     #A52535;
+  --noel-rouge-pale:    #C4616E;
+  --noel-vert:          #1A3A2A;
+  --noel-vert-mid:      #264D38;
+  --noel-vert-light:    #3D7A56;
+  --noel-or:            #B8860B;
+  --noel-or-vif:        #D4A017;
+  --noel-or-clair:      #F0D060;
+  --noel-or-pale:       #F5E6A0;
+  --noel-creme:         #FDF6E3;
+  --noel-creme-dark:    #F0E2C0;
+  --noel-ivoire:        #FFFDF5;
+  --noel-brun:          #2C1405;
+  --noel-brun-mid:      #4A2010;
+
+  /* Remplacement variables de base */
+  --color-cream:        var(--noel-creme);
+  --color-cream-dark:   var(--noel-creme-dark);
+  --color-white:        var(--noel-ivoire);
+  --color-border:       #D4B896;
+  --color-primary:      var(--noel-rouge);
+  --color-primary-dark: var(--noel-brun);
+  --color-primary-light: #C4616E;
+  --color-gold:         var(--noel-or);
+  --color-gold-dark:    var(--noel-or);
+  --color-text-muted:   #7A5C3A;
+
+  /* Typographie Noël */
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-accent:  'Cinzel', Georgia, serif;
+  --font-body:    'EB Garamond', Georgia, serif;
+
+  /* Ombres Noël */
+  --shadow-noel-card:  0 4px 24px rgba(44, 20, 5, .10), 0 1px 4px rgba(44, 20, 5, .06);
+  --shadow-noel-hover: 0 16px 48px rgba(122, 28, 46, .18), 0 4px 16px rgba(44, 20, 5, .12);
+  --shadow-noel-gold:  0 0 0 2px var(--noel-or-clair), 0 8px 32px rgba(184, 134, 11, .22);
+}
+
+/* ── FOND GLOBAL ──────────────────────────────────────────── */
+.event--noel {
+  background-color: var(--noel-creme);
+  /* Texture grain subtile comme du papier cadeau */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");
+}
+
+/* ══════════════════════════════════════════════════════════
+   HERO BOUTIQUE
+══════════════════════════════════════════════════════════ */
+.event--noel .boutique-hero {
+  background:
+    linear-gradient(160deg, var(--noel-vert) 0%, var(--noel-brun) 50%, var(--noel-rouge) 100%);
+  border-bottom: 3px solid var(--noel-or);
+  box-shadow: 0 6px 32px rgba(0,0,0,.25);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Étoiles scintillantes en pseudo-éléments */
+.event--noel .boutique-hero::before {
+  content: '✦ ❄ ✦ ❅ ✦ ❄ ✦ ❅ ✦ ❄ ✦ ❅ ✦ ❄ ✦ ❅ ✦ ❄ ✦';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12px;
+  font-size: .9rem;
+  letter-spacing: 1.4em;
+  color: rgba(255,255,255,.12);
+  animation: noel-drift 22s linear infinite;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.event--noel .boutique-hero::after {
+  content: '❅ ✦ ❄ ✦ ❅ ✦ ❄ ✦ ❅ ✦ ❄ ✦ ❅ ✦ ❄ ✦ ❅ ✦ ❄';
+  position: absolute;
+  bottom: 10px;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: .7rem;
+  letter-spacing: 1.8em;
+  color: rgba(255,255,255,.08);
+  animation: noel-drift 30s linear infinite reverse;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@keyframes noel-drift {
+  0%   { transform: translateX(-3%); }
+  100% { transform: translateX(3%); }
+}
+
+.event--noel .boutique-hero__eyebrow {
+  font-family: var(--font-accent);
+  font-size: .72rem;
+  letter-spacing: .3em;
+  color: var(--noel-or-clair);
+  text-shadow: 0 2px 12px rgba(0,0,0,.4);
+}
+
+.event--noel .boutique-hero__title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: var(--noel-creme);
+  text-shadow: 0 4px 24px rgba(0,0,0,.5);
+  font-weight: 300;
+}
+
+.event--noel .boutique-hero__title em {
+  font-family: 'Cinzel', Georgia, serif;
+  font-style: normal;
+  color: var(--noel-or-clair);
+  letter-spacing: .12em;
+  font-size: .55em;
+  text-shadow: 0 2px 16px rgba(0,0,0,.4);
+  animation: noel-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes noel-shimmer {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  50%       { opacity: .85; filter: brightness(1.3); }
+}
+
+.event--noel .boutique-hero__desc {
+  color: rgba(253, 246, 227, .75);
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+}
+
+/* ══════════════════════════════════════════════════════════
+   NAVIGATION RAYONS
+══════════════════════════════════════════════════════════ */
+.event--noel .rayon-nav {
+  background: var(--noel-vert);
+  background-image: linear-gradient(90deg, var(--noel-brun) 0%, var(--noel-vert) 40%, var(--noel-vert-mid) 100%);
+  border-bottom: 3px solid var(--noel-or);
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+}
+
+.event--noel .rayon-nav__item {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: .68rem;
+  letter-spacing: .18em;
+  color: rgba(253, 246, 227, .7);
+  border-bottom-color: transparent;
+  transition: color .25s, border-color .25s, background .25s;
+}
+
+.event--noel .rayon-nav__item:hover {
+  color: var(--noel-or-clair);
+  background: rgba(255,255,255,.06);
+}
+
+.event--noel .rayon-nav__item.active {
+  color: var(--noel-or-clair);
+  border-bottom-color: var(--noel-or-vif);
+  background: rgba(255,255,255,.08);
+}
+
+.event--noel .rayon-nav__count {
+  background: rgba(255,255,255,.15);
+  color: var(--noel-creme);
+}
+
+.event--noel .rayon-nav__item.active .rayon-nav__count {
+  background: var(--noel-or);
+  color: var(--noel-brun);
+}
+
+/* ══════════════════════════════════════════════════════════
+   CORPS
+══════════════════════════════════════════════════════════ */
+.event--noel .boutique-body {
+  background: none;
+}
+
+/* ══════════════════════════════════════════════════════════
+   BARRE D'OUTILS
+══════════════════════════════════════════════════════════ */
+.event--noel .boutique-toolbar {
+  background: var(--noel-ivoire);
+  border: 1px solid var(--noel-creme-dark);
+  border-radius: 12px;
+  box-shadow: var(--shadow-noel-card);
+  padding: 12px 20px;
+}
+
+.event--noel .boutique-filter-chip {
+  border-color: var(--noel-or);
+  color: var(--noel-brun-mid);
+  font-family: 'Cinzel', serif;
+  font-size: .65rem;
+  letter-spacing: .1em;
+}
+
+.event--noel .boutique-filter-chip:hover,
+.event--noel .boutique-filter-chip.active {
+  border-color: var(--noel-rouge);
+  color: var(--noel-rouge);
+  background: rgba(122, 28, 46, .06);
+}
+
+.event--noel .boutique-view-btn.active {
+  background: var(--noel-rouge);
+}
+
+/* ══════════════════════════════════════════════════════════
+   SÉPARATEUR DE THÈME
+══════════════════════════════════════════════════════════ */
+.event--noel .theme-divider {
+  color: var(--noel-or);
+}
+
+.event--noel .theme-divider::before,
+.event--noel .theme-divider::after {
+  background: linear-gradient(to right, transparent, var(--noel-or), transparent);
+  height: 1px;
+}
+
+.event--noel .theme-divider__icon {
+  animation: noel-spin 10s linear infinite;
+  font-size: 1.1rem;
+  opacity: 1;
+}
+
+@keyframes noel-spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   EN-TÊTE DE THÈME
+══════════════════════════════════════════════════════════ */
+.event--noel .theme-section {
+  animation: noel-fade-up .6s ease both;
+}
+
+@keyframes noel-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.event--noel .theme-header {
+  border-bottom: 1px solid var(--noel-creme-dark);
+  position: relative;
+}
+
+/* Petite branche de houx décorative */
+.event--noel .theme-header::after {
+  content: '🎄';
+  position: absolute;
+  right: 0;
+  bottom: var(--space-lg);
+  font-size: 1.6rem;
+  opacity: .18;
+  pointer-events: none;
+}
+
+.event--noel .theme-header__eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: .68rem;
+  letter-spacing: .28em;
+  color: var(--noel-or);
+}
+
+.event--noel .theme-header__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  color: var(--noel-brun);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+}
+
+.event--noel .theme-header__title span {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--noel-rouge);
+}
+
+.event--noel .theme-header__ornament-line {
+  background: var(--noel-or) !important;
+  height: 1.5px;
+}
+
+.event--noel .theme-header__ornament-dot {
+  background: var(--noel-or) !important;
+  box-shadow: 0 0 0 3px rgba(184,134,11,.2);
+}
+
+/* ══════════════════════════════════════════════════════════
+   GRILLE PRODUITS
+══════════════════════════════════════════════════════════ */
+.event--noel .products-grid {
+  gap: 24px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CARTE PRODUIT
+══════════════════════════════════════════════════════════ */
+.event--noel .boutique-card {
+  background: var(--noel-ivoire);
+  border: 1px solid var(--noel-creme-dark);
+  border-radius: 18px;
+  box-shadow: var(--shadow-noel-card);
+  transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s ease, border-color .3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Effet de neige sur le coin supérieur */
+.event--noel .boutique-card::before {
+  content: '';
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 44px 44px 0;
+  border-color: transparent var(--noel-or) transparent transparent;
+  opacity: .4;
+  transition: opacity .3s;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Petit flocon dans le coin */
+.event--noel .boutique-card::after {
+  content: '❄';
+  position: absolute;
+  top: 3px; right: 5px;
+  font-size: .7rem;
+  color: var(--noel-brun);
+  opacity: .5;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+
+.event--noel .boutique-card:hover {
+  transform: translateY(-8px) scale(1.015);
+  box-shadow: var(--shadow-noel-hover);
+  border-color: rgba(184,134,11,.4);
+}
+
+.event--noel .boutique-card:hover::before { opacity: .85; }
+.event--noel .boutique-card:hover::after  { opacity: .9; color: var(--noel-creme); }
+
+/* ── IMAGE ─────────────────────────────────────────────────── */
+.event--noel .boutique-card__img-wrap {
+  background: linear-gradient(135deg, var(--noel-vert) 0%, var(--noel-brun) 100%);
+  position: relative;
+}
+
+/* Motif étoilé derrière l'image */
+.event--noel .boutique-card__img-placeholder {
+  background: linear-gradient(135deg, var(--noel-vert) 0%, var(--noel-brun) 100%) !important;
+  position: relative;
+}
+
+.event--noel .boutique-card__img-placeholder::after {
+  content: '❅  ✦  ❄';
+  position: absolute;
+  bottom: 8px; right: 10px;
+  font-size: .65rem;
+  color: rgba(255,255,255,.2);
+  letter-spacing: .4em;
+  pointer-events: none;
+}
+
+.event--noel .boutique-card__img {
+  transition: transform .45s ease;
+}
+
+.event--noel .boutique-card:hover .boutique-card__img {
+  transform: scale(1.07);
+}
+
+/* ── BOUTON AJOUT RAPIDE ────────────────────────────────────── */
+.event--noel .boutique-card__quick-add {
+  background: var(--noel-vert);
+  font-family: 'Cinzel', serif;
+  font-size: .65rem;
+  letter-spacing: .12em;
+}
+.event--noel .boutique-card__quick-add:hover {
+  background: var(--noel-rouge);
+}
+
+/* ── BADGES ─────────────────────────────────────────────────── */
+.event--noel .badge--new,
+.event--noel [class*="badge--new"] {
+  background: var(--noel-or);
+  color: var(--noel-brun);
+  font-family: 'Cinzel', serif;
+  font-size: .62rem;
+  letter-spacing: .08em;
+  box-shadow: 0 2px 10px rgba(184,134,11,.35);
+}
+
+.event--noel .badge--close,
+.event--noel [class*="badge--close"] {
+  background: rgba(122, 28, 46, .9);
+  color: var(--noel-creme);
+}
+
+.event--noel .badge--cream,
+.event--noel [class*="badge--cream"] {
+  background: var(--noel-creme-dark);
+  color: var(--noel-brun-mid);
+  border-color: rgba(184,134,11,.3);
+}
+
+/* ── CORPS DE CARTE ─────────────────────────────────────────── */
+.event--noel .boutique-card__body {
+  padding: 16px 18px;
+}
+
+.event--noel .boutique-card__theme {
+  font-family: 'Cinzel', serif;
+  font-size: .63rem;
+  letter-spacing: .2em;
+  color: var(--noel-vert-light);
+}
+
+.event--noel .boutique-card__name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--noel-brun);
+  line-height: 1.3;
+}
+
+.event--noel .boutique-card__desc {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: .9rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ── PIED DE CARTE ──────────────────────────────────────────── */
+.event--noel .boutique-card__footer {
+  border-top: 1px solid var(--noel-creme-dark);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.event--noel .boutique-card__price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--noel-rouge);
+}
+
+.event--noel .boutique-card__add-btn {
+  background: var(--noel-rouge);
+  border: none;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  color: var(--noel-creme);
+  font-size: 1.2rem;
+  box-shadow: 0 3px 12px rgba(122,28,46,.3);
+  transition: background .2s, transform .2s, box-shadow .2s;
+}
+
+.event--noel .boutique-card__add-btn:hover {
+  background: var(--noel-or);
+  color: var(--noel-brun);
+  transform: scale(1.15) rotate(90deg);
+  box-shadow: var(--shadow-noel-gold);
+}
+
+/* ══════════════════════════════════════════════════════════
+   ÉTAT VIDE
+══════════════════════════════════════════════════════════ */
+.event--noel .boutique-empty__icon {
+  opacity: 1;
+  animation: noel-sway 3s ease-in-out infinite;
+}
+
+@keyframes noel-sway {
+  0%, 100% { transform: rotate(-6deg); }
+  50%       { transform: rotate(6deg); }
+}
+
+.event--noel .boutique-empty__title {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--noel-brun);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PAGINATION
+══════════════════════════════════════════════════════════ */
+.event--noel .boutique-pagination {
+  border-top-color: var(--noel-creme-dark);
+}
+
+.event--noel .boutique-page-btn {
+  border-color: var(--noel-creme-dark);
+  background: var(--noel-ivoire);
+  font-family: 'Cinzel', serif;
+  font-size: .7rem;
+  color: var(--noel-brun-mid);
+}
+
+.event--noel .boutique-page-btn:hover {
+  border-color: var(--noel-rouge);
+  color: var(--noel-rouge);
+}
+
+.event--noel .boutique-page-btn.active {
+  background: var(--noel-rouge);
+  border-color: var(--noel-rouge);
+  color: var(--noel-creme);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANIER FLOTTANT
+══════════════════════════════════════════════════════════ */
+.event--noel .cart-bubble {
+  background: var(--noel-vert);
+  border: 2px solid var(--noel-or);
+  font-family: 'Cinzel', serif;
+  font-size: .72rem;
+  letter-spacing: .08em;
+}
+
+.event--noel .cart-bubble:hover {
+  background: var(--noel-rouge);
+  border-color: var(--noel-or-clair);
+}
+
+.event--noel .cart-bubble__badge {
+  background: var(--noel-or);
+  color: var(--noel-brun);
+}
+
+/* ══════════════════════════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════════════════════════ */
+.event--noel ::-webkit-scrollbar-track { background: var(--noel-creme-dark); }
+.event--noel ::-webkit-scrollbar-thumb {
+  background: var(--noel-rouge);
+  border-radius: 4px;
+}
+.event--noel ::-webkit-scrollbar-thumb:hover { background: var(--noel-rouge-vif); }
+
+/* ══════════════════════════════════════════════════════════
+   SÉLECTION
+══════════════════════════════════════════════════════════ */
+.event--noel ::selection {
+  background: var(--noel-or-pale);
+  color: var(--noel-brun);
+}
+
+/* ══════════════════════════════════════════════════════════
+   FOCUS ACCESSIBILITÉ
+══════════════════════════════════════════════════════════ */
+.event--noel :focus-visible {
+  outline: 3px solid var(--noel-or-vif);
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ANIMATIONS D'ENTRÉE EN CASCADE POUR LES CARTES
+══════════════════════════════════════════════════════════ */
+.event--noel .boutique-card {
+  animation: noel-card-in .55s ease both;
+}
+.event--noel .boutique-card:nth-child(1) { animation-delay: .00s; }
+.event--noel .boutique-card:nth-child(2) { animation-delay: .07s; }
+.event--noel .boutique-card:nth-child(3) { animation-delay: .14s; }
+.event--noel .boutique-card:nth-child(4) { animation-delay: .21s; }
+.event--noel .boutique-card:nth-child(5) { animation-delay: .28s; }
+.event--noel .boutique-card:nth-child(6) { animation-delay: .35s; }
+.event--noel .boutique-card:nth-child(7) { animation-delay: .42s; }
+.event--noel .boutique-card:nth-child(8) { animation-delay: .49s; }
+
+@keyframes noel-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .event--noel .boutique-hero::before,
+  .event--noel .boutique-hero::after { display: none; }
+}
+
+@media (max-width: 640px) {
+  .event--noel .rayon-nav__item {
+    font-size: .62rem;
+    letter-spacing: .1em;
+  }
+  .event--noel .boutique-card__name {
+    font-size: 1rem;
+  }
+}

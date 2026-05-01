@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Boutique;
+use App\Models\PanierLigne;
+use App\Models\Panier;
 use App\Models\Rayon;
 use App\Models\Theme;
 use App\Models\Produit;
@@ -141,7 +143,12 @@ class ShopController extends Controller
 		// ── 7. Thèmes disponibles pour le filtre ──────────────────
 		$themesDisponibles = $themes;
 
-        $images = Image::all();
+		$images = Image::all();
+
+		$panier = Panier::with('lignes.produit')
+                    ->where('user_id', auth()->id())
+                    ->first();
+		$ListeProduits = $panier ? $panier->lignes : collect();
 
 		return view('shop', compact(
 			'boutique',
@@ -152,6 +159,8 @@ class ShopController extends Controller
 			'totalProduits',
 			'produits',
 			'images',
+			'panier',
+			'ListeProduits',
 		));
 	}
 }

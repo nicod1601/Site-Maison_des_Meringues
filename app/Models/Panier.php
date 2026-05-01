@@ -20,4 +20,10 @@ class Panier extends Model
     {
         return $this->lignes->sum(fn($l) => $l->prix_unitaire * $l->quantite);
     }
+
+    //récupérer une liste des produits dans le panier
+    public function produits() : array
+    {
+        return $this->lignes()->with('produit')->get()->pluck('produit')->toArray();
+    }
 }
