@@ -12,8 +12,9 @@
 	$rayonsActifs      = $rayons->filter(fn($r) => $r->islive());
 	$rayonsActifsCount = $rayonsActifs->count();
 	$rayonSelectionne  = $rayonActif?->id_rayon;
-
+	$totalArticles     = $ListeProduits ? $ListeProduits->sum('quantite') : 0;
 @endphp
+
 
 {{-- ── EVENT CSS ──────────────────────────────────────────── --}}
 @php
@@ -39,44 +40,17 @@
 	</div>
 
 	{{-- PANIER À DROITE --}}
-	<div class="cart-bubble" id="cart-bubble" aria-expanded="false">
+	<a href="/panier"
+	   class="cart-bubble"
+	   id="cart-bubble"
+	   aria-label="Voir mon panier ({{ $totalArticles }} article{{ $totalArticles > 1 ? 's' : '' }})">
 		<span>🛒 Mon Panier</span>
-			<div class="cart-dropdown" id="cart-dropdown">
-
-				@if($ListeProduits->isEmpty())
-					<p class="cart-dropdown__empty">🛒 Votre panier est vide</p>
-				@else
-
-					<ul class="cart-dropdown__list">
-						@foreach($ListeProduits as $ligne)
-							<li class="cart-dropdown__item">
-
-								<span class="cart-dropdown__item-name">
-									{{ $ligne->produit->nom_produit }}
-								</span>
-
-								<span class="cart-dropdown__item-qty">
-									× {{ $ligne->quantite }}
-								</span>
-
-								<span class="cart-dropdown__item-price">
-									{{ number_format($ligne->prix_unitaire * $ligne->quantite, 2, ',', ' ') }} €
-								</span>
-
-							</li>
-						@endforeach
-					</ul>
-
-					<div class="cart-dropdown__footer">
-						<a href="/panier" class="btn btn--primary btn--sm" style="width:100%;text-align:center;">
-							Voir mon panier →
-						</a>
-					</div>
-
-				@endif
-
-			</div>
-	</div>
+		@if($totalArticles > 0)
+			<span class="cart-bubble__badge" id="cart-badge">{{ $totalArticles }}</span>
+		@else
+			<span class="cart-bubble__badge" id="cart-badge" style="display:none;">0</span>
+		@endif
+	</a>
 
 </nav>
 
@@ -203,7 +177,7 @@
 									@endphp
 
 									@if($dispo)
-										<form action="{{ route('panier.ajouter') }}" method="POST">
+										<form class="form-ajout-panier" action="{{ route('panier.ajouter') }}" method="POST">
 											@csrf
 											<input type="hidden" name="id_produit"     value="{{ $produit->id_produit }}">
 											<input type="hidden" name="id_forme_condi" value="{{ $fc->id_forme_condi }}">
@@ -257,45 +231,66 @@
 
 
 {{-- ── SCRIPTS ─────────────────────────────────────────────── --}}
+{{-- !! Tri ──────────────────────────────────────────────────── --}}
 <script>
-	// ── Navbar dropdown ──
-	const profileBtn = document.querySelector('.navbar__profile');
-	const dropdown   = document.querySelector('.navbar__dropdown');
-	profileBtn.addEventListener('click', function () {
-		const isOpen = dropdown.classList.contains('open');
-		dropdown.classList.toggle('open', !isOpen);
-		profileBtn.setAttribute('aria-expanded', !isOpen);
-	});
-	document.addEventListener('click', function (e) {
-		if (!profileBtn.contains(e.target)) {
-			dropdown.classList.remove('open');
-			profileBtn.setAttribute('aria-expanded', false);
-		}
-	});
-
-	// ── Tri ──
 	function appliquerTri(valeur) {
 		const url = new URL(window.location.href);
 		url.searchParams.set('tri', valeur);
 		window.location.href = url.toString();
 	}
 
-	// ── Voir fiche produit ──
 	function voirProduit(id) {
 		window.location.href = '/produit/' + id;
 	}
 
-	// ── Cart bubble toggle ──
-	const cartBubble = document.getElementById('cart-bubble');
-	cartBubble.addEventListener('click', function(e) {
-		e.stopPropagation();
-		const isOpen = this.getAttribute('aria-expanded') === 'true';
-		this.setAttribute('aria-expanded', String(!isOpen));
-	});
-	document.addEventListener('click', function(e) {
-		if (!cartBubble.contains(e.target)) {
-			cartBubble.setAttribute('aria-expanded', 'false');
-		}
+	// ── Ajout au panier en AJAX (garde la position de scroll) ──
+	document.addEventListener('submit', function (e) {
+		const form = e.target.closest('.form-ajout-panier');
+		if (!form) return;
+
+		e.preventDefault();
+		console.log('AJAX déclenché ✓', form.action);
+
+		const btn   = form.querySelector('button[type="submit"]');
+		const data  = new FormData(form);
+		const badge = document.getElementById('cart-badge');
+
+		btn.disabled         = true;
+		btn.textContent      = '✓';
+		btn.style.background = 'var(--color-gold)';
+
+		fetch(form.action, {
+			method: 'POST',
+			headers: {
+				'X-Requested-With': 'XMLHttpRequest',
+				'X-CSRF-TOKEN':     data.get('_token'),
+				'Accept':           'application/json',
+			},
+			body: data,
+		})
+		.then(res => {
+			if (!res.ok) throw new Error('Erreur serveur');
+			return res.json();
+		})
+		.then(json => {
+			const total = json.total_quantite ?? (parseInt(badge.textContent || '0') + 1);
+			badge.textContent   = total;
+			badge.style.display = 'flex';
+
+			badge.classList.remove('pop');
+			void badge.offsetWidth;
+			badge.classList.add('pop');
+
+			setTimeout(() => {
+				btn.disabled         = false;
+				btn.textContent      = '+';
+				btn.style.background = '';
+			}, 1200);
+		})
+		.catch(() => {
+			btn.disabled = false;
+			form.submit();
+		});
 	});
 </script>
 

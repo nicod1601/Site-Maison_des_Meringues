@@ -93,25 +93,25 @@
 			</div>
 		</header>
 
+		{{-- Script navbar — sécurisé avec vérification null --}}
 		<script>
-			const profileBtn = document.querySelector('.navbar__profile');
-			const dropdown = document.querySelector('.navbar__dropdown');
+			(function () {
+				const profileBtn = document.querySelector('.navbar__profile');
+				const dropdown   = document.querySelector('.navbar__dropdown');
 
-			if (profileBtn && dropdown) {
+				if (!profileBtn || !dropdown) return; {{-- sécurité si non connecté --}}
+
 				profileBtn.addEventListener('click', function () {
 					const isOpen = dropdown.classList.contains('open');
 					dropdown.classList.toggle('open', !isOpen);
-					profileBtn.setAttribute('aria-expanded', !isOpen);
+					profileBtn.setAttribute('aria-expanded', String(!isOpen));
 				});
 
 				document.addEventListener('click', function (e) {
 					if (!profileBtn.contains(e.target)) {
 						dropdown.classList.remove('open');
-						profileBtn.setAttribute('aria-expanded', false);
+						profileBtn.setAttribute('aria-expanded', 'false');
 					}
 				});
-			}
+			})();
 		</script>
-
-
-

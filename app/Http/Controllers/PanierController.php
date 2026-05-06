@@ -62,6 +62,16 @@ class PanierController extends Controller
 			]);
 		}
 
+		// ── Réponse AJAX (boutique) ───────────────────────────────
+		if ($request->ajax() || $request->wantsJson()) {
+			$totalQuantite = $panier->lignes()->sum('quantite');
+			return response()->json([
+				'success'        => true,
+				'total_quantite' => $totalQuantite,
+			]);
+		}
+
+		// ── Fallback classique ────────────────────────────────────
 		return redirect()->back()->with('success', 'Produit ajouté au panier !');
 	}
 

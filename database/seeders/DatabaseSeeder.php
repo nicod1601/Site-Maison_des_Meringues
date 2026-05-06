@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             EventSeeder::class,
             BoutiqueSeeder::class,
             RayonSeeder::class,
+            AdminUserSeeder::class,
         ]);
 
         // Resynchronisation des séquences PostgreSQL après insertion manuelle d'IDs

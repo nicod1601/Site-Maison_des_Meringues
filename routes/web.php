@@ -9,6 +9,7 @@ use App\Http\Controllers\AccueilController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\CreationController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\SettingsController;
 
 // ── Pages publiques ───────────────────────────────────────────────────────────
 Route::get('/',     [AccueilController::class, 'index'])->name('index');
@@ -22,25 +23,31 @@ Route::patch ('/panier/ligne/{id}', [PanierController::class, 'modifier']) ->nam
 Route::delete('/panier/ligne/{id}', [PanierController::class, 'supprimer'])->name('panier.supprimer');
 Route::post  ('/panier/vider',      [PanierController::class, 'vider'])    ->name('panier.vider');
 
+// ── Paramètres (compte obligatoire) ──────────────────────────────────────────
+Route::middleware(['auth'])->prefix('settings')->group(function () {
+    Route::get ('/',          [SettingsController::class, 'index'])         ->name('settings');
+    Route::post('/profile',   [SettingsController::class, 'updateProfile']) ->name('settings.profile');
+    Route::post('/password',  [SettingsController::class, 'updatePassword'])->name('settings.password');
+    Route::post('/deactivate',[SettingsController::class, 'deactivate'])    ->name('settings.deactivate');
+});
+
 // ── Checkout (compte obligatoire) ─────────────────────────────────────────────
 Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', function () {
         return view('checkout');
     })->name('checkout.index');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])    ->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile',    [ProfileController::class, 'edit'])   ->name('profile.edit');
+    Route::patch('/profile',  [ProfileController::class, 'update']) ->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ── Gestion (admin uniquement) ────────────────────────────────
+// ── Gestion (admin uniquement) ────────────────────────────────────────────────
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/gestion', [GestionController::class, 'index'])->name('gestion');
 
     Route::post('/import/excel', [ImportController::class, 'import'])->name('import.excel');
     Route::get ('/import/clear', [ImportController::class, 'clear']) ->name('import.clear');
-
-    // Produits, Rayons, Thèmes, etc...
 });
 
 // Produits
