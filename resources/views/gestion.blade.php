@@ -17,27 +17,34 @@
 			{{-- Statistiques --}}
 			<div class="card">
 				<div class="card__body">
-				<p class="card__tag card__tag--wrap">
+					<p class="card__tag card__tag--wrap">
 						Infos {{ $nom_boutique ?? '' }}
 					</p>
-					<div class="stat-card mt-md">
-						<span class="stat-card__value">{{ $stock_total ?? '—' }}</span>
-						<span class="stat-card__label">Stock — Total</span>
-					</div>
-					<hr class="mt-lg mb-lg">
-					<div class="stat-card">
-						<span class="stat-card__value">{{ $nb_produits ?? '—' }}</span>
-						<span class="stat-card__label">Types de produit</span>
-					</div>
-					<hr class="mt-lg mb-lg">
-					<div class="stat-card">
-						<span class="stat-card__value">{{ count($rayons) }}</span>
-						<span class="stat-card__label">Rayons</span>
-					</div>
-					<hr class="mt-lg mb-lg">
-					<div class="stat-card">
-						<span class="stat-card__value">{{ count($themes) }}</span>
-						<span class="stat-card__label">Thèmes</span>
+					<div class="stat-grid mt-md">
+						<div class="stat-item">
+							<span class="stat-item__value">{{ $stock_total ?? '—' }}</span>
+							<span class="stat-item__label">Stock total</span>
+						</div>
+						<div class="stat-item">
+							<span class="stat-item__value">{{ $nb_produits ?? '—' }}</span>
+							<span class="stat-item__label">Produits</span>
+						</div>
+						<div class="stat-item">
+							<span class="stat-item__value">{{ count($rayons) }}</span>
+							<span class="stat-item__label">Rayons</span>
+						</div>
+						<div class="stat-item">
+							<span class="stat-item__value">{{ count($themes) }}</span>
+							<span class="stat-item__label">Thèmes</span>
+						</div>
+						<div class="stat-item">
+							<span class="stat-item__value">{{ count($images) }}</span>
+							<span class="stat-item__label">Images</span>
+						</div>
+						<div class="stat-item">
+							<span class="stat-item__value">{{ count($events) }}</span>
+							<span class="stat-item__label">Events</span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -78,6 +85,24 @@
 
 		</div>
 
+		{{-- Navigation rapide --}}
+		<div class="quick-nav card">
+			<div class="card__body">
+				<p class="card__tag">Navigation rapide</p>
+				<nav class="quick-nav__list mt-md">
+					<button class="quick-nav__item active" data-target="produits">🍬 Produits <span class="quick-nav__count">{{ count($produits) }}</span></button>
+					<button class="quick-nav__item" data-target="images">🖼️ Images <span class="quick-nav__count">{{ count($images) }}</span></button>
+					<button class="quick-nav__item" data-target="rayons">🗂 Rayons <span class="quick-nav__count">{{ count($rayons) }}</span></button>
+					<button class="quick-nav__item" data-target="themes">🎨 Thèmes <span class="quick-nav__count">{{ count($themes) }}</span></button>
+					<button class="quick-nav__item" data-target="events">🎉 Events <span class="quick-nav__count">{{ count($events) }}</span></button>
+					<button class="quick-nav__item" data-target="formes">🔷 Formes <span class="quick-nav__count">{{ count($formes) }}</span></button>
+					<button class="quick-nav__item" data-target="conditionnements">📦 Conditionnements <span class="quick-nav__count">{{ count($conditionnements) }}</span></button>
+					<button class="quick-nav__item" data-target="parfums">🍓 Parfums <span class="quick-nav__count">{{ count($parfums) }}</span></button>
+					<button class="quick-nav__item" data-target="prix">💰 Prix <span class="quick-nav__count">{{ count($forme_condi) }}</span></button>
+				</nav>
+			</div>
+		</div>
+
 	</div>{{-- /gestion-left-panel --}}
 
 	{{-- ══ COLONNE DROITE ══ --}}
@@ -86,12 +111,13 @@
 		{{-- Onglets --}}
 		<div class="tabs">
 			<button class="tab active" data-tab="produits">🍬 Produits</button>
+			<button class="tab" data-tab="images">🖼️ Images</button>
 			<button class="tab" data-tab="rayons">🗂 Rayons</button>
 			<button class="tab" data-tab="formes">🔷 Formes</button>
-			<button class="tab" data-tab="conditionnements">📦 Conditionnements</button>
+			<button class="tab" data-tab="conditionnements">📦 Condi.</button>
 			<button class="tab" data-tab="parfums">🍓 Parfums</button>
 			<button class="tab" data-tab="themes">🎨 Thèmes</button>
-			<button class="tab" data-tab="events">🎉 Events</button>{{-- ✅ Onglet Events ajouté --}}
+			<button class="tab" data-tab="events">🎉 Events</button>
 			<button class="tab" data-tab="prix">💰 Prix</button>
 
 			<select id="select-rayon" class="form-select form-select--sm select--right">
@@ -117,28 +143,23 @@
 							</span>
 						@endif
 					@endif
-
-					<input type="text" id="search-input" class="form-input form-input--sm" placeholder="Rechercher...">
-
+				</h2>
+				<div class="toolbar-actions">
+					<input type="text" id="search-input" class="form-input form-input--sm search-input" placeholder="🔍 Rechercher…">
 					@if($rayonId && $rayonId != '-1')
 						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
 						@if($rayonActif)
-							<form action="/gestion/rayon/{{ $rayonActif->id_rayon }}/live" method="POST">
+							<form action="/gestion/rayon/{{ $rayonActif->id_rayon }}/live" method="POST" class="form-inline">
 								@csrf @method('PATCH')
-								<label>
-									<input
-										type="checkbox"
-										name="live_rayon"
-										value="1"
-										{{ $rayonActif->live_rayon ? 'checked' : '' }}
-										onchange="this.form.submit()"
-									> Live
+								<label class="toggle-label">
+									<input type="checkbox" name="live_rayon" value="1" {{ $rayonActif->live_rayon ? 'checked' : '' }} onchange="this.form.submit()">
+									<span class="toggle-text">Live rayon</span>
 								</label>
 							</form>
 						@endif
 					@endif
-				</h2>
-				<button class="btn btn--primary btn--sm" id="btn-nvproduit" disabled>+ Nouveau produit</button>
+					<button class="btn btn--primary btn--sm" id="btn-nvproduit" disabled>+ Nouveau produit</button>
+				</div>
 			</div>
 
 			@if(count($produits) > 0)
@@ -154,10 +175,10 @@
 								<th>Rayons</th>
 								<th>Thème</th>
 								<th>Stock</th>
-								<th>Nouveauté</th>
-								<th>Emporter</th>
-								<th>Expédition</th>
-								<th class="th-actions">Live</th>
+								<th title="Nouveauté">🆕</th>
+								<th title="À emporter">🛍️</th>
+								<th title="Expédition">📦</th>
+								<th title="Live" class="th-actions">Live</th>
 								<th class="th-actions">Actions</th>
 							</tr>
 						</thead>
@@ -172,7 +193,6 @@
 								<td class="td-name">{{ $produit->parfum->nom_parfum ?? '—' }}</td>
 								<td class="td-desc text-muted">{{ Str::limit($produit->description, 50) }}</td>
 
-								{{-- Rayons (many-to-many) --}}
 								<td>
 									@forelse($produit->rayons as $r)
 										<span class="chip">{{ $r->nom_rayon }}</span>
@@ -181,7 +201,6 @@
 									@endforelse
 								</td>
 
-								{{-- Thème du produit (optionnel, indicateur de tri) --}}
 								<td>
 									@if($produit->theme && $produit->theme->id_theme)
 										<span class="chip chip--dynamic-color" style="background:{{ $produit->theme->couleur }}20; border-color:{{ $produit->theme->couleur }};">
@@ -204,14 +223,7 @@
 									<div class="actions-wrap">
 										<form action="/gestion/produit/{{ $produit->id_produit }}/nouveaute" method="POST">
 											@csrf @method('PATCH')
-											<label>
-												<input
-													type="checkbox"
-													name="nouveaute"
-													value="1"
-													{{ $produit->nouveaute ? 'checked' : '' }}
-												>
-											</label>
+											<label><input type="checkbox" name="nouveaute" value="1" {{ $produit->nouveaute ? 'checked' : '' }}></label>
 										</form>
 									</div>
 								</td>
@@ -220,14 +232,7 @@
 									<div class="actions-wrap">
 										<form action="/gestion/produit/{{ $produit->id_produit }}/emporter" method="POST">
 											@csrf @method('PATCH')
-											<label>
-												<input
-													type="checkbox"
-													name="dispo_emporter"
-													value="1"
-													{{ $produit->dispo_emporter ? 'checked' : '' }}
-												>
-											</label>
+											<label><input type="checkbox" name="dispo_emporter" value="1" {{ $produit->dispo_emporter ? 'checked' : '' }}></label>
 										</form>
 									</div>
 								</td>
@@ -236,14 +241,7 @@
 									<div class="actions-wrap">
 										<form action="/gestion/produit/{{ $produit->id_produit }}/expedition" method="POST">
 											@csrf @method('PATCH')
-											<label>
-												<input
-													type="checkbox"
-													name="dispo_expedition"
-													value="1"
-													{{ $produit->dispo_expedition ? 'checked' : '' }}
-												>
-											</label>
+											<label><input type="checkbox" name="dispo_expedition" value="1" {{ $produit->dispo_expedition ? 'checked' : '' }}></label>
 										</form>
 									</div>
 								</td>
@@ -252,14 +250,7 @@
 									<div class="actions-wrap">
 										<form action="/gestion/produit/{{ $produit->id_produit }}/live" method="POST">
 											@csrf @method('PATCH')
-											<label>
-												<input
-													type="checkbox"
-													name="live"
-													value="1"
-													{{ $produit->live ? 'checked' : '' }}
-												>
-											</label>
+											<label><input type="checkbox" name="live" value="1" {{ $produit->live ? 'checked' : '' }}></label>
 										</form>
 									</div>
 								</td>
@@ -285,6 +276,80 @@
 			@endif
 		</div>
 
+		{{-- ══ IMAGES ══ --}}
+		<div id="tab-images" class="tab-panel hidden">
+			<div class="data-toolbar">
+				<h2 class="data-toolbar__title">
+					Images <span class="data-count">{{ count($images) }}</span>
+				</h2>
+				<div class="toolbar-actions">
+					<input type="text" id="search-input-images" class="form-input form-input--sm search-input" placeholder="🔍 Rechercher…">
+					<button class="btn btn--primary btn--sm" id="btn-nvimage">📤 Ajouter une image</button>
+				</div>
+			</div>
+
+			@if(count($images) > 0)
+				{{-- Vue grille --}}
+				<div class="images-grid" id="images-grid">
+					@foreach($images as $image)
+					<div class="image-card" data-search="{{ strtolower(($image->produit->nom_produit ?? '') . ' ' . ($image->formeCondi->forme->nom_forme ?? '') . ' ' . ($image->formeCondi->conditionnement->type ?? '')) }}">
+						<div class="image-card__preview" onclick="ouvrirLightbox('{{ asset($image->url) }}', '{{ $image->produit->nom_produit ?? 'Image #'.$image->id_image }}')">
+							<img
+								src="{{ asset($image->url) }}"
+								alt="{{ $image->produit->nom_produit ?? 'Image produit' }}"
+								loading="lazy"
+								onerror="this.closest('.image-card__preview').classList.add('image-error'); this.style.display='none';"
+							>
+							<div class="image-card__overlay">
+								<span>🔍 Voir</span>
+							</div>
+							<div class="image-error-placeholder" style="display:none;">
+								<span>⚠️</span>
+								<span>Image introuvable</span>
+							</div>
+						</div>
+						<div class="image-card__body">
+							<p class="image-card__name">{{ $image->produit->nom_produit ?? '— Produit #'.$image->id_produit }}</p>
+							@if($image->formeCondi)
+								<div class="image-card__meta">
+									<span class="chip">{{ $image->formeCondi->forme->nom_forme ?? '—' }}</span>
+									<span class="chip">{{ $image->formeCondi->conditionnement->type ?? '—' }}</span>
+								</div>
+							@endif
+							<p class="image-card__path" title="{{ $image->url }}">
+								<span class="path-icon">🔗</span>{{ $image->url }}
+							</p>
+							<div class="image-card__actions">
+								<button
+									class="btn-icon btn-icon--edit"
+									title="Remplacer l'image (conserve le lien)"
+									onclick="ouvrirModalRemplaceImage({{ $image->id_image }}, '{{ asset($image->url) }}', '{{ $image->url }}', '{{ $image->produit->nom_produit ?? '' }}')"
+								>🔄</button>
+								<button
+									class="btn-icon btn-icon--copy"
+									title="Copier le lien"
+									onclick="copierLien('{{ $image->url }}')"
+								>📋</button>
+								<form action="{{ route('image.destroy', $image->id_image) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('cette image')">
+									@csrf @method('DELETE')
+									<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+								</form>
+							</div>
+						</div>
+					</div>
+					@endforeach
+				</div>
+			@else
+				<div class="data-empty">
+					<p class="data-empty__icon">🖼️</p>
+					<p class="data-empty__text">Aucune image enregistrée.</p>
+					<button class="btn btn--primary btn--sm" onclick="document.getElementById('modal-image').classList.remove('hidden')">
+						📤 Ajouter une première image
+					</button>
+				</div>
+			@endif
+		</div>
+
 		{{-- ══ RAYONS ══ --}}
 		<div id="tab-rayons" class="tab-panel hidden">
 			<div class="data-toolbar">
@@ -295,7 +360,6 @@
 				<div class="table-wrapper">
 					<table>
 						<thead>
-							{{-- ✅ Corrigé : colonne Thèmes → Events --}}
 							<tr><th>#</th><th>Nom</th><th>Events</th><th>Stock</th><th class="th-actions">Actions</th></tr>
 						</thead>
 						<tbody>
@@ -304,7 +368,6 @@
 								<td class="td-id">{{ $rayon->id_rayon }}</td>
 								<td class="td-name">{{ $rayon->nom_rayon }}</td>
 								<td>
-									{{-- ✅ Corrigé : $rayon->themes → $rayon->events --}}
 									@forelse($rayon->events as $event)
 										<span class="chip chip--dynamic-color" style="background:{{ $event->couleur }}20; border-color:{{ $event->couleur }};">
 											{{ $event->icone }} {{ $event->nom_event }}
@@ -315,7 +378,6 @@
 								</td>
 								<td><span class="stock-badge stock-badge--ok">{{ $rayon->stock_total_rayon }}</span></td>
 								<td class="td-actions">
-									{{-- Bouton modifier les events du rayon --}}
 									<button
 										class="btn-icon btn-icon--edit"
 										title="Modifier les events"
@@ -363,10 +425,7 @@
 										{{ $theme->couleur }}
 									</span>
 								</td>
-
-								<td>
-									<span class="data-count">{{ $produitsByTheme[$theme->id_theme] ?? 0 }}</span>
-								</td>
+								<td><span class="data-count">{{ $produitsByTheme[$theme->id_theme] ?? 0 }}</span></td>
 								<td class="td-actions">
 									<form action="{{ route('theme.destroy', $theme->id_theme) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce thème')">
 										@csrf @method('DELETE')
@@ -410,12 +469,8 @@
 										{{ $event->couleur }}
 									</span>
 								</td>
-								<td>
-									<span class="data-count">{{ $event->rayons->count() }}</span>
-								</td>
-								<td>
-									<span class="data-count">{{ $produitsByEvent[$event->id_event] ?? 0 }}</span>
-								</td>
+								<td><span class="data-count">{{ $event->rayons->count() }}</span></td>
+								<td><span class="data-count">{{ $produitsByEvent[$event->id_event] ?? 0 }}</span></td>
 								<td class="td-actions">
 									<form action="{{ route('event.destroy', $event->id_event) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('cet event')">
 										@csrf @method('DELETE')
@@ -534,7 +589,7 @@
 		<div id="tab-parfums" class="tab-panel hidden">
 			<div class="data-toolbar">
 				<h2 class="data-toolbar__title">Parfums <span class="data-count">{{ count($parfums) }}</span>
-					<input type="text" id="search-input-parfums" class="form-input form-input--sm" placeholder="Rechercher...">
+					<input type="text" id="search-input-parfums" class="form-input form-input--sm search-input" placeholder="🔍 Rechercher…">
 				</h2>
 				<button class="btn btn--primary btn--sm" id="btn-nvparfum">+ Nouveau parfum</button>
 			</div>
@@ -568,8 +623,127 @@
 
 {{-- ══ MODAL NOUVEAU PRODUIT ══ --}}
 <div id="modal-produit" class="data-modal hidden">
-
 </div>
+
+{{-- ══ MODAL AJOUTER IMAGE ══ --}}
+<div id="modal-image" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>📤 Ajouter une image</h2>
+		<p class="modal-hint">Associez le fichier image au produit et au conditionnement correspondants. Le fichier sera enregistré dans <code>/public/images/</code>.</p>
+		<form action="{{ route('image.store') }}" method="POST" enctype="multipart/form-data" id="form-image">
+			@csrf
+
+			<label>Produit associé</label>
+			<select name="id_produit" id="image-produit-select" required>
+				<option value="">— Choisir un produit —</option>
+				@foreach($produits as $p)
+					<option value="{{ $p->id_produit }}">{{ $p->nom_produit ?? 'Produit #'.$p->id_produit }}</option>
+				@endforeach
+			</select>
+
+			<label>Conditionnement associé (forme + conditionnement)</label>
+			<select name="id_forme_condi" id="image-formecondi-select" required>
+				<option value="">— Choisir un conditionnement —</option>
+				@foreach($forme_condi as $fc)
+					<option value="{{ $fc->id_forme_condi }}">
+						{{ $fc->forme->nom_forme ?? '—' }} — {{ $fc->conditionnement->type ?? '—' }} ({{ $fc->prix }} €)
+					</option>
+				@endforeach
+			</select>
+
+			<label>Fichier image</label>
+			<label for="image-file-input" class="drop-zone drop-zone--image mt-xs" id="drop-zone-image">
+				<div class="drop-zone__icon">🖼️</div>
+				<div class="drop-zone__label">
+					<strong id="image-file-name">Choisir une image</strong>
+					<span class="hint">.jpg, .jpeg, .png, .webp, .gif</span>
+				</div>
+				<input type="file" id="image-file-input" name="image" accept=".jpg,.jpeg,.png,.webp,.gif" hidden>
+			</label>
+
+			{{-- Aperçu image --}}
+			<div id="image-preview-wrap" class="image-preview-wrap" style="display:none;">
+				<img id="image-preview" src="" alt="Aperçu">
+				<button type="button" id="image-preview-remove" class="image-preview-remove" title="Retirer">✕</button>
+			</div>
+
+			{{-- Chemin généré --}}
+			<label class="mt-lg">Chemin généré <span class="label-hint">(automatique selon forme + conditionnement)</span></label>
+			<div class="lien-genere" id="lien-genere">
+				<span class="lien-genere__prefix">fichier/image/meringues/</span>
+				<span class="lien-genere__value" id="lien-genere-value">— choisissez d'abord un conditionnement —</span>
+			</div>
+
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary" id="btn-submit-image" disabled>📤 Enregistrer</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+{{-- ══ MODAL REMPLACER IMAGE ══ --}}
+<div id="modal-remplace-image" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>🔄 Remplacer l'image</h2>
+		<p class="modal-hint">Le lien restera identique. Seul le fichier physique sera remplacé.</p>
+
+		<div class="lien-actuel-wrap">
+			<span class="lien-actuel__label">Lien actuel</span>
+			<span class="lien-actuel__value" id="lien-actuel-display">—</span>
+		</div>
+
+		<div class="image-remplace-preview">
+			<div class="image-remplace-preview__before">
+				<span class="preview-label">Image actuelle</span>
+				<img id="remplace-img-actuelle" src="" alt="Image actuelle" onerror="this.src=''; this.closest('.image-remplace-preview__before').classList.add('no-image');">
+			</div>
+			<div class="image-remplace-preview__arrow">→</div>
+			<div class="image-remplace-preview__after">
+				<span class="preview-label">Nouvelle image</span>
+				<div class="remplace-new-preview" id="remplace-new-preview">
+					<span>Aucun fichier</span>
+				</div>
+			</div>
+		</div>
+
+		<form id="form-remplace-image" action="" method="POST" enctype="multipart/form-data">
+			@csrf @method('POST')
+			<input type="hidden" name="remplace_image" value="1">
+
+			<label>Nouveau fichier</label>
+			<label for="remplace-file-input" class="drop-zone drop-zone--image mt-xs" id="drop-zone-remplace">
+				<div class="drop-zone__icon">📁</div>
+				<div class="drop-zone__label">
+					<strong id="remplace-file-name">Choisir un fichier</strong>
+					<span class="hint">.jpg, .jpeg, .png, .webp, .gif</span>
+				</div>
+				<input type="file" id="remplace-file-input" name="image" accept=".jpg,.jpeg,.png,.webp,.gif" hidden>
+			</label>
+
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary" id="btn-submit-remplace" disabled>🔄 Remplacer</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+{{-- ══ LIGHTBOX IMAGE ══ --}}
+<div id="lightbox" class="lightbox hidden" onclick="fermerLightbox(event)">
+	<button class="lightbox__close" onclick="fermerLightbox()">✕</button>
+	<div class="lightbox__content" onclick="event.stopPropagation()">
+		<img id="lightbox-img" src="" alt="Image agrandie">
+		<div class="lightbox__info">
+			<p class="lightbox__name" id="lightbox-name"></p>
+			<p class="lightbox__path" id="lightbox-path"></p>
+			<button class="btn btn--ghost btn--sm" onclick="copierLien(document.getElementById('lightbox-path').textContent)">📋 Copier le lien</button>
+		</div>
+	</div>
+</div>
+
+{{-- ══ TOAST NOTIFICATION ══ --}}
+<div id="toast" class="toast hidden"></div>
 
 {{-- ══ MODAL NOUVEAU RAYON ══ --}}
 <div id="modal-rayon" class="data-modal hidden">
@@ -578,32 +752,20 @@
 		<form action="{{ route('nvrayon') }}" method="POST">
 			@csrf
 			<input type="hidden" name="id_boutique" value="{{ $boutique->id_boutique }}">
-
 			<label>Nom du rayon</label>
 			<input type="text" name="nom_rayon" placeholder="Ex : Noël, Printemps…" required>
-
-			{{-- ✅ Corrigé : sélection d'Events (et non de Thèmes) pour le rayon --}}
-			{{-- Un rayon est lié à des events (occasion), pas à des thèmes (tri produit) --}}
-			<label>Events associés <span style="font-weight:400; text-transform:none; letter-spacing:0;">(optionnel — les produits éligibles à ces events seront liés)</span></label>
+			<label>Events associés <span class="label-hint">(optionnel)</span></label>
 			<div class="themes-selector">
 				@foreach($events as $event)
 					<label class="themes-selector-item" id="event-label-{{ $event->id_event }}">
-						<input
-							type="checkbox"
-							name="id_events[]"
-							value="{{ $event->id_event }}"
-							data-couleur="{{ $event->couleur }}"
-							class="event-checkbox"
-						>
+						<input type="checkbox" name="id_events[]" value="{{ $event->id_event }}" data-couleur="{{ $event->couleur }}" class="event-checkbox">
 						{{ $event->icone }} {{ $event->nom_event }}
 					</label>
 				@endforeach
 			</div>
-
 			<div id="preview-produits" class="preview-produits" style="display:none;">
 				🔍 <span id="preview-text">0 produit(s) seront liés à ce rayon</span>
 			</div>
-
 			<div class="modal-actions">
 				<button type="button" class="btn-close-modal">Annuler</button>
 				<button type="submit" class="btn btn--primary">Créer le rayon</button>
@@ -633,7 +795,6 @@
 </div>
 
 {{-- ══ MODAL NOUVEL EVENT ══ --}}
-{{-- ✅ Nouveau modal Event ajouté --}}
 <div id="modal-event" class="data-modal hidden">
 	<div class="data-modal-content">
 		<h2>Nouvel event</h2>
@@ -729,24 +890,17 @@
 	</div>
 </div>
 
-
 {{-- ══ MODAL MODIFIER RAYON ══ --}}
 <div id="modal-edit-rayon" class="data-modal hidden">
 	<div class="data-modal-content">
 		<h2 id="edit-rayon-titre">Modifier le rayon</h2>
 		<form id="form-edit-rayon" method="POST">
 			@csrf @method('PUT')
-			<label>Events associés <span style="font-weight:400; text-transform:none; letter-spacing:0;">(les produits seront automatiquement mis à jour)</span></label>
+			<label>Events associés <span class="label-hint">(les produits seront automatiquement mis à jour)</span></label>
 			<div class="themes-selector" id="edit-events-selector">
 				@foreach($events as $event)
 					<label class="themes-selector-item edit-event-item" data-id="{{ $event->id_event }}" data-couleur="{{ $event->couleur }}">
-						<input
-							type="checkbox"
-							name="id_events[]"
-							value="{{ $event->id_event }}"
-							data-couleur="{{ $event->couleur }}"
-							class="edit-event-checkbox"
-						>
+						<input type="checkbox" name="id_events[]" value="{{ $event->id_event }}" data-couleur="{{ $event->couleur }}" class="edit-event-checkbox">
 						{{ $event->icone }} {{ $event->nom_event }}
 					</label>
 				@endforeach
@@ -768,270 +922,452 @@
 </div>
 
 <script>
-	// ── Fichier drag & drop ──
-	const inputFichier = document.getElementById('file-input');
-	const badge        = document.getElementById('file-name-badge');
-	const badgeText    = document.getElementById('file-name-text');
-	const removeBtn    = document.getElementById('remove-file');
+// ════════════════════════════════════════
+// IMPORT FICHIER — Drag & Drop
+// ════════════════════════════════════════
+const inputFichier = document.getElementById('file-input');
+const badge        = document.getElementById('file-name-badge');
+const badgeText    = document.getElementById('file-name-text');
+const removeBtn    = document.getElementById('remove-file');
 
-	inputFichier.addEventListener('change', () => {
-		if (inputFichier.files.length > 0) {
-			badgeText.textContent = inputFichier.files[0].name;
-			badge.classList.add('visible');
-		}
+inputFichier.addEventListener('change', () => {
+	if (inputFichier.files.length > 0) {
+		badgeText.textContent = inputFichier.files[0].name;
+		badge.classList.add('visible');
+	}
+});
+removeBtn.addEventListener('click', () => {
+	inputFichier.value = '';
+	badge.classList.remove('visible');
+});
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+	e.preventDefault();
+	dropZone.classList.remove('drag-over');
+	if (e.dataTransfer.files.length > 0) {
+		inputFichier.files = e.dataTransfer.files;
+		badgeText.textContent = e.dataTransfer.files[0].name;
+		badge.classList.add('visible');
+	}
+});
+
+// ════════════════════════════════════════
+// ONGLETS (tabs + navigation rapide)
+// ════════════════════════════════════════
+function activerOnglet(tabName) {
+	document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+	document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+	document.querySelectorAll('.quick-nav__item').forEach(i => i.classList.remove('active'));
+
+	const tabBtn = document.querySelector(`.tabs .tab[data-tab="${tabName}"]`);
+	const panel  = document.getElementById('tab-' + tabName);
+	const navBtn = document.querySelector(`.quick-nav__item[data-target="${tabName}"]`);
+
+	if (tabBtn)  tabBtn.classList.add('active');
+	if (panel)   panel.classList.remove('hidden');
+	if (navBtn)  navBtn.classList.add('active');
+}
+
+document.querySelectorAll('.tabs .tab').forEach(btn => {
+	btn.addEventListener('click', () => activerOnglet(btn.dataset.tab));
+});
+
+document.querySelectorAll('.quick-nav__item').forEach(btn => {
+	btn.addEventListener('click', () => activerOnglet(btn.dataset.target));
+});
+
+// ════════════════════════════════════════
+// CONFIRMATION SUPPRESSION
+// ════════════════════════════════════════
+function confirmSuppr(label) {
+	return confirm('Voulez-vous vraiment supprimer ' + label + ' ?');
+}
+
+// ════════════════════════════════════════
+// OUVERTURE MODALS
+// ════════════════════════════════════════
+const modals = {
+	'btn-nvproduit': 'modal-produit',
+	'btn-nvrayon':   'modal-rayon',
+	'btn-nvrayon2':  'modal-rayon',
+	'btn-nvevent':   'modal-event',
+	'btn-nvevent2':  'modal-event',
+	'btn-nvtheme2':  'modal-theme',
+	'btn-nvforme':   'modal-forme',
+	'btn-nvcondi':   'modal-condi',
+	'btn-nvprix':    'modal-prix',
+	'btn-nvparfum':  'modal-parfum',
+	'btn-nvimage':   'modal-image',
+};
+Object.entries(modals).forEach(([btnId, modalId]) => {
+	const btn = document.getElementById(btnId);
+	if (btn) btn.addEventListener('click', () => document.getElementById(modalId).classList.remove('hidden'));
+});
+
+// ════════════════════════════════════════
+// FERMETURE MODALS
+// ════════════════════════════════════════
+document.addEventListener('click', e => {
+	if (e.target.classList.contains('data-modal') || e.target.classList.contains('btn-close-modal')) {
+		document.querySelectorAll('.data-modal').forEach(m => m.classList.add('hidden'));
+	}
+});
+
+// ════════════════════════════════════════
+// OVERLAY IMPORT
+// ════════════════════════════════════════
+document.getElementById('import-form').addEventListener('submit', () => {
+	document.getElementById('loading-overlay').classList.add('visible');
+});
+
+const submitBtn = document.getElementById('import-form').querySelector('button[type="submit"]');
+function updateSubmitState() {
+	submitBtn.disabled = !(inputFichier.files.length > 0);
+}
+inputFichier.addEventListener('change', updateSubmitState);
+removeBtn.addEventListener('click', () => setTimeout(updateSubmitState, 10));
+updateSubmitState();
+
+// ════════════════════════════════════════
+// FILTRE RAYON
+// ════════════════════════════════════════
+document.getElementById('select-rayon').addEventListener('change', function () {
+	const url = new URL(window.location.href);
+	this.value === '-1' ? url.searchParams.delete('rayon') : url.searchParams.set('rayon', this.value);
+	window.location.href = url.toString();
+});
+
+// ════════════════════════════════════════
+// CHECKBOXES EVENTS (modal rayon)
+// ════════════════════════════════════════
+const produitsByEvent = @json($produitsByEvent);
+
+document.querySelectorAll('.event-checkbox').forEach(checkbox => {
+	checkbox.addEventListener('change', function () {
+		styleEventLabel(this.closest('label'), this.checked, this.dataset.couleur);
+		updatePreview();
 	});
-	removeBtn.addEventListener('click', () => {
-		inputFichier.value = '';
-		badge.classList.remove('visible');
+});
+
+function styleEventLabel(label, checked, couleur) {
+	if (checked) {
+		label.style.borderColor = couleur;
+		label.style.background  = couleur + '20';
+		label.style.color       = couleur;
+	} else {
+		label.style.borderColor = 'var(--color-border)';
+		label.style.background  = 'var(--color-cream)';
+		label.style.color       = 'inherit';
+	}
+}
+
+function updatePreview() {
+	const checked = [...document.querySelectorAll('.event-checkbox:checked')].map(cb => parseInt(cb.value));
+	const preview = document.getElementById('preview-produits');
+	const text    = document.getElementById('preview-text');
+	if (checked.length === 0) { preview.style.display = 'none'; return; }
+	let total = 0;
+	checked.forEach(id => { total += produitsByEvent[id] || 0; });
+	preview.style.display = 'block';
+	text.textContent = `${total} produit(s) éligible(s) seront automatiquement liés à ce nouveau rayon`;
+}
+
+// ════════════════════════════════════════
+// RECHERCHE PRODUITS
+// ════════════════════════════════════════
+document.getElementById('search-input').addEventListener('input', function () {
+	const query = this.value.toLowerCase();
+	document.querySelectorAll('#tab-produits tbody tr').forEach(row => {
+		const namecode = row.querySelector('.td-namecode')?.textContent.toLowerCase() || '';
+		const name     = row.querySelector('.td-name')?.textContent.toLowerCase() || '';
+		const id       = row.querySelector('.td-id')?.textContent.toLowerCase() || '';
+		row.style.display = (namecode.includes(query) || name.includes(query) || id.includes(query)) ? '' : 'none';
+	});
+});
+
+document.getElementById('search-input-parfums').addEventListener('input', function () {
+	const query = this.value.toLowerCase();
+	document.querySelectorAll('#tab-parfums tbody tr').forEach(row => {
+		const name = row.querySelector('.td-name')?.textContent.toLowerCase() || '';
+		row.style.display = name.includes(query) ? '' : 'none';
+	});
+});
+
+// ════════════════════════════════════════
+// RECHERCHE IMAGES
+// ════════════════════════════════════════
+document.getElementById('search-input-images')?.addEventListener('input', function () {
+	const query = this.value.toLowerCase();
+	document.querySelectorAll('.image-card').forEach(card => {
+		const search = card.dataset.search || '';
+		card.style.display = search.includes(query) ? '' : 'none';
+	});
+});
+
+// ════════════════════════════════════════
+// MODAL MODIFIER RAYON
+// ════════════════════════════════════════
+function ouvrirModalEditRayon(id, nom, eventIds) {
+	document.getElementById('edit-rayon-titre').textContent = 'Modifier : ' + nom;
+	document.getElementById('form-edit-rayon').action = '/gestion/rayon/' + id;
+
+	document.querySelectorAll('.edit-event-checkbox').forEach(cb => {
+		const checked = eventIds.includes(parseInt(cb.value));
+		cb.checked = checked;
+		styleEventLabel(cb.closest('label'), checked, cb.dataset.couleur);
 	});
 
-	const dropZone = document.getElementById('drop-zone');
-	dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-	dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-	dropZone.addEventListener('drop', e => {
-		e.preventDefault();
-		dropZone.classList.remove('drag-over');
-		if (e.dataTransfer.files.length > 0) {
-			inputFichier.files = e.dataTransfer.files;
-			badgeText.textContent = e.dataTransfer.files[0].name;
-			badge.classList.add('visible');
-		}
-	});
+	document.getElementById('modal-edit-rayon').classList.remove('hidden');
+}
 
-	// ── Onglets ──
-	document.querySelectorAll('.tabs .tab').forEach(btn => {
-		btn.addEventListener('click', () => {
-			document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
-			document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-			btn.classList.add('active');
-			document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+document.querySelectorAll('.edit-event-checkbox').forEach(checkbox => {
+	checkbox.addEventListener('change', function () {
+		styleEventLabel(this.closest('label'), this.checked, this.dataset.couleur);
+	});
+});
+
+// ════════════════════════════════════════
+// TOGGLES AJAX (live, expedition, emporter, nouveaute)
+// ════════════════════════════════════════
+document.querySelectorAll('input[name="live"], input[name="dispo_expedition"], input[name="dispo_emporter"], input[name="nouveaute"]').forEach(checkbox => {
+	checkbox.addEventListener('change', function () {
+		const form    = this.closest('form');
+		const url     = form.action;
+		const checked = this.checked;
+		const name    = this.name;
+
+		const body = new URLSearchParams();
+		body.append('_token', '{{ csrf_token() }}');
+		body.append('_method', 'PATCH');
+		body.append(name, checked ? '1' : '0');
+
+		fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() })
+		.then(res => {
+			if (!res.ok) { this.checked = !checked; afficherToast('Erreur lors de la mise à jour', 'error'); }
+			else { afficherToast('Mise à jour effectuée ✓', 'success'); }
+		})
+		.catch(() => { this.checked = !checked; afficherToast('Erreur réseau', 'error'); });
+	});
+});
+
+// ════════════════════════════════════════
+// PAGINATION
+// ════════════════════════════════════════
+document.querySelectorAll('.table-wrapper').forEach(wrapper => {
+	const table = wrapper.querySelector('table');
+	const rowsPerPage = 10;
+	let currentPage = 1;
+	const rows = Array.from(table.querySelectorAll('tbody tr'));
+	const totalPages = Math.ceil(rows.length / rowsPerPage);
+	if (totalPages <= 1) return;
+
+	function renderTable() {
+		rows.forEach((row, index) => {
+			row.style.display = (index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage) ? '' : 'none';
 		});
-	});
-
-	// ── Confirmation suppression ──
-	function confirmSuppr(label) {
-		return confirm('Voulez-vous vraiment supprimer ' + label + ' ?');
+		pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
+		prevBtn.disabled = currentPage === 1;
+		nextBtn.disabled = currentPage === totalPages;
 	}
 
-	// ── Ouverture modals ──
-	document.getElementById('btn-nvproduit') .addEventListener('click', () => document.getElementById('modal-produit').classList.remove('hidden'));
-	document.getElementById('btn-nvrayon')   .addEventListener('click', () => document.getElementById('modal-rayon')  .classList.remove('hidden'));
-	document.getElementById('btn-nvrayon2')  .addEventListener('click', () => document.getElementById('modal-rayon')  .classList.remove('hidden'));
-	// ✅ Corrigé : btn-nvtheme retiré du panneau gauche, remplacé par btn-nvevent
-	document.getElementById('btn-nvevent')   .addEventListener('click', () => document.getElementById('modal-event')  .classList.remove('hidden'));
-	document.getElementById('btn-nvevent2')  .addEventListener('click', () => document.getElementById('modal-event')  .classList.remove('hidden'));
-	document.getElementById('btn-nvtheme2')  .addEventListener('click', () => document.getElementById('modal-theme')  .classList.remove('hidden'));
-	document.getElementById('btn-nvforme')   .addEventListener('click', () => document.getElementById('modal-forme')  .classList.remove('hidden'));
-	document.getElementById('btn-nvcondi')   .addEventListener('click', () => document.getElementById('modal-condi')  .classList.remove('hidden'));
-	document.getElementById('btn-nvprix')    .addEventListener('click', () => document.getElementById('modal-prix')   .classList.remove('hidden'));
-	document.getElementById('btn-nvparfum')  .addEventListener('click', () => document.getElementById('modal-parfum') .classList.remove('hidden'));
+	const paginationControls = document.createElement('div');
+	paginationControls.className = 'pagination-controls';
+	const prevBtn = document.createElement('button');
+	prevBtn.textContent = '← Précédent';
+	prevBtn.className = 'btn-pagination';
+	const nextBtn = document.createElement('button');
+	nextBtn.textContent = 'Suivant →';
+	nextBtn.className = 'btn-pagination';
+	const pageInfo = document.createElement('span');
+	paginationControls.append(prevBtn, pageInfo, nextBtn);
+	wrapper.appendChild(paginationControls);
 
-	// ── Fermeture modals ──
-	document.addEventListener('click', e => {
-		if (e.target.classList.contains('data-modal') || e.target.classList.contains('btn-close-modal')) {
-			document.querySelectorAll('.data-modal').forEach(m => m.classList.add('hidden'));
-		}
-	});
+	prevBtn.addEventListener('click', () => { if (currentPage > 1)           { currentPage--; renderTable(); } });
+	nextBtn.addEventListener('click', () => { if (currentPage < totalPages)  { currentPage++; renderTable(); } });
+	renderTable();
+});
 
-	// ── Overlay import ──
-	document.getElementById('import-form').addEventListener('submit', () => {
-		document.getElementById('loading-overlay').classList.add('visible');
-	});
+// ════════════════════════════════════════
+// IMAGES — MODAL AJOUTER
+// ════════════════════════════════════════
+const imageFileInput    = document.getElementById('image-file-input');
+const imagePreviewWrap  = document.getElementById('image-preview-wrap');
+const imagePreview      = document.getElementById('image-preview');
+const imagePreviewRemove = document.getElementById('image-preview-remove');
+const btnSubmitImage    = document.getElementById('btn-submit-image');
 
-	// ── Validation import ──
-	const submitBtn  = document.getElementById('import-form').querySelector('button[type="submit"]');
-	function updateSubmitState() {
-		submitBtn.disabled = !(inputFichier.files.length > 0);
-	}
-	inputFichier.addEventListener('change', updateSubmitState);
-	removeBtn.addEventListener('click', () => setTimeout(updateSubmitState, 10));
-	updateSubmitState();
+function sanitizeFilename(name) {
+	return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-_.]/g, '');
+}
 
-	// ── Filtre rayon ──
-	document.getElementById('select-rayon').addEventListener('change', function () {
-		const url = new URL(window.location.href);
-		this.value === '-1' ? url.searchParams.delete('rayon') : url.searchParams.set('rayon', this.value);
-		window.location.href = url.toString();
-	});
+// Données des forme_condi pour afficher le chemin dynamique
+@php
+$formeCondiJs = $forme_condi->mapWithKeys(function($fc) {
+    return [
+        $fc->id_forme_condi => [
+            'id'    => $fc->id_forme_condi,
+            'forme' => $fc->forme->nom_forme ?? 'divers',
+            'condi' => $fc->conditionnement->type ?? 'divers',
+        ]
+    ];
+});
+@endphp
+const formeCondiData = @json($formeCondiJs);
 
-	// ── Checkboxes events dans le modal rayon ──
-	// ✅ Corrigé : theme-checkbox → event-checkbox, produitsByTheme → produitsByEvent
-	const produitsByEvent = @json($produitsByEvent);
+function slugify(str) {
+	return str.toLowerCase()
+		.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+}
 
-	document.querySelectorAll('.event-checkbox').forEach(checkbox => {
-		checkbox.addEventListener('change', function () {
-			const label   = this.closest('label');
-			const couleur = this.dataset.couleur;
-			if (this.checked) {
-				label.style.borderColor = couleur;
-				label.style.background  = couleur + '20';
-				label.style.color       = couleur;
-			} else {
-				label.style.borderColor = 'var(--color-border)';
-				label.style.background  = 'var(--color-cream)';
-				label.style.color       = 'inherit';
-			}
-			updatePreview();
-		});
-	});
+function mettreAjourCheminGenere() {
+	const fcId    = document.getElementById('image-formecondi-select')?.value;
+	const fichier = imageFileInput?.files[0]?.name || null;
+	const val     = document.getElementById('lien-genere-value');
+	if (!val) return;
 
-	function updatePreview() {
-		const checked = [...document.querySelectorAll('.event-checkbox:checked')]
-			.map(cb => parseInt(cb.value));
-
-		const preview = document.getElementById('preview-produits');
-		const text    = document.getElementById('preview-text');
-
-		if (checked.length === 0) {
-			preview.style.display = 'none';
-			return;
-		}
-
-		let total = 0;
-		checked.forEach(id => { total += produitsByEvent[id] || 0; });
-
-		preview.style.display = 'block';
-		text.textContent = `${total} produit(s) éligible(s) seront automatiquement liés à ce nouveau rayon`;
+	if (!fcId || !fichier) {
+		val.textContent = fcId
+			? '— choisissez un fichier —'
+			: '— choisissez d\'abord un conditionnement —';
+		return;
 	}
 
-	// ── Recherche rapide produits ──
-	document.getElementById('search-input').addEventListener('input', function () {
-		const query = this.value.toLowerCase();
-		document.querySelectorAll('#tab-produits tbody tr').forEach(row => {
-			const namecode = row.querySelector('.td-namecode').textContent.toLowerCase();
-			const name     = row.querySelector('.td-name').textContent.toLowerCase();
-			const id       = row.querySelector('.td-id').textContent.toLowerCase();
-			row.style.display = (namecode.includes(query) || name.includes(query) || id.includes(query)) ? '' : 'none';
-		});
-	});
+	const fc = formeCondiData[fcId];
+	if (!fc) { val.textContent = '—'; return; }
 
-	document.getElementById('search-input-parfums').addEventListener('input', function () {
-		const query = this.value.toLowerCase();
-		document.querySelectorAll('#tab-parfums tbody tr').forEach(row => {
-			const name = row.querySelector('.td-name').textContent.toLowerCase();
-			row.style.display = (name.includes(query)) ? '' : 'none';
-		});
-	});
+	const forme = slugify(fc.forme);
+	const condi = slugify(fc.condi);
+	val.textContent = forme + '/' + condi + '/' + fichier;
+}
 
-	// ── Modal modifier rayon ──
-	function ouvrirModalEditRayon(id, nom, eventIds) {
-		document.getElementById('edit-rayon-titre').textContent = 'Modifier : ' + nom;
-		document.getElementById('form-edit-rayon').action = '/gestion/rayon/' + id;
+document.getElementById('image-formecondi-select')?.addEventListener('change', mettreAjourCheminGenere);
 
-		// Cocher les events actuels du rayon
-		document.querySelectorAll('.edit-event-checkbox').forEach(cb => {
-			const checked = eventIds.includes(parseInt(cb.value));
-			cb.checked = checked;
-			const label = cb.closest('label');
-			const couleur = cb.dataset.couleur;
-			if (checked) {
-				label.style.borderColor = couleur;
-				label.style.background  = couleur + '20';
-				label.style.color       = couleur;
-			} else {
-				label.style.borderColor = 'var(--color-border)';
-				label.style.background  = 'var(--color-cream)';
-				label.style.color       = 'inherit';
-			}
-		});
+imageFileInput?.addEventListener('change', function () {
+	if (this.files.length > 0) {
+		const file = this.files[0];
+		const reader = new FileReader();
+		reader.onload = e => {
+			imagePreview.src = e.target.result;
+			imagePreviewWrap.style.display = 'block';
+		};
+		reader.readAsDataURL(file);
 
-		document.getElementById('modal-edit-rayon').classList.remove('hidden');
+		document.getElementById('image-file-name').textContent = file.name;
+		mettreAjourCheminGenere();
+		btnSubmitImage.disabled = false;
 	}
+});
 
-	document.querySelectorAll('.edit-event-checkbox').forEach(checkbox => {
-		checkbox.addEventListener('change', function () {
-			const label   = this.closest('label');
-			const couleur = this.dataset.couleur;
-			if (this.checked) {
-				label.style.borderColor = couleur;
-				label.style.background  = couleur + '20';
-				label.style.color       = couleur;
-			} else {
-				label.style.borderColor = 'var(--color-border)';
-				label.style.background  = 'var(--color-cream)';
-				label.style.color       = 'inherit';
-			}
-		});
-	});
+imagePreviewRemove?.addEventListener('click', () => {
+	imageFileInput.value = '';
+	imagePreview.src = '';
+	imagePreviewWrap.style.display = 'none';
+	document.getElementById('image-file-name').textContent = 'Choisir une image';
+	lienGenereValue.textContent = '—';
+	btnSubmitImage.disabled = true;
+});
 
-	// ── Toggles Live & Expédition sans rechargement ──────────────
-	// Remplace le bloc générique existant par celui-ci
-		document.querySelectorAll('input[name="live"], input[name="dispo_expedition"], input[name="dispo_emporter"], input[name="nouveaute"]').forEach(checkbox => {
-		checkbox.addEventListener('change', function () {
-			const form    = this.closest('form');
-			const url     = form.action;
-			const checked = this.checked;
-			const name    = this.name;
+// Drag & drop zone image
+const dropZoneImage = document.getElementById('drop-zone-image');
+dropZoneImage?.addEventListener('dragover',  e => { e.preventDefault(); dropZoneImage.classList.add('drag-over'); });
+dropZoneImage?.addEventListener('dragleave', () => dropZoneImage.classList.remove('drag-over'));
+dropZoneImage?.addEventListener('drop', e => {
+	e.preventDefault();
+	dropZoneImage.classList.remove('drag-over');
+	if (e.dataTransfer.files.length > 0) {
+		imageFileInput.files = e.dataTransfer.files;
+		imageFileInput.dispatchEvent(new Event('change'));
+	}
+});
 
-			// Construire le body
-			const body = new URLSearchParams();
-			body.append('_token', document.querySelector('meta[name="csrf-token"]')?.content
-				|| '{{ csrf_token() }}');
-			body.append('_method', 'PATCH');
-			body.append(name, checked ? '1' : '0');
+// ════════════════════════════════════════
+// IMAGES — MODAL REMPLACER
+// ════════════════════════════════════════
+function ouvrirModalRemplaceImage(id, srcAsset, urlRelative, nom) {
+	document.getElementById('lien-actuel-display').textContent = urlRelative;
+	document.getElementById('remplace-img-actuelle').src = srcAsset;
+	document.getElementById('form-remplace-image').action = '/gestion/image/' + id + '/remplacer';
+	document.getElementById('remplace-file-name').textContent = 'Choisir un fichier';
+	document.getElementById('btn-submit-remplace').disabled = true;
+	document.getElementById('remplace-new-preview').innerHTML = '<span>Aucun fichier</span>';
+	document.getElementById('modal-remplace-image').classList.remove('hidden');
+}
 
-			fetch(url, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: body.toString(),
-			})
-			.then(res => {
-				if (!res.ok) {
-					// Annuler visuellement si erreur
-					this.checked = !checked;
-					console.error('Erreur toggle', name);
-				}
-			})
-			.catch(() => {
-				this.checked = !checked;
-			});
-		});
-	});
+const remplaceFileInput = document.getElementById('remplace-file-input');
+remplaceFileInput?.addEventListener('change', function () {
+	if (this.files.length > 0) {
+		const file = this.files[0];
+		const reader = new FileReader();
+		reader.onload = e => {
+			document.getElementById('remplace-new-preview').innerHTML = `<img src="${e.target.result}" alt="Nouvelle image">`;
+		};
+		reader.readAsDataURL(file);
+		document.getElementById('remplace-file-name').textContent = file.name;
+		document.getElementById('btn-submit-remplace').disabled = false;
+	}
+});
 
-	//Pagination des Tableaux
-	document.querySelectorAll('.table-wrapper').forEach(wrapper => {
-		const table = wrapper.querySelector('table');
-		const rowsPerPage = 10;
-		let currentPage = 1;
+const dropZoneRemplace = document.getElementById('drop-zone-remplace');
+dropZoneRemplace?.addEventListener('dragover',  e => { e.preventDefault(); dropZoneRemplace.classList.add('drag-over'); });
+dropZoneRemplace?.addEventListener('dragleave', () => dropZoneRemplace.classList.remove('drag-over'));
+dropZoneRemplace?.addEventListener('drop', e => {
+	e.preventDefault();
+	dropZoneRemplace.classList.remove('drag-over');
+	if (e.dataTransfer.files.length > 0) {
+		remplaceFileInput.files = e.dataTransfer.files;
+		remplaceFileInput.dispatchEvent(new Event('change'));
+	}
+});
 
-		const rows = Array.from(table.querySelectorAll('tbody tr'));
-		const totalPages = Math.ceil(rows.length / rowsPerPage);
+// ════════════════════════════════════════
+// LIGHTBOX
+// ════════════════════════════════════════
+function ouvrirLightbox(src, nom) {
+	document.getElementById('lightbox-img').src = src;
+	document.getElementById('lightbox-name').textContent = nom || 'Image';
+	document.getElementById('lightbox-path').textContent = src;
+	document.getElementById('lightbox').classList.remove('hidden');
+	document.body.style.overflow = 'hidden';
+}
 
-		function renderTable() {
-			rows.forEach((row, index) => {
-				row.style.display = (index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage) ? '' : 'none';
-			});
-			pageInfo.textContent = `Page ${currentPage} sur ${totalPages}`;
-			prevBtn.disabled = currentPage === 1;
-			nextBtn.disabled = currentPage === totalPages;
-		}
+function fermerLightbox(e) {
+	if (!e || e.target === document.getElementById('lightbox') || e.target.classList.contains('lightbox__close')) {
+		document.getElementById('lightbox').classList.add('hidden');
+		document.body.style.overflow = '';
+	}
+}
 
-		const paginationControls = document.createElement('div');
-		paginationControls.className = 'pagination-controls';
-		const prevBtn = document.createElement('button');
-		prevBtn.textContent = 'Précédent';
-		const nextBtn = document.createElement('button');
-		nextBtn.textContent = 'Suivant';
-		const pageInfo = document.createElement('span');
-		paginationControls.appendChild(prevBtn);
-		paginationControls.appendChild(pageInfo);
-		paginationControls.appendChild(nextBtn);
-		wrapper.appendChild(paginationControls);
+document.addEventListener('keydown', e => {
+	if (e.key === 'Escape') {
+		document.querySelectorAll('.data-modal').forEach(m => m.classList.add('hidden'));
+		fermerLightbox();
+	}
+});
 
-		prevBtn.addEventListener('click', () => {
-			if (currentPage > 1) {
-				currentPage--;
-				renderTable();
-			}
-		});
-		nextBtn.addEventListener('click', () => {
-			if (currentPage < totalPages) {
-				currentPage++;
-				renderTable();
-			}
-		});
+// ════════════════════════════════════════
+// TOAST NOTIFICATION
+// ════════════════════════════════════════
+function afficherToast(message, type = 'success') {
+	const toast = document.getElementById('toast');
+	toast.textContent = message;
+	toast.className   = `toast toast--${type}`;
+	toast.classList.remove('hidden');
+	clearTimeout(toast._timer);
+	toast._timer = setTimeout(() => toast.classList.add('hidden'), 2800);
+}
 
-		renderTable();
-	});
-
+// ════════════════════════════════════════
+// COPIER LIEN
+// ════════════════════════════════════════
+function copierLien(lien) {
+	navigator.clipboard.writeText(lien)
+		.then(() => afficherToast('Lien copié ! 📋'))
+		.catch(() => afficherToast('Impossible de copier', 'error'));
+}
 </script>
+</document_content>

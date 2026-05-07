@@ -10,6 +10,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\CreationController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ImageController;
 
 // ── Pages publiques ───────────────────────────────────────────────────────────
 Route::get('/',     [AccueilController::class, 'index'])->name('index');
@@ -44,7 +45,7 @@ Route::middleware(['auth'])->group(function () {
 
 // ── Gestion (admin uniquement) ────────────────────────────────────────────────
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/gestion', [GestionController::class, 'index'])->name('gestion');
+    Route::get('/gestion', [GestionController::class, 'index'])->name('gestion.index');
 
     Route::post('/import/excel', [ImportController::class, 'import'])->name('import.excel');
     Route::get ('/import/clear', [ImportController::class, 'clear']) ->name('import.clear');
@@ -87,5 +88,10 @@ Route::delete('/gestion/parfum/{id}', [CreationController::class, 'destroyParfum
 // Événements
 Route::post  ('/gestion/event',      [CreationController::class, 'nvevent'])      ->name('nvevent');
 Route::delete('/gestion/event/{id}', [CreationController::class, 'destroyEvent']) ->name('event.destroy');
+
+// Images
+Route::post  ('/gestion/image',                   [ImageController::class, 'store'])    ->name('image.store');
+Route::post  ('/gestion/image/{image}/remplacer',  [ImageController::class, 'remplacer'])->name('image.remplacer');
+Route::delete('/gestion/image/{image}',            [ImageController::class, 'destroy']) ->name('image.destroy');
 
 require __DIR__.'/auth.php';

@@ -11,6 +11,7 @@ use App\Models\Forme_Condi;
 use App\Models\Rayon;
 use App\Models\Theme;
 use App\Models\Event;
+use App\Models\Image;
 use Illuminate\Http\Request;
 
 class GestionController extends Controller
@@ -64,11 +65,18 @@ class GestionController extends Controller
 			];
 		});
 
+		$images = Image::with([
+            'produit',
+            'formeCondi.forme',
+            'formeCondi.conditionnement',
+        ])->get();
+
+
 		return view('gestion', compact(
 			'datas', 'stock_total', 'nom_boutique', 'nb_produits',
 			'produits', 'formes', 'conditionnements', 'parfums',
 			'forme_condi', 'rayons', 'themes', 'events', 'boutique', 'rayonId',
-			'produitsByTheme', 'produitsByEvent',
+			'produitsByTheme', 'produitsByEvent', 'images',
 		));
 	}
 }

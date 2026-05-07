@@ -6,16 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Image extends Model
 {
-	protected $table = 'image';
+    protected $table      = 'image';
+    protected $primaryKey = 'id_image';
+    public    $timestamps = false;
 
-	protected $primaryKey = 'id_image';
+    protected $fillable = [
+        'id_produit',
+        'id_forme_condi',
+        'url',
+    ];
 
-	public $timestamps = false;
+    public function produit()
+    {
+        return $this->belongsTo(Produit::class, 'id_produit', 'id_produit');
+    }
 
-	protected $fillable = [
-		'id_image',
-		'id_produit',
-		'id_forme_condi',
-		'url',
-	];
+    public function formeCondi()
+    {
+        return $this->belongsTo(Forme_Condi::class, 'id_forme_condi', 'id_forme_condi');
+    }
 }
