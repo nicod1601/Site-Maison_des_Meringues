@@ -13,6 +13,7 @@ use App\Models\Parfum;
 use App\Models\Theme;
 use App\Models\Event;
 use App\Models\Image;
+use Intervention\Image\Laravel\Facades\Image as ImageManager;
 
 class UsersImport implements ToCollection
 {
@@ -38,7 +39,7 @@ class UsersImport implements ToCollection
 			$nomProduit = trim($row[0] ?? '');
 			if ($nomProduit === '') continue;
 
-			// ── Forme ──────────────────────────────────────────────────────
+			// ── Forme ─────────────────────────────
 			$nomForme = trim($row[1] ?? '');
 			if (!isset($formesCache[$nomForme])) {
 				$formesCache[$nomForme] = Forme::where('nom_forme', $nomForme)->first();
@@ -46,7 +47,7 @@ class UsersImport implements ToCollection
 			$forme = $formesCache[$nomForme];
 			if (!$forme) continue;
 
-			// ── Parfum ─────────────────────────────────────────────────────
+			// ── Parfum ─────────────────────────────
 			$nomParfum = trim($row[2] ?? '');
 			if (!isset($parfumsCache[$nomParfum])) {
 				$parfumsCache[$nomParfum] = Parfum::where('nom_parfum', $nomParfum)->first();
@@ -54,7 +55,7 @@ class UsersImport implements ToCollection
 			$parfum = $parfumsCache[$nomParfum];
 			if (!$parfum) continue;
 
-			// ── Champs simples ─────────────────────────────────────────────
+			// ── Champs ─────────────────────────────
 			$description = trim($row[3] ?? '') ?: 'Aucune description';
 			$quantite    = (int) ($row[4] ?? 0);
 			$nouveaute   = strtolower(trim($row[5] ?? '')) === 'oui';
@@ -62,9 +63,10 @@ class UsersImport implements ToCollection
 			$expedition  = strtolower($forme->nom_forme) === 'mini';
 			$special     = strtolower(trim($row[9] ?? '')) === 'oui';
 
-			// ── Thème (optionnel) ──────────────────────────────────────────
+			// ── Theme ─────────────────────────────
 			$nomTheme = trim($row[7] ?? '');
 			$idTheme  = null;
+
 			if ($nomTheme !== '') {
 				if (!isset($themesCache[$nomTheme])) {
 					$themesCache[$nomTheme] = Theme::where('nom_theme', $nomTheme)->first();
@@ -73,22 +75,21 @@ class UsersImport implements ToCollection
 				if ($theme) $idTheme = $theme->id_theme;
 			}
 
-			// ── Events (optionnels, séparés par des virgules) ─────────────
+			// ── Events ─────────────────────────────
 			$eventIds  = [];
 			$nomEvents = trim($row[8] ?? '');
+
 			if ($nomEvents !== '') {
 				foreach (array_map('trim', explode(',', $nomEvents)) as $nomEvent) {
-					if ($nomEvent !== '') {
-						if (!isset($eventsCache[$nomEvent])) {
-							$eventsCache[$nomEvent] = Event::where('nom_event', $nomEvent)->first();
-						}
-						$event = $eventsCache[$nomEvent];
-						if ($event) $eventIds[] = $event->id_event;
+					if (!isset($eventsCache[$nomEvent])) {
+						$eventsCache[$nomEvent] = Event::where('nom_event', $nomEvent)->first();
 					}
+					$event = $eventsCache[$nomEvent];
+					if ($event) $eventIds[] = $event->id_event;
 				}
 			}
 
-			// ── Créer ou mettre à jour le produit ─────────────────────────
+			// ── Produit ─────────────────────────────
 			$produit = Produit::updateOrCreate(
 				[
 					'nom_produit' => $nomProduit,
@@ -99,16 +100,15 @@ class UsersImport implements ToCollection
 					'id_theme'         => $idTheme,
 					'description'      => $description,
 					'quantite'         => $quantite,
-					'nouveaute'        => $nouveaute ? true : false,
-					'live'             => $live ? true : false,
+					'nouveaute'        => $nouveaute,
+					'live'             => $live,
 					'dispo_emporter'   => false,
-					'dispo_expedition' => $expedition ? true : false,
-					'special'          => $special ? true : false,
+					'dispo_expedition' => $expedition,
+					'special'          => $special,
 				]
 			);
 
-			// ── Créer les Images associées ────────────────────────────────
-			// Str::slug() gère les accents : Café → cafe, Fève de Tonka → feve-de-tonka
+			// ── IMAGES OPTIMISÉES WEBP ─────────────────────────────
 			$images = [];
 
 			$conditionnements = Forme_Condi::where('id_forme', $produit->id_forme)
@@ -117,29 +117,49 @@ class UsersImport implements ToCollection
 				->get();
 
 			foreach ($conditionnements as $condi) {
+
+				$slugForme  = Str::slug($produit->forme->nom_forme);
+				$slugParfum = Str::slug($produit->parfum->nom_parfum);
+				$type       = strtolower($condi->type);
+
+				$filename = "{$slugForme}-{$type}-{$slugParfum}.webp";
+
+				$relativePath = "fichier/image/meringues/{$filename}";
+				$fullPath     = public_path($relativePath);
+
+				$sourcePath = public_path(
+					"fichier/image/meringues/{$slugForme}/{$type}/{$slugParfum}.jpg"
+				);
+
+				// ✔ création image optimisée si source existe
+				if (file_exists($sourcePath) && !file_exists($fullPath)) {
+
+					ImageManager::read($sourcePath)
+						->cover(600, 600)
+						->toWebp(75)
+						->save($fullPath);
+				}
+
 				$images[] = [
 					'id_produit'     => $produit->id_produit,
 					'id_forme_condi' => $condi->id_forme_condi,
-					'url'            => 'fichier/image/meringues/'
-						. Str::slug($produit->forme->nom_forme)           // nid, mini
-						. '/' . strtolower($condi->type)                  // boite_de_8, sachet_de_10
-						. '/' . Str::slug($produit->parfum->nom_parfum)   // cafe, feve-de-tonka
-						. '.jpg',
+					'url'            => $relativePath,
 				];
 			}
 
 			Image::where('id_produit', $produit->id_produit)->delete();
 			Image::insert($images);
 
-			// ── Synchroniser les events du produit ────────────────────────
+			// ── Events sync ─────────────────────────────
 			if (!empty($eventIds)) {
 				$produit->events()->sync($eventIds);
 			} else {
 				$produit->events()->detach();
 			}
 
-			// ── Lier aux rayons selon special ─────────────────────────────
+			// ── Rayons ─────────────────────────────
 			if ($produit->special && !empty($eventIds)) {
+
 				$rayonIds = Rayon::whereHas('events', function ($q) use ($eventIds) {
 						$q->whereIn('event.id_event', $eventIds);
 					})
@@ -151,7 +171,9 @@ class UsersImport implements ToCollection
 					$produit->rayons()->detach(self::RAYON_BASE_ID);
 					$produit->rayons()->syncWithoutDetaching($rayonIds);
 				}
+
 			} else {
+
 				$rayonsEvents = Rayon::whereHas('events')
 					->where('id_boutique', $boutique->id_boutique)
 					->pluck('id_rayon')
@@ -164,14 +186,14 @@ class UsersImport implements ToCollection
 			$produitsImportesIds[] = $produit->id_produit;
 		}
 
-		// ── Détacher du rayon Base les produits absents du fichier ────────
+		// ── Nettoyage rayons ─────────────────────────────
 		$produitsActuelsIds = $rayon->produits()->pluck('produit.id_produit')->toArray();
 		$aDetacher          = array_diff($produitsActuelsIds, $produitsImportesIds);
+
 		if (!empty($aDetacher)) {
 			$rayon->produits()->detach($aDetacher);
 		}
 
-		// ── Mise à jour du stock ───────────────────────────────────────────
 		$rayon->recalculerStock();
 		$boutique->recalculerStock();
 	}

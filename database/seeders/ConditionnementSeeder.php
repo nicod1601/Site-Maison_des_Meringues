@@ -14,7 +14,7 @@ class ConditionnementSeeder extends Seeder
 			['type' => 'sachet_de_4'],
 			['type' => 'boite_de_8'],
 			['type' => 'sachet_de_10'],
-			['type' => 'individuelle'],
+			['type' => 'individuel'],
 			['type' => 'vrac'],
 		]);
 	}

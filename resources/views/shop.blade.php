@@ -116,8 +116,18 @@
 									@if($theme->couleur)
 										style="background:linear-gradient(135deg,{{ $theme->couleur }}22 0%,{{ $theme->couleur }}44 100%);"
 									@endif>
-									<img src="{{ asset($produit->image($fc->id_forme_condi)) }}"
-										class="boutique-card__img">
+									<img
+										src="{{ asset($produit->image($fc->id_forme_condi)) }}"
+										class="boutique-card__img"
+										loading="lazy"
+										decoding="async"
+										fetchpriority="low"
+
+										onerror="
+											console.log('Erreur image ❌');
+											this.src='/fichier/image/meringues/oups.png";
+										"
+									>
 								</div>
 								<div class="boutique-card__badges">
 									@if($produit->nouveaute)
@@ -150,7 +160,7 @@
 									@if($produit->dispo_emporter)
 										<span class="badge badge--cream" style="font-size:10px;">🛍 Emporter</span>
 									@endif
-									@if($produit->dispo_expedition && $fc->conditionnement->type == 'individuelle')
+									@if($produit->dispo_expedition && $fc->conditionnement->type == 'individuel')
 										<span class="badge badge--cream" style="font-size:10px;">📦 Expédition</span>
 									@endif
 								</div>
@@ -168,7 +178,7 @@
 
 									@php
 										$dispo = match($fc->conditionnement->type) {
-											'individuelle' => $produit->quantite > 0,
+											'individuel' => $produit->quantite > 0,
 											'sachet_de_10' => $produit->quantite >= 10,
 											'sachet_de_4'  => $produit->quantite >= 4,
 											'boite_de_8'   => $produit->quantite >= 8,
@@ -292,6 +302,20 @@
 			form.submit();
 		});
 	});
+
+	document.querySelectorAll('.boutique-card__img').forEach(img => {
+
+		/*img.addEventListener('load', () => {
+			console.log('OK :', img.src);
+		});*/
+
+		img.addEventListener('error', () => {
+			//console.log('ERREUR :', img.src);
+			img.src = "/fichier/image/meringues/oups.png";
+		});
+
+	});
+
 </script>
 
 </body>

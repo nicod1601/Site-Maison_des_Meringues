@@ -189,7 +189,19 @@
 			</div>
 			<div class="produit-item__img-wrap">
 				<span class="produit-item__label">${nom}</span>
-				<img src="${img.url}" class="produit-item__img" alt="${nom}">
+				<img src="${img.url}"
+					class="produit-item__img"
+					alt="${nom}"
+					loading="lazy"
+					decoding="async"
+					fetchpriority="low"
+
+					onerror="
+                        this.dataset.error = 'true';
+                        this.onerror = null;
+                        this.src='/fichier/image/meringues/oups.png';
+                    "
+				>
 			</div>
 		`;
 		carousel.appendChild(div);

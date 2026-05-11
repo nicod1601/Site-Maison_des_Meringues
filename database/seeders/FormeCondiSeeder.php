@@ -30,7 +30,7 @@ class FormeCondiSeeder extends Seeder
 						];
 					}
 
-					if($condi->type === "individuelle")
+					if($condi->type === "individuel")
 					{
 						$data[] = [
 							'id_forme' => $forme->id_forme,
@@ -42,7 +42,7 @@ class FormeCondiSeeder extends Seeder
 				}
 				else
 				{
-					if($condi->type === "individuelle")
+					if($condi->type === "individuel")
 					{
 						$data[] = [
 							'id_forme' => $forme->id_forme,

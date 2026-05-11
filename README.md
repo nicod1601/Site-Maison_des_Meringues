@@ -256,11 +256,11 @@ Les images doivent être placées dans `public/fichier/image/meringues/` selon l
 ```
 Mini/
   sachet_de_10/Ananas.jpg
-  individuelle/Ananas.jpg
+  individuel/Ananas.jpg
 Nid/
   sachet_de_4/Ananas.jpg
   boite_de_8/Ananas.jpg
-  individuelle/Ananas.jpg
+  individuel/Ananas.jpg
 ```
 
 ---
