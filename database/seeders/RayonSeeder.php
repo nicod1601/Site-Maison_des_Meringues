@@ -14,7 +14,7 @@ class RayonSeeder extends Seeder
 				'nom_rayon'        => 'Base',
 				'id_boutique'      => 1,
 				'stock_total_rayon'=> 0,
-				'live_rayon'       => false,
+				'live_rayon'       => DB::raw('false'),
 			 ],
 		 ]);
 	 }

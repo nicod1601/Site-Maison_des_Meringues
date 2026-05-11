@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Models\Produit;
 use App\Models\Rayon;
@@ -98,47 +99,33 @@ class UsersImport implements ToCollection
 					'id_theme'         => $idTheme,
 					'description'      => $description,
 					'quantite'         => $quantite,
-					'nouveaute'        => $nouveaute,
-					'live'             => $live,
+					'nouveaute'        => $nouveaute ? true : false,
+					'live'             => $live ? true : false,
 					'dispo_emporter'   => false,
-					'dispo_expedition' => $expedition,
-					'special'          => $special,
+					'dispo_expedition' => $expedition ? true : false,
+					'special'          => $special ? true : false,
 				]
 			);
 
-			//- Créer les Images associées
+			// ── Créer les Images associées ────────────────────────────────
+			// Str::slug() gère les accents : Café → cafe, Fève de Tonka → feve-de-tonka
 			$images = [];
 
-			if ($produit->forme->nom_forme === 'Mini'){
+			$conditionnements = Forme_Condi::where('id_forme', $produit->id_forme)
+				->join('conditionnement', 'forme_condi.id_condi', '=', 'conditionnement.id_condi')
+				->select('forme_condi.id_forme_condi', 'conditionnement.type')
+				->get();
 
-				$conditionnements = Forme_Condi::where('id_forme', $produit->id_forme)
-					->join('conditionnement', 'forme_condi.id_condi', '=', 'conditionnement.id_condi')
-					->select('forme_condi.id_forme_condi', 'conditionnement.type')
-					->get();
-
-				foreach ($conditionnements as $condi) {
-					$images[] = [
-						'id_produit' => $produit->id_produit,
-						'id_forme_condi' => $condi->id_forme_condi,
-						'url' => "fichier/image/meringues/Mini/" . $condi->type . "/" . $produit->parfum->nom_parfum . ".jpg",
-					];
-				}
-			}
-
-			if ($produit->forme->nom_forme === 'Nid'){
-
-				$conditionnements = Forme_Condi::where('id_forme', $produit->id_forme)
-					->join('conditionnement', 'forme_condi.id_condi', '=', 'conditionnement.id_condi')
-					->select('forme_condi.id_forme_condi', 'conditionnement.type')
-					->get();
-
-				foreach ($conditionnements as $condi) {
-					$images[] = [
-						'id_produit' => $produit->id_produit,
-						'id_forme_condi' => $condi->id_forme_condi,
-						'url' => "fichier/image/meringues/Nid/". $condi->type . "/" . $produit->parfum->nom_parfum . ".jpg",
-					];
-				}
+			foreach ($conditionnements as $condi) {
+				$images[] = [
+					'id_produit'     => $produit->id_produit,
+					'id_forme_condi' => $condi->id_forme_condi,
+					'url'            => 'fichier/image/meringues/'
+						. Str::slug($produit->forme->nom_forme)           // nid, mini
+						. '/' . strtolower($condi->type)                  // boite_de_8, sachet_de_10
+						. '/' . Str::slug($produit->parfum->nom_parfum)   // cafe, feve-de-tonka
+						. '.jpg',
+				];
 			}
 
 			Image::where('id_produit', $produit->id_produit)->delete();
@@ -153,7 +140,6 @@ class UsersImport implements ToCollection
 
 			// ── Lier aux rayons selon special ─────────────────────────────
 			if ($produit->special && !empty($eventIds)) {
-				// Trouver tous les rayons liés à ses events
 				$rayonIds = Rayon::whereHas('events', function ($q) use ($eventIds) {
 						$q->whereIn('event.id_event', $eventIds);
 					})
@@ -162,13 +148,10 @@ class UsersImport implements ToCollection
 					->toArray();
 
 				if (!empty($rayonIds)) {
-					// Détacher le rayon Base si présent, attacher les rayons events
 					$produit->rayons()->detach(self::RAYON_BASE_ID);
 					$produit->rayons()->syncWithoutDetaching($rayonIds);
 				}
 			} else {
-				// Produit normal → rayon Base uniquement
-				// Détacher les rayons events au cas où il ne serait plus special
 				$rayonsEvents = Rayon::whereHas('events')
 					->where('id_boutique', $boutique->id_boutique)
 					->pluck('id_rayon')
@@ -183,7 +166,7 @@ class UsersImport implements ToCollection
 
 		// ── Détacher du rayon Base les produits absents du fichier ────────
 		$produitsActuelsIds = $rayon->produits()->pluck('produit.id_produit')->toArray();
-		$aDetacher = array_diff($produitsActuelsIds, $produitsImportesIds);
+		$aDetacher          = array_diff($produitsActuelsIds, $produitsImportesIds);
 		if (!empty($aDetacher)) {
 			$rayon->produits()->detach($aDetacher);
 		}

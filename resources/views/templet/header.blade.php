@@ -46,7 +46,7 @@
 							</a>
 
 							@if(Auth::user()->isAdmin())
-								<a href="/gestion" class="navbar__dropdown-item {{ request()->is('gestion') ? 'active' : '' }}">
+								<a href="/gestion" class="navbar__dropdown-item">
 									<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
 										<rect x="1" y="1" width="5" height="5" rx="1"/>
 										<rect x="8" y="1" width="5" height="5" rx="1"/>

@@ -21,12 +21,12 @@ class ImportController extends Controller
 
 		Excel::import(new UsersImport(), $file);
 
-		return redirect()->route('gestion')->with('success', 'Import effectué avec succès !');
+		return redirect()->route('gestion.index')->with('success', 'Import effectué avec succès !');
 	}
 
 	public function clear()
 	{
 		session()->forget('import_preview');
-		return redirect()->route('gestion');
+		return redirect()->route('gestion.index');
 	}
 }

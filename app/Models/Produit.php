@@ -31,6 +31,7 @@ class Produit extends Model
 		'dispo_emporter'   => 'boolean',
 		'dispo_expedition' => 'boolean',
 		'nouveaute_since'  => 'datetime',
+        'special'          => 'boolean',
 	];
 
 	// Un produit appartient à plusieurs rayons (many-to-many)

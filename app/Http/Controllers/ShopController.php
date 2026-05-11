@@ -54,6 +54,9 @@ class ShopController extends Controller
 				'themesDisponibles' => collect(),
 				'totalProduits'     => 0,
 				'produits'          => collect(),
+				'images'            => collect(),
+				'panier'            => null,
+				'ListeProduits'     => collect(),
 			]);
 		}
 
@@ -146,8 +149,8 @@ class ShopController extends Controller
 		$images = Image::all();
 
 		$panier = Panier::with('lignes.produit')
-                    ->where('user_id', auth()->id())
-                    ->first();
+					->where('user_id', auth()->id())
+					->first();
 		$ListeProduits = $panier ? $panier->lignes : collect();
 
 		return view('shop', compact(
