@@ -379,47 +379,6 @@ body {
 .btn--danger { background: transparent; color: var(--error-text); border-color: #e57373; }
 .btn--danger:hover { background: var(--error-bg); }
 
-/* ── TOGGLE ROW ── */
-.toggle-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.9rem 0;
-    border-bottom: 1px solid var(--border);
-    gap: 1rem;
-}
-
-.toggle-row:last-child { border-bottom: none; }
-
-.toggle-row__info h4 { font-size: 0.85rem; font-weight: 600; color: var(--text); }
-.toggle-row__info p  { font-size: 0.73rem; color: var(--text-muted); margin-top: 2px; }
-
-.toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
-.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-
-.toggle__track {
-    position: absolute;
-    inset: 0;
-    border-radius: 11px;
-    background: #ddd;
-    cursor: pointer;
-    transition: background 0.25s ease;
-}
-
-.toggle__track::before {
-    content: '';
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,.2);
-    transition: transform 0.25s ease;
-}
-
-.toggle input:checked + .toggle__track { background: #22c55e; }
-.toggle input:checked + .toggle__track::before { transform: translateX(18px); }
-
 /* ── INFO ROW (lecture seule) ── */
 .info-row {
     display: flex;
@@ -494,14 +453,6 @@ body {
             <div class="nav-item" data-tab="securite">
                 <span class="nav-item__icon">🔒</span> Sécurité
             </div>
-            @if($isAdmin)
-            <div class="nav-item" data-tab="boutique">
-                <span class="nav-item__icon">🏪</span> Boutique
-            </div>
-            <div class="nav-item" data-tab="commandes">
-                <span class="nav-item__icon">📦</span> Commandes
-            </div>
-            @endif
             <div class="nav-item" data-tab="danger">
                 <span class="nav-item__icon">⚠️</span> Zone danger
             </div>
@@ -704,200 +655,6 @@ body {
 
         </div>
 
-        {{-- ══ BOUTIQUE (admin) ══ --}}
-        @if($isAdmin)
-        <div class="section-panel" id="tab-boutique">
-
-            <div>
-                <h2 class="section-title">Paramètres boutique</h2>
-                <p class="section-sub">Configuration générale de votre boutique en ligne</p>
-            </div>
-
-            <div class="card">
-                <div class="card__head">
-                    <div class="card__icon">🏪</div>
-                    <div class="card__head-text">
-                        <h3>Options de vente</h3>
-                        <p>Modes de retrait et livraison disponibles</p>
-                    </div>
-                </div>
-                <div class="card__body">
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>Click &amp; Collect</h4>
-                            <p>Permettre le retrait en boutique</p>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox" checked>
-                            <span class="toggle__track"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>Expédition activée</h4>
-                            <p>Autoriser la livraison à domicile</p>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox">
-                            <span class="toggle__track"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>Confirmation automatique</h4>
-                            <p>Les commandes sont confirmées sans validation manuelle</p>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox" checked>
-                            <span class="toggle__track"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card__head">
-                    <div class="card__icon">⏱️</div>
-                    <div class="card__head-text">
-                        <h3>Règles de commande</h3>
-                        <p>Délais et montants minimaux</p>
-                    </div>
-                </div>
-                <div class="card__body">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Délai de préparation (jours)</label>
-                            <input type="number" value="2" min="1" max="14" placeholder="2">
-                            <span class="input-hint">Nombre de jours avant que la commande soit prête</span>
-                        </div>
-                        <div class="form-group">
-                            <label>Commande minimum (€)</label>
-                            <input type="number" value="15" min="0" step="0.50" placeholder="15">
-                            <span class="input-hint">Montant minimal pour valider une commande</span>
-                        </div>
-                    </div>
-                    <div class="btn-row">
-                        <button class="btn btn--primary">Enregistrer</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        {{-- ══ COMMANDES (admin) ══ --}}
-        <div class="section-panel" id="tab-commandes">
-
-            <div>
-                <h2 class="section-title">Notifications commandes</h2>
-                <p class="section-sub">Choisissez comment être alerté des nouvelles commandes</p>
-            </div>
-
-            <div class="card">
-                <div class="card__head">
-                    <div class="card__icon">📧</div>
-                    <div class="card__head-text">
-                        <h3>Alertes e-mail</h3>
-                        <p>E-mail envoyé à {{ $user->email }}</p>
-                    </div>
-                </div>
-                <div class="card__body">
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>Nouvelle commande reçue</h4>
-                            <p>Recevoir un e-mail dès qu'une commande est passée</p>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox" checked>
-                            <span class="toggle__track"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>Commande annulée</h4>
-                            <p>Être notifié si un client annule sa commande</p>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox" checked>
-                            <span class="toggle__track"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>Rupture de stock</h4>
-                            <p>Alerte quand un produit tombe à zéro</p>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox">
-                            <span class="toggle__track"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>Récapitulatif quotidien</h4>
-                            <p>Résumé des commandes du jour chaque soir à 20h</p>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox" checked>
-                            <span class="toggle__track"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            @if($user->phone ?? false)
-            <div class="card">
-                <div class="card__head">
-                    <div class="card__icon">📱</div>
-                    <div class="card__head-text">
-                        <h3>Alertes SMS</h3>
-                        <p>Envoyé au {{ $user->phone }}</p>
-                    </div>
-                </div>
-                <div class="card__body">
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>SMS — Nouvelle commande</h4>
-                            <p>Recevoir un SMS à chaque nouvelle commande</p>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox">
-                            <span class="toggle__track"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>SMS — Rupture de stock</h4>
-                            <p>SMS immédiat quand un produit est épuisé</p>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox">
-                            <span class="toggle__track"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            @else
-            <div class="card">
-                <div class="card__head">
-                    <div class="card__icon">📱</div>
-                    <div class="card__head-text">
-                        <h3>Alertes SMS</h3>
-                        <p>Ajoutez un numéro de téléphone pour activer les SMS</p>
-                    </div>
-                </div>
-                <div class="card__body">
-                    <div class="alert alert--error" style="margin-bottom:0;">
-                        📵 Aucun numéro de téléphone enregistré — rendez-vous dans
-                        <strong style="cursor:pointer; text-decoration:underline;" onclick="activateTab('profil')">Mon profil</strong>
-                        pour en ajouter un et débloquer les alertes SMS.
-                    </div>
-                </div>
-            </div>
-            @endif
-
-        </div>
-        @endif
-
         {{-- ══ ZONE DANGER ══ --}}
         <div class="section-panel" id="tab-danger">
 
@@ -915,10 +672,10 @@ body {
                     </div>
                 </div>
                 <div class="card__body">
-                    <div class="toggle-row">
-                        <div class="toggle-row__info">
-                            <h4>Désactiver mon compte</h4>
-                            <p>Vous ne pourrez plus vous connecter jusqu'à réactivation par un administrateur</p>
+                    <div class="info-row">
+                        <div>
+                            <div style="font-weight:600;font-size:.85rem;">Désactiver mon compte</div>
+                            <div style="font-size:.73rem;color:var(--text-muted);margin-top:2px;">Vous ne pourrez plus vous connecter jusqu'à réactivation par un administrateur</div>
                         </div>
                         <form action="{{ route('settings.deactivate') }}" method="POST"
                               onsubmit="return confirm('Êtes-vous sûr ? Votre compte sera suspendu.')">

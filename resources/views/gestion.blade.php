@@ -2,7 +2,7 @@
 
 {{-- TOPBAR --}}
 <header class="topbar">
-	<span class="topbar__brand">Maison des <em>Meringues</em></span>
+	<span class="topbar__brand">La Maison des <em>Meringues</em></span>
 	<a href="/" class="topbar__back">← Retour à l'accueil</a>
 </header>
 

@@ -2,11 +2,14 @@
 
 namespace App\Providers;
 
+use App\Mail\WelcomeMail;
 use App\Models\Panier;
 use App\Listeners\TransfererPanierApresLogin;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +25,12 @@ class AppServiceProvider extends ServiceProvider
 		});
 
 		Event::listen(Login::class, TransfererPanierApresLogin::class);
+
+		// ── Envoi du mail de bienvenue à l'inscription ──
+		Event::listen(function (Registered $event) {
+			Mail::to($event->user->email)
+				->send(new WelcomeMail($event->user->name));
+		});
 
 		View::composer('*', function ($view) {
 			static $panier = null;

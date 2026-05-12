@@ -37,13 +37,6 @@
 						</svg>
 
 						<div class="navbar__dropdown">
-							<a href="/profil" class="navbar__dropdown-item">
-								<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
-									<circle cx="7" cy="5" r="3"/>
-									<path d="M2 12c0-2.8 2.2-4 5-4s5 1.2 5 4"/>
-								</svg>
-								Mon profil
-							</a>
 
 							@if(Auth::user()->isAdmin())
 								<a href="/gestion" class="navbar__dropdown-item">

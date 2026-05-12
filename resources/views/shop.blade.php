@@ -1,6 +1,6 @@
 @include('templet.header', [
-	'titre' => $boutique->nom_boutique,
-	'note'  => 'Meringues &amp; Douceurs Artisanales',
+	'titre' => 'La '.$boutique->nom_boutique,
+	'note'  => 'Douceurs Artisanales',
 	'title' => 'Shop'
 ])
 
@@ -44,7 +44,7 @@
 	   class="cart-bubble"
 	   id="cart-bubble"
 	   aria-label="Voir mon panier ({{ $totalArticles }} article{{ $totalArticles > 1 ? 's' : '' }})">
-		<span>🛒 Mon Panier</span>
+		<span>🛒</span>
 		@if($totalArticles > 0)
 			<span class="cart-bubble__badge" id="cart-badge">{{ $totalArticles }}</span>
 		@else
