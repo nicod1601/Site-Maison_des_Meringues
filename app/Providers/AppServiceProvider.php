@@ -6,6 +6,7 @@ use App\Models\Panier;
 use App\Listeners\TransfererPanierApresLogin;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,6 +16,11 @@ class AppServiceProvider extends ServiceProvider
 
 	public function boot(): void
 	{
+		// Gate admin
+		Gate::define('access-admin', function ($user) {
+			return $user->is_admin === true;
+		});
+
 		Event::listen(Login::class, TransfererPanierApresLogin::class);
 
 		View::composer('*', function ($view) {

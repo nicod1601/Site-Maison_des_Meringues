@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
@@ -11,6 +12,9 @@ use App\Http\Controllers\CreationController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ImageController;
+
+use Illuminate\Http\Request;
+
 
 // ── Pages publiques ───────────────────────────────────────────────────────────
 Route::get('/',     [AccueilController::class, 'index'])->name('index');
@@ -26,29 +30,29 @@ Route::post  ('/panier/vider',      [PanierController::class, 'vider'])    ->nam
 
 // ── Paramètres (compte obligatoire) ──────────────────────────────────────────
 Route::middleware(['auth'])->prefix('settings')->group(function () {
-    Route::get ('/',          [SettingsController::class, 'index'])         ->name('settings');
-    Route::post('/profile',   [SettingsController::class, 'updateProfile']) ->name('settings.profile');
-    Route::post('/password',  [SettingsController::class, 'updatePassword'])->name('settings.password');
-    Route::post('/deactivate',[SettingsController::class, 'deactivate'])    ->name('settings.deactivate');
+	Route::get ('/',          [SettingsController::class, 'index'])         ->name('settings');
+	Route::post('/profile',   [SettingsController::class, 'updateProfile']) ->name('settings.profile');
+	Route::post('/password',  [SettingsController::class, 'updatePassword'])->name('settings.password');
+	Route::post('/deactivate',[SettingsController::class, 'deactivate'])    ->name('settings.deactivate');
 });
 
 // ── Checkout (compte obligatoire) ─────────────────────────────────────────────
 Route::middleware(['auth'])->group(function () {
-    Route::get('/checkout', function () {
-        return view('checkout');
-    })->name('checkout.index');
+	Route::get('/checkout', function () {
+		return view('checkout');
+	})->name('checkout.index');
 
-    Route::get('/profile',    [ProfileController::class, 'edit'])   ->name('profile.edit');
-    Route::patch('/profile',  [ProfileController::class, 'update']) ->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+	Route::get('/profile',    [ProfileController::class, 'edit'])   ->name('profile.edit');
+	Route::patch('/profile',  [ProfileController::class, 'update']) ->name('profile.update');
+	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // ── Gestion (admin uniquement) ────────────────────────────────────────────────
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/gestion', [GestionController::class, 'index'])->name('gestion.index');
+	Route::get('/gestion', [GestionController::class, 'index'])->name('gestion.index');
 
-    Route::post('/import/excel', [ImportController::class, 'import'])->name('import.excel');
-    Route::get ('/import/clear', [ImportController::class, 'clear']) ->name('import.clear');
+	Route::post('/import/excel', [ImportController::class, 'import'])->name('import.excel');
+	Route::get ('/import/clear', [ImportController::class, 'clear']) ->name('import.clear');
 });
 
 // Produits
@@ -93,5 +97,13 @@ Route::delete('/gestion/event/{id}', [CreationController::class, 'destroyEvent']
 Route::post  ('/gestion/image',                   [ImageController::class, 'store'])    ->name('image.store');
 Route::post  ('/gestion/image/{image}/remplacer',  [ImageController::class, 'remplacer'])->name('image.remplacer');
 Route::delete('/gestion/image/{image}',            [ImageController::class, 'destroy']) ->name('image.destroy');
+
+
+
+use App\Http\Controllers\TestController;
+
+Route::get('/test/foo', [TestController::class, 'foo'])->middleware('auth')->name('test.foo');
+Route::get('/test/bar', [TestController::class, 'bar'])->name('test.bar'); // pas besoin d'auth
+
 
 require __DIR__.'/auth.php';
