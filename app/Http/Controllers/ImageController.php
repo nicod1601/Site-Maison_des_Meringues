@@ -32,11 +32,9 @@ class ImageController extends Controller
 		$file      = $request->file('image');
 		$extension = strtolower($file->getClientOriginalExtension());
 		$baseName  = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-
-		// Slug sur le nom du fichier aussi (supprime accents, espaces, caractères spéciaux)
 		$filename  = Str::slug($baseName) . '.' . $extension;
 
-		// Éviter les doublons
+		// Éviter les doublons de nom de fichier
 		$counter = 1;
 		while (file_exists("{$dossier}/{$filename}")) {
 			$filename = Str::slug($baseName) . '-' . $counter . '.' . $extension;
@@ -53,18 +51,21 @@ class ImageController extends Controller
 			'url'            => $url,
 		]);
 
-		return redirect()->route('gestion.index')
+		return redirect()->route('gestion.index', ['tab' => 'images'])
 			->with('success', 'Image ajoutée avec succès.');
 	}
 
-	public function remplacer(Request $request, Image $image)
+	public function remplacer(Request $request, $id)
 	{
+		$image = Image::findOrFail($id);
+
 		$request->validate([
 			'image' => 'required|file|mimes:jpg,jpeg,png,webp,gif|max:5120',
 		]);
 
 		$cheminExistant = public_path($image->url);
 
+		// Supprimer l'ancien fichier s'il existe
 		if (file_exists($cheminExistant)) {
 			unlink($cheminExistant);
 		}
@@ -76,36 +77,24 @@ class ImageController extends Controller
 			mkdir($dossier, 0755, true);
 		}
 
+		// Déposer le nouveau fichier exactement au même emplacement avec le même nom
 		$request->file('image')->move($dossier, $filename);
 
-		return redirect()->route('gestion.index')
+		return redirect()->route('gestion.index', ['tab' => 'images'])
 			->with('success', 'Image remplacée avec succès.');
 	}
 
-	public function destroy(Image $image)
+	public function destroy($id)
 	{
+		$image = Image::findOrFail($id);
+
 		$chemin = public_path($image->url);
 
 		if (file_exists($chemin)) {
 			unlink($chemin);
 		}
 
-		$image->delete();
-
-		return redirect()->route('gestion.index')
-			->with('success', 'Image supprimée.');
-	}
-
-	public function serve(string $path)
-	{
-		$fullPath = public_path($path);
-
-		if (!file_exists($fullPath)) {
-			return response('',404);
-		}
-
-		return response()->file($fullPath, [
-			'Content-Type' => mime_content_type($fullPath),
-		]);
+		return redirect()->route('gestion.index', ['tab' => 'images'])
+			->with('success', 'Fichier image supprimé. La carte produit est conservée.');
 	}
 }
