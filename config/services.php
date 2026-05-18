@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'monetico' => [
+        'tpe'     => env('MONETICO_TPE'),
+        'cle'     => env('MONETICO_CLE'),
+        'societe' => env('MONETICO_SOCIETE'),
+    ],
+
 ];

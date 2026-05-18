@@ -98,6 +98,17 @@ Route::post  ('/gestion/image',                   [ImageController::class, 'stor
 Route::post  ('/gestion/image/{image}/remplacer',  [ImageController::class, 'remplacer'])->name('image.remplacer');
 Route::delete('/gestion/image/{image}',            [ImageController::class, 'destroy']) ->name('image.destroy');
 
+// Commande
+// Dans le groupe middleware(['auth'])
+Route::get ('/checkout',         [CommandeController::class, 'index'])  ->name('checkout.index');
+Route::post('/checkout/payer',   [CommandeController::class, 'payer'])  ->name('checkout.payer');
+Route::get ('/checkout/success', [CommandeController::class, 'success'])->name('checkout.success');
+Route::get ('/checkout/error',   [CommandeController::class, 'error'])  ->name('checkout.error');
+
+// Hors auth — appelé par Monetico directement
+Route::post('/checkout/retour', [CommandeController::class, 'retour'])->name('checkout.retour');
+
+
 
 
 use App\Http\Controllers\TestController;

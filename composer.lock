@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c1061bd7a6c6fc4f054198e6a97e47ce",
+    "content-hash": "02204a155d4cbdee5f86c276e90a5c0e",
     "packages": [
         {
             "name": "brick/math",
@@ -290,6 +290,66 @@
                 }
             ],
             "time": "2025-08-20T19:15:30+00:00"
+        },
+        {
+            "name": "dansmaculotte/monetico-php",
+            "version": "2.0.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dansmaculotte/monetico-php.git",
+                "reference": "4caa56c6645013e1e81c67cbccb7cb39799fb3ba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dansmaculotte/monetico-php/zipball/4caa56c6645013e1e81c67cbccb7cb39799fb3ba",
+                "reference": "4caa56c6645013e1e81c67cbccb7cb39799fb3ba",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.2|^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.13",
+                "nesbot/carbon": "^2.27",
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "extra": {
+                "hooks": {
+                    "pre-push": "composer format",
+                    "pre-commit": "composer format"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "DansMaCulotte\\Monetico\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gaël Reyrol",
+                    "email": "gael@dansmaculotte.fr"
+                },
+                {
+                    "name": "Martin Potel",
+                    "email": "martin@dansmaculotte.fr"
+                }
+            ],
+            "description": "PHP SDK for Monetico Payment Service",
+            "homepage": "https://github.com/dansmaculotte/monetico-php",
+            "keywords": [
+                "monetico"
+            ],
+            "support": {
+                "issues": "https://github.com/dansmaculotte/monetico-php/issues",
+                "source": "https://github.com/dansmaculotte/monetico-php/tree/v2.0.11"
+            },
+            "time": "2024-06-10T18:49:42+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
