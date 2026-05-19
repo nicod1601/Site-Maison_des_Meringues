@@ -159,7 +159,6 @@
 </div>
 </main>
 </body>
-
 @include('templet.footer')
 
 <script>

@@ -12,6 +12,7 @@ use App\Http\Controllers\CreationController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ProController;
 
 use Illuminate\Http\Request;
 
@@ -20,6 +21,7 @@ use Illuminate\Http\Request;
 Route::get('/',     [AccueilController::class, 'index'])->name('index');
 Route::get('/news', [NewsController::class,    'index'])->name('news');
 Route::get('/shop/{id}', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/pro',  [ProController::class,    'index'])->name('pro');
 
 // ── Panier (accessible sans compte) ──────────────────────────────────────────
 Route::get   ('/panier',            [PanierController::class, 'index'])    ->name('panier.index');

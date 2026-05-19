@@ -1,0 +1,249 @@
+/* ══════════════════════════════════════════════
+   BOUTIQUE PRO — Structure & Style
+   ══════════════════════════════════════════════ */
+
+.boutique-body {
+  background: var(--color-cream);
+  min-height: 100vh;
+  padding: var(--space-2xl) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: var(--container-2xl);
+  margin-inline: auto;
+}
+
+/* ── Layout 2 colonnes ─────────────────────── */
+.boutique-layout {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.boutique-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* ── Section card (boîte blanche arrondie) ── */
+.section-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl) var(--space-2xl);
+}
+
+.section-card__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  color: var(--color-primary-dark);
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.section-card__title-icon {
+  color: var(--color-gold);
+  font-size: var(--text-lg);
+}
+
+/* ── Grille produits ───────────────────────── */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-lg);
+}
+
+/* ── Carte boutique ────────────────────────── */
+.boutique-card {
+  background: var(--color-cream);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  cursor: pointer;
+}
+.boutique-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.boutique-card__img-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--color-cream-dark);
+}
+
+.boutique-card__img-placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.boutique-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--transition-slow);
+}
+.boutique-card:hover .boutique-card__img {
+  transform: scale(1.05);
+}
+
+.boutique-card__body {
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.boutique-card__name {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  text-transform: capitalize;
+}
+
+.boutique-card__badges {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  margin-top: var(--space-xs);
+}
+
+/* ── Colonne droite : parfums sticky ───────── */
+.boutique-col-right {
+  position: sticky;
+  top: calc(72px + var(--space-lg));
+}
+
+.parfums-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+}
+
+.parfum-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-cream);
+  margin-bottom: var(--space-sm);
+  transition: all var(--transition-fast);
+}
+.parfum-item:last-child { margin-bottom: 0; }
+.parfum-item:hover {
+  border-color: var(--color-primary-light);
+  transform: translateX(3px);
+}
+
+.parfum-item__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.parfum-item__name {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  text-transform: capitalize;
+}
+
+/* ── Section contact ───────────────────────── */
+.contact-section {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+}
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3xl);
+  margin-top: var(--space-xl);
+}
+
+/* Infos contact */
+.contact-infos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.contact-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.contact-info-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: var(--color-cream);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-primary);
+  font-size: var(--text-md);
+}
+
+.contact-info-label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+}
+
+.contact-info-val {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  font-weight: 600;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* Formulaire */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ── Responsive ────────────────────────────── */
+@media (max-width: 1024px) {
+  .boutique-layout {
+    grid-template-columns: 1fr;
+  }
+  .boutique-col-right {
+    position: static;
+  }
+  .parfums-card {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .boutique-body { padding: var(--space-lg) var(--space-md); }
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .contact-layout { grid-template-columns: 1fr; gap: var(--space-xl); }
+  .section-card { padding: var(--space-lg); }
+}

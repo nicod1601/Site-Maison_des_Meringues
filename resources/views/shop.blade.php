@@ -231,17 +231,14 @@
 
 		@endforelse
 
-	@endif {{-- Fin vérification rayons actifs --}}
+	@endif
 
 </main>
 
 
-{{-- ── FOOTER ──────────────────────────────────────────────── --}}
 @include('templet.footer')
 
 
-{{-- ── SCRIPTS ─────────────────────────────────────────────── --}}
-{{-- !! Tri ──────────────────────────────────────────────────── --}}
 <script>
 	function appliquerTri(valeur) {
 		const url = new URL(window.location.href);
@@ -305,13 +302,9 @@
 
 	document.querySelectorAll('.boutique-card__img').forEach(img => {
 
-		/*img.addEventListener('load', () => {
-			console.log('OK :', img.src);
-		});*/
-
 		img.addEventListener('error', () => {
 			//console.log('ERREUR :', img.src);
-			img.src = "/fichier/image/meringues/oups.png";
+			img.src = "/fichier/image/meringues/oups.webp";
 		});
 
 	});

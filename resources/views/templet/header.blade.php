@@ -15,7 +15,7 @@
 						alt="Logo La Maison des Meringues"
 						class="navbar__logo-img">
 					<span class="navbar__logo-text">
-						Maison des<br><span>Meringues</span>
+						La Maison des<br><span>Meringues</span>
 					</span>
 				</a>
 
@@ -25,6 +25,7 @@
 					<a href="/"        class="navbar__link {{ request()->is('/') ? 'active' : '' }}">Accueil</a>
 					<a href="/news"    class="navbar__link {{ request()->is('news') ? 'active' : '' }}">Catalogue</a>
 					<a href="/shop/{{1}}"    class="navbar__cta">Boutique</a>
+					<a href="/pro"    class="navbar__cta">Professionnel </a>
 				</nav>
 
 				@auth
