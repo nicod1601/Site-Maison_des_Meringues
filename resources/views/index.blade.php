@@ -75,7 +75,7 @@
 				{{-- Horaires --}}
 				<div class="card">
 					<div class="card__body">
-						<h3 class="card__title mb-lg">Horaires d'ouverture</h3>
+						<h3 class="card__title mb-lg">Horaires Service Client</h3>
 						<table class="horaires-table">
 							<tbody>
 								<tr><td>Lundi</td><td>9h00 – 18h00 <span class="badge badge--new">Ouvert</span></td></tr>

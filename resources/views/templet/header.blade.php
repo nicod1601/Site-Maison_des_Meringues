@@ -23,7 +23,7 @@
 
 				<nav class="navbar__links" aria-label="Navigation principale">
 					<a href="/"        class="navbar__link {{ request()->is('/') ? 'active' : '' }}">Accueil</a>
-					<a href="/news"    class="navbar__link {{ request()->is('news') ? 'active' : '' }}">Catalogue</a>
+					<a href="/news"    class="navbar__link {{ request()->is('news') ? 'active' : '' }}">Blog</a>
 					<a href="/shop/{{1}}"    class="navbar__cta">Boutique</a>
 					<a href="/pro"    class="navbar__cta">Professionnel </a>
 				</nav>
