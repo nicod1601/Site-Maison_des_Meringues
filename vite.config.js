@@ -12,6 +12,8 @@ export default defineConfig({
 				'resources/css/boutique.css',
 				'resources/css/pro.css',
 				'resources/css/event/noel.css',
+				'resources/css/event/halloween.css',
+				'resources/css/blog.css',
 				'resources/js/app.js',
 			],
 			refresh: true,

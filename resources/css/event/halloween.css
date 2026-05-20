@@ -1,86 +1,100 @@
 /* ============================================================
-   LA MAISON DES MERINGUES — Boutique Édition Noël Traditionnel
-   🎄 Mode : Vitrine de Noël — Crème, rouge vif, vert sapin, or
-   Polices : Libre Baskerville + Lato + DM Mono
+   LA MAISON DES MERINGUES — Boutique Halloween Edition
+   🎃 Mode : Nuit de Samhain — Sombre, envoûtant, spectaculaire
+   Polices : Cinzel Decorative + Crimson Pro + DM Mono
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=DM+Mono:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400&display=swap');
 
 /* ══════════════════════════════════════════════════════════
-   VARIABLES NOËL TRADITIONNEL
+   VARIABLES HALLOWEEN (remplacent les variables artisanales)
 ══════════════════════════════════════════════════════════ */
 
 :root {
-    /* Fonds & surfaces — crème chaud */
-    --bout-cream:        #FDF6EC;
-    --bout-cream-dark:   #F5E8D0;
-    --bout-cream-deep:   #ECD9B8;
+    /* Fond & surfaces */
+    --bout-cream:        #0D0A0E;          /* noir velouté */
+    --bout-cream-dark:   #160D1A;          /* violet nuit */
+    --bout-cream-deep:   #1E1025;          /* prune sombre */
 
-    /* Rouge Noël */
-    --bout-rose:         #C41E3A;
-    --bout-rose-dark:    #8B0000;
-    --bout-rose-pale:    rgba(196, 30, 58, 0.08);
-    --bout-rose-pale2:   rgba(196, 30, 58, 0.15);
+    /* Oranges & feux */
+    --bout-rose:         #E8640A;          /* orange citrouille */
+    --bout-rose-dark:    #B84D06;          /* braise profonde */
+    --bout-rose-pale:    rgba(232, 100, 10, 0.09);
+    --bout-rose-pale2:   rgba(232, 100, 10, 0.18);
 
-    /* Vert sapin */
-    --bout-gold:         #2D6A2D;
-    --bout-gold-light:   #3D8B3D;
-    --bout-gold-pale:    rgba(45, 106, 45, 0.10);
-
-    /* Or brillant */
-    --bout-or:           #C8960C;
-    --bout-or-light:     #F0B429;
-    --bout-or-pale:      rgba(200, 150, 12, 0.12);
+    /* Violets & dorés maudits */
+    --bout-gold:         #8B5CF6;          /* violet sorcière */
+    --bout-gold-light:   #A78BFA;          /* lilas fantôme */
+    --bout-gold-pale:    rgba(139, 92, 246, 0.12);
 
     /* Textes */
-    --bout-text:         #1C0A00;
-    --bout-text-mid:     #4A2C10;
-    --bout-text-muted:   #8B6340;
+    --bout-text:         #F0E8FF;          /* blanc fantôme */
+    --bout-text-mid:     #C4A8D4;          /* lilas clair */
+    --bout-text-muted:   #8A6A9A;          /* violet estompé */
 
     /* Bordures */
-    --bout-border:       #D9C4A0;
-    --bout-white:        #FFFFFF;
+    --bout-border:       #2D1A3D;          /* frontière sombre */
+    --bout-white:        #1A0F24;          /* "blanc" = fond carte */
 
     /* Formes */
-    --bout-r-card:       16px;
-    --bout-r-sm:         6px;
+    --bout-r-card:       12px;
+    --bout-r-sm:         5px;
     --bout-r-full:       9999px;
 
-    /* Ombres festives */
+    /* Ombres de crypte */
     --bout-shadow-card:
-        0 2px 8px rgba(100, 40, 0, 0.08),
-        0 8px 32px rgba(100, 40, 0, 0.06);
+        0 2px 8px rgba(0, 0, 0, 0.5),
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(139, 92, 246, 0.08);
     --bout-shadow-hover:
-        0 8px 24px rgba(100, 40, 0, 0.14),
-        0 24px 64px rgba(100, 40, 0, 0.10),
-        0 0 0 1px rgba(196, 30, 58, 0.12);
+        0 8px 24px rgba(0, 0, 0, 0.7),
+        0 24px 64px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(232, 100, 10, 0.18),
+        0 0 0 1px rgba(232, 100, 10, 0.25);
 
-    --bout-t: 260ms cubic-bezier(0.4, 0, 0.2, 1);
+    --bout-t: 280ms cubic-bezier(0.4, 0, 0.2, 1);
 
-    --font-display-bout: 'Libre Baskerville', Georgia, serif;
-    --font-body-bout:    'Lato', system-ui, sans-serif;
+    --font-display-bout: 'Cinzel Decorative', 'Palatino Linotype', serif;
+    --font-body-bout:    'Crimson Pro', Georgia, serif;
     --font-mono-bout:    'DM Mono', monospace;
 }
 
 /* ══════════════════════════════════════════════════════════
-   ANIMATIONS NOËL
+   FOND GLOBAL — TOILE D'ARAIGNÉE & BRUME
 ══════════════════════════════════════════════════════════ */
 
-@keyframes snow-fall {
-    0%   { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 0; }
-    10%  { opacity: 1; }
-    90%  { opacity: 0.8; }
-    100% { transform: translateY(110px) translateX(15px) rotate(180deg); opacity: 0; }
+body,
+.boutique-hero,
+.boutique-body,
+.rayon-nav {
+    background-color: var(--bout-cream);
 }
 
-@keyframes ribbon-shimmer {
-    0%, 100% { background-position: -200% center; }
-    50%       { background-position: 200% center; }
+/* Keyframes globaux Halloween */
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92%       { opacity: 1; }
+    93%       { opacity: 0.7; }
+    94%       { opacity: 1; }
+    96%       { opacity: 0.85; }
+    97%       { opacity: 1; }
 }
 
-@keyframes star-shine {
-    0%, 100% { opacity: 0.6; transform: scale(1) rotate(0deg); }
-    50%       { opacity: 1;   transform: scale(1.2) rotate(15deg); }
+@keyframes float-ghost {
+    0%, 100% { transform: translateY(0px) rotate(-1deg); }
+    50%       { transform: translateY(-12px) rotate(1deg); }
+}
+
+@keyframes mist-drift {
+    0%   { transform: translateX(-20px); opacity: 0; }
+    15%  { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { transform: translateX(20px);  opacity: 0; }
+}
+
+@keyframes ember-glow {
+    0%, 100% { box-shadow: 0 0 12px rgba(232, 100, 10, 0.4), 0 0 24px rgba(232, 100, 10, 0.2); }
+    50%       { box-shadow: 0 0 20px rgba(232, 100, 10, 0.7), 0 0 48px rgba(232, 100, 10, 0.35); }
 }
 
 @keyframes badge-pop {
@@ -89,60 +103,45 @@
     100% { transform: scale(1);   opacity: 1; }
 }
 
-@keyframes bell-ring {
-    0%, 100% { transform: rotate(0deg); }
-    15%       { transform: rotate(12deg); }
-    30%       { transform: rotate(-10deg); }
-    45%       { transform: rotate(8deg); }
-    60%       { transform: rotate(-6deg); }
-    75%       { transform: rotate(3deg); }
-}
-
-@keyframes holly-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(196, 30, 58, 0.3); }
-    50%       { box-shadow: 0 0 0 5px rgba(196, 30, 58, 0); }
+@keyframes cauldron-bubble {
+    0%, 100% { transform: scaleY(1); }
+    50%       { transform: scaleY(1.05); }
 }
 
 /* ══════════════════════════════════════════════════════════
-   FLOCONS DÉCORATIFS
-══════════════════════════════════════════════════════════ */
-
-.boutique-hero::after {
-    content: '❄ ❄ ❄';
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.9rem;
-    color: var(--bout-or-light);
-    opacity: 0.35;
-    letter-spacing: 1.5rem;
-    pointer-events: none;
-    animation: star-shine 4s ease-in-out infinite;
-}
-
-/* ══════════════════════════════════════════════════════════
-   HERO BOUTIQUE — VITRINE DE NOËL
+   HERO BOUTIQUE — CHÂTEAU HANTÉ
 ══════════════════════════════════════════════════════════ */
 
 .boutique-hero {
     background: var(--bout-cream);
-    border-bottom: 3px solid var(--bout-rose-dark);
+    border-bottom: 1px solid var(--bout-border);
     padding: 4rem 0 0;
     position: relative;
     overflow: hidden;
 }
 
-/* Texture chaleureuse + coins de houx */
+/* Lune et brume en arrière-plan */
 .boutique-hero::before {
     content: '';
     position: absolute;
     inset: 0;
     background-image:
-        radial-gradient(ellipse at 50% 0%, rgba(196, 30, 58, 0.06) 0%, transparent 60%),
-        radial-gradient(circle at 5% 50%, rgba(45, 106, 45, 0.07) 0%, transparent 35%),
-        radial-gradient(circle at 95% 50%, rgba(45, 106, 45, 0.07) 0%, transparent 35%),
-        radial-gradient(circle at 50% 110%, rgba(200, 150, 12, 0.08) 0%, transparent 50%);
+        radial-gradient(ellipse at 50% -20%, rgba(139, 92, 246, 0.25) 0%, transparent 55%),
+        radial-gradient(circle at 15% 80%, rgba(232, 100, 10, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 70%, rgba(139, 92, 246, 0.10) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    animation: mist-drift 18s ease-in-out infinite;
+}
+
+/* Ligne de bougies / toile */
+.boutique-hero::after {
+    content: '🕸️';
+    position: absolute;
+    top: 12px;
+    right: 24px;
+    font-size: 2rem;
+    opacity: 0.15;
     pointer-events: none;
 }
 
@@ -160,80 +159,87 @@
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.28em;
-    color: var(--bout-gold);
+    color: var(--bout-gold-light);
     margin-bottom: 0.75rem;
+    opacity: 0.85;
 }
 
 .boutique-hero__title {
     font-family: var(--font-display-bout);
-    font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+    font-size: clamp(2rem, 5.5vw, 3.4rem);
     font-weight: 700;
-    color: var(--bout-rose-dark);
+    color: #F0E8FF;
     margin-bottom: 0;
-    line-height: 1.08;
-    letter-spacing: -0.01em;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+    text-shadow:
+        0 0 40px rgba(139, 92, 246, 0.5),
+        0 0 80px rgba(139, 92, 246, 0.2);
+    animation: flicker 8s ease-in-out infinite;
 }
 
 .boutique-hero__title em {
     display: block;
     font-family: var(--font-display-bout);
     font-style: italic;
-    font-size: 0.58em;
+    font-size: 0.55em;
     font-weight: 400;
-    color: var(--bout-gold);
-    letter-spacing: 0.06em;
-    margin-top: 0.25em;
+    color: var(--bout-rose);
+    letter-spacing: 0.1em;
+    margin-top: 0.3em;
+    text-shadow: 0 0 20px rgba(232, 100, 10, 0.6);
 }
 
-/* Ornement : guirlande dorée */
+/* Ornement : chauves-souris */
 .boutique-hero__ornament {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 1rem;
     margin: 1.5rem auto 0;
-    max-width: 300px;
+    max-width: 280px;
 }
 
 .boutique-hero__ornament-line {
-    height: 2px;
+    height: 1px;
     flex: 1;
-    background: linear-gradient(to right, transparent, var(--bout-or), transparent);
-    opacity: 0.6;
-    border-radius: 2px;
+    background: linear-gradient(to right, transparent, var(--bout-gold), transparent);
+    opacity: 0.4;
 }
 
 .boutique-hero__ornament-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: var(--bout-or);
-    box-shadow: 0 0 8px rgba(200, 150, 12, 0.5);
-    animation: star-shine 3s ease-in-out infinite;
+    background: var(--bout-gold);
+    box-shadow: 0 0 8px var(--bout-gold);
 }
 
 .boutique-hero__desc {
     font-family: var(--font-body-bout);
-    font-size: 1.0625rem;
+    font-size: 1.1rem;
     font-weight: 300;
+    font-style: italic;
     color: var(--bout-text-muted);
     max-width: 480px;
     margin: 1.25rem auto 2.5rem;
-    line-height: 1.7;
+    line-height: 1.75;
 }
 
 /* ══════════════════════════════════════════════════════════
-   BARRE RAYONS — GUIRLANDE DE NAVIGATION
+   BARRE RAYONS — CRYPTE DE NAVIGATION
 ══════════════════════════════════════════════════════════ */
 
 .rayon-nav {
-    background: var(--bout-white);
-    border-bottom: 2px solid var(--bout-cream-dark);
-    border-top: 2px solid var(--bout-rose-dark);
+    background: rgba(13, 10, 14, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--bout-border);
     position: sticky;
     top: 100px;
     z-index: 150;
-    box-shadow: 0 4px 16px rgba(100, 40, 0, 0.08);
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.6),
+        0 1px 0 rgba(139, 92, 246, 0.1) inset;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -260,16 +266,16 @@
     align-items: center;
     gap: 7px;
     padding: 10px 20px;
-    font-family: var(--font-body-bout);
-    font-size: 12px;
-    font-weight: 700;
+    font-family: var(--font-mono-bout);
+    font-size: 11px;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     color: var(--bout-text-muted);
     text-decoration: none;
-    border-bottom: 3px solid transparent;
+    border-bottom: 2px solid transparent;
     white-space: nowrap;
-    transition: color var(--bout-t), border-color var(--bout-t), background var(--bout-t);
+    transition: color var(--bout-t), border-color var(--bout-t), background var(--bout-t), text-shadow var(--bout-t);
     cursor: pointer;
     background: none;
     border-top: none;
@@ -281,12 +287,14 @@
 .rayon-nav__item:hover {
     color: var(--bout-rose);
     background: var(--bout-rose-pale);
+    text-shadow: 0 0 12px rgba(232, 100, 10, 0.5);
 }
 
 .rayon-nav__item.active {
-    color: var(--bout-rose-dark);
-    border-bottom-color: var(--bout-rose-dark);
+    color: var(--bout-rose);
+    border-bottom-color: var(--bout-rose);
     background: var(--bout-rose-pale);
+    text-shadow: 0 0 12px rgba(232, 100, 10, 0.5);
 }
 
 .rayon-nav__item-icon {
@@ -301,29 +309,32 @@
     min-width: 18px;
     height: 18px;
     padding: 0 5px;
-    background: var(--bout-cream-dark);
-    color: var(--bout-rose-dark);
+    background: var(--bout-cream-deep);
+    color: var(--bout-gold-light);
     font-family: var(--font-mono-bout);
     font-size: 10px;
     font-weight: 500;
     border-radius: var(--bout-r-full);
-    transition: background var(--bout-t), color var(--bout-t);
+    border: 1px solid var(--bout-border);
+    transition: background var(--bout-t), color var(--bout-t), box-shadow var(--bout-t);
 }
 
 .rayon-nav__item.active .rayon-nav__count {
     background: var(--bout-rose-dark);
-    color: var(--bout-white);
+    color: #FFE8D6;
+    border-color: var(--bout-rose);
+    box-shadow: 0 0 8px rgba(232, 100, 10, 0.4);
 }
 
 /* ══════════════════════════════════════════════════════════
-   PANIER BULLE — CLOCHETTE
+   PANIER BULLE — CHAUDRON MAGIQUE
 ══════════════════════════════════════════════════════════ */
 
 .cart-bubble {
     position: relative;
     flex-shrink: 0;
-    background: var(--bout-rose-dark);
-    color: var(--bout-white);
+    background: linear-gradient(135deg, var(--bout-rose-dark) 0%, #7A3300 100%);
+    color: #FFE8D6;
     border-radius: var(--bout-r-full);
     padding: 9px 20px;
     display: flex;
@@ -331,22 +342,22 @@
     gap: 8px;
     cursor: pointer;
     transition: background var(--bout-t), transform var(--bout-t), box-shadow var(--bout-t);
-    font-family: var(--font-body-bout);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-family: var(--font-mono-bout);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    border: 2px solid rgba(139, 0, 0, 0.4);
+    border: 1px solid rgba(232, 100, 10, 0.4);
     user-select: none;
     text-decoration: none;
     right: 1.5rem;
-    animation: holly-glow 2.5s ease-in-out infinite;
+    animation: ember-glow 3s ease-in-out infinite;
 }
 
 .cart-bubble:hover {
-    background: var(--bout-rose);
+    background: linear-gradient(135deg, var(--bout-rose) 0%, var(--bout-rose-dark) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(196, 30, 58, 0.35);
+    box-shadow: 0 8px 24px rgba(232, 100, 10, 0.4);
     animation: none;
 }
 
@@ -354,8 +365,8 @@
     position: absolute;
     top: -8px;
     right: -8px;
-    background: var(--bout-or);
-    color: var(--bout-white);
+    background: var(--bout-gold);
+    color: #F0E8FF;
     border-radius: 50%;
     min-width: 20px;
     height: 20px;
@@ -366,8 +377,9 @@
     font-family: var(--font-mono-bout);
     font-size: 11px;
     font-weight: 700;
-    border: 2px solid var(--bout-white);
+    border: 2px solid var(--bout-cream);
     pointer-events: none;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
     animation: badge-pop 0.35s ease;
 }
 
@@ -381,7 +393,6 @@
     padding-inline: 1.5rem;
     padding-top: 2.5rem;
     padding-bottom: 5rem;
-    background: var(--bout-cream);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -405,10 +416,11 @@
 }
 
 .boutique-toolbar__count {
-    font-family: var(--font-body-bout);
-    font-size: 0.9375rem;
+    font-family: var(--font-mono-bout);
+    font-size: 0.85rem;
     color: var(--bout-text-muted);
     font-weight: 300;
+    letter-spacing: 0.04em;
 }
 
 .boutique-toolbar__filters {
@@ -423,23 +435,24 @@
     gap: 5px;
     padding: 5px 14px;
     border-radius: var(--bout-r-full);
-    font-family: var(--font-body-bout);
-    font-size: 11px;
-    font-weight: 700;
+    font-family: var(--font-mono-bout);
+    font-size: 10px;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    border: 1.5px solid var(--bout-border);
+    letter-spacing: 0.1em;
+    border: 1px solid var(--bout-border);
     color: var(--bout-text-muted);
-    background: var(--bout-white);
+    background: var(--bout-cream-dark);
     cursor: pointer;
-    transition: all 150ms ease;
+    transition: all 200ms ease;
 }
 
 .boutique-filter-chip:hover,
 .boutique-filter-chip.active {
     border-color: var(--bout-gold);
-    color: var(--bout-gold);
+    color: var(--bout-gold-light);
     background: var(--bout-gold-pale);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
 }
 
 .boutique-toolbar__right {
@@ -452,32 +465,33 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: var(--font-body-bout);
-    font-size: 0.8125rem;
+    font-family: var(--font-mono-bout);
+    font-size: 0.8rem;
     color: var(--bout-text-muted);
+    letter-spacing: 0.04em;
 }
 
 .boutique-sort select {
     padding: 6px 12px;
-    border: 1.5px solid var(--bout-border);
+    border: 1px solid var(--bout-border);
     border-radius: var(--bout-r-sm);
-    background: var(--bout-white);
+    background: var(--bout-cream-dark);
     color: var(--bout-text);
-    font-family: var(--font-body-bout);
-    font-size: 0.8125rem;
+    font-family: var(--font-mono-bout);
+    font-size: 0.8rem;
     cursor: pointer;
     outline: none;
-    transition: border-color 150ms ease;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
     appearance: none;
 }
 
 .boutique-sort select:focus {
-    border-color: var(--bout-rose);
-    box-shadow: 0 0 0 3px var(--bout-rose-pale);
+    border-color: var(--bout-gold);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
 }
 
 /* ══════════════════════════════════════════════════════════
-   SECTION THÈME — RAYON DU SAPIN
+   SECTION THÈME — SALLE DES RITES
 ══════════════════════════════════════════════════════════ */
 
 .theme-section {
@@ -490,7 +504,7 @@
     justify-content: space-between;
     margin-bottom: 2rem;
     padding-bottom: 1.25rem;
-    border-bottom: 2px solid var(--bout-cream-dark);
+    border-bottom: 1px solid var(--bout-border);
     gap: 1.5rem;
     flex-wrap: wrap;
     position: relative;
@@ -499,11 +513,11 @@
 .theme-header::after {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: -1px;
     left: 0;
     width: 80px;
-    height: 2px;
-    background: var(--bout-rose-dark);
+    height: 1px;
+    background: linear-gradient(to right, var(--bout-rose), transparent);
 }
 
 .theme-header__left {}
@@ -512,45 +526,53 @@
     font-family: var(--font-mono-bout);
     font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 0.22em;
-    color: var(--bout-gold);
+    letter-spacing: 0.25em;
+    color: var(--bout-gold-light);
     margin-bottom: 5px;
+    opacity: 0.75;
 }
 
 .theme-header__title {
     font-family: var(--font-display-bout);
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: var(--bout-rose-dark);
+    color: #F0E8FF;
     line-height: 1.1;
     margin: 0;
+    letter-spacing: 0.04em;
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
 }
 
 .theme-header__title em {
     font-style: italic;
-    color: var(--bout-gold);
+    color: var(--bout-rose);
+    text-shadow: 0 0 15px rgba(232, 100, 10, 0.4);
 }
 
 .theme-header__desc {
     font-family: var(--font-body-bout);
-    font-size: 0.9375rem;
+    font-size: 1rem;
     font-weight: 300;
+    font-style: italic;
     color: var(--bout-text-muted);
     margin-top: 0.4rem;
     max-width: 400px;
-    line-height: 1.6;
+    line-height: 1.65;
 }
 
 .theme-header__count {
     font-family: var(--font-mono-bout);
-    font-size: 11px;
-    letter-spacing: 0.1em;
+    font-size: 10px;
+    letter-spacing: 0.12em;
     color: var(--bout-text-muted);
     flex-shrink: 0;
 }
 
-.theme-header__action { flex-shrink: 0; }
+.theme-header__action {
+    flex-shrink: 0;
+}
 
+/* Ornement croix / rune */
 .theme-header__ornament {
     display: flex;
     align-items: center;
@@ -559,19 +581,18 @@
 }
 
 .theme-header__ornament-line {
-    height: 2px;
+    height: 1px;
     width: 50px;
-    background: linear-gradient(to right, var(--bout-or), transparent);
-    opacity: 0.6;
-    border-radius: 2px;
+    background: linear-gradient(to right, var(--bout-gold), transparent);
+    opacity: 0.4;
 }
 
 .theme-header__ornament-dot {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
-    background: var(--bout-or);
-    box-shadow: 0 0 5px rgba(200, 150, 12, 0.5);
+    background: var(--bout-gold);
+    box-shadow: 0 0 6px var(--bout-gold);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -585,12 +606,12 @@
 }
 
 /* ══════════════════════════════════════════════════════════
-   CARTE PRODUIT — CADEAUX SOUS LE SAPIN
+   CARTE PRODUIT — RELIQUES MAUDITES
 ══════════════════════════════════════════════════════════ */
 
 .boutique-card {
     background: var(--bout-white);
-    border: 1.5px solid var(--bout-border);
+    border: 1px solid var(--bout-border);
     border-radius: var(--bout-r-card);
     overflow: hidden;
     display: flex;
@@ -600,33 +621,25 @@
     position: relative;
 }
 
-/* Ruban décoratif en haut de chaque carte */
+/* Effet de halo sur hover */
+.boutique-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--bout-shadow-hover);
+    border-color: rgba(232, 100, 10, 0.35);
+}
+
+/* Ligne lumineuse en haut de la carte */
 .boutique-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(
-        90deg,
-        var(--bout-rose-dark) 0%,
-        var(--bout-or) 25%,
-        var(--bout-gold) 50%,
-        var(--bout-or) 75%,
-        var(--bout-rose-dark) 100%
-    );
-    background-size: 200% 100%;
-    z-index: 3;
-    opacity: 0.7;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(139, 92, 246, 0.4), transparent);
+    opacity: 0;
     transition: opacity var(--bout-t);
-    animation: ribbon-shimmer 4s linear infinite;
-}
-
-.boutique-card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--bout-shadow-hover);
-    border-color: rgba(196, 30, 58, 0.3);
+    z-index: 3;
 }
 
 .boutique-card:hover::before {
@@ -639,7 +652,7 @@
     position: relative;
     aspect-ratio: 3 / 3.5;
     overflow: hidden;
-    background: var(--bout-cream);
+    background: var(--bout-cream-dark);
 }
 
 .boutique-card__img {
@@ -647,11 +660,13 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease;
+    filter: saturate(0.85) brightness(0.9);
 }
 
 .boutique-card:hover .boutique-card__img {
-    transform: scale(1.06);
+    transform: scale(1.07);
+    filter: saturate(1.1) brightness(1.0);
 }
 
 .boutique-card__img-placeholder {
@@ -661,9 +676,9 @@
     align-items: center;
     justify-content: center;
     font-size: 3.5rem;
-    background: linear-gradient(145deg, var(--bout-cream) 0%, var(--bout-cream-dark) 100%);
+    background: linear-gradient(145deg, var(--bout-cream-dark) 0%, #1E0A2E 100%);
     color: var(--bout-gold);
-    animation: star-shine 4s ease-in-out infinite;
+    animation: float-ghost 4s ease-in-out infinite;
 }
 
 /* ── Badges ─────────────────────────────────────────────── */
@@ -691,28 +706,28 @@
     line-height: 1;
 }
 
-/* rouge Noël */
+/* "rose" → orange feu */
 .boutique-card__badge--rose {
-    background: var(--bout-rose-dark);
-    color: #FFEEF0;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, var(--bout-rose) 0%, #A33800 100%);
+    color: #FFE8D6;
+    box-shadow: 0 0 8px rgba(232, 100, 10, 0.4);
 }
 
-/* vert sapin */
+/* "gold" → violet sorcière */
 .boutique-card__badge--gold {
-    background: var(--bout-gold);
-    color: #FFFFFF;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, var(--bout-gold) 0%, #5B21B6 100%);
+    color: #F0E8FF;
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
 }
 
-/* or / crème */
+/* "cream" → fond sombre avec bordure */
 .boutique-card__badge--cream {
     background: var(--bout-cream-deep);
-    color: var(--bout-rose-dark);
-    border: 1.5px solid var(--bout-or);
+    color: var(--bout-gold-light);
+    border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
-/* ── Bouton ajout rapide ────────────────────────────────── */
+/* ── Bouton ajout rapide — Envoûtement ──────────────────── */
 
 .boutique-card__quick-add {
     position: absolute;
@@ -722,19 +737,20 @@
     opacity: 0;
     white-space: nowrap;
     padding: 9px 22px;
-    background: var(--bout-rose-dark);
-    color: var(--bout-white);
-    font-family: var(--font-body-bout);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, rgba(13, 5, 18, 0.92) 0%, rgba(30, 16, 37, 0.95) 100%);
+    color: var(--bout-rose);
+    font-family: var(--font-mono-bout);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     border-radius: var(--bout-r-full);
-    border: 2px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(232, 100, 10, 0.5);
     cursor: pointer;
     transition: opacity var(--bout-t), transform var(--bout-t);
     z-index: 2;
-    box-shadow: 0 4px 16px rgba(139, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 20px rgba(232, 100, 10, 0.2);
 }
 
 .boutique-card:hover .boutique-card__quick-add {
@@ -742,12 +758,11 @@
     transform: translateX(-50%) translateY(0);
 }
 
-/* ── Séparateur image / corps ───────────────────────────── */
+/* ── Séparateur image / corps — Fissure maudite ─────────── */
 
 .boutique-card__divider {
-    height: 2px;
-    background: linear-gradient(to right, var(--bout-rose-dark), var(--bout-or), var(--bout-gold), var(--bout-or), var(--bout-rose-dark));
-    opacity: 0.25;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--bout-border), transparent);
     flex-shrink: 0;
 }
 
@@ -759,7 +774,7 @@
     flex-direction: column;
     gap: 4px;
     flex: 1;
-    background: var(--bout-white);
+    background: linear-gradient(180deg, var(--bout-white) 0%, rgba(13, 5, 18, 0.8) 100%);
 }
 
 .boutique-card__theme {
@@ -767,8 +782,9 @@
     font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    color: var(--bout-gold);
+    color: var(--bout-gold-light);
     font-weight: 400;
+    opacity: 0.8;
 }
 
 .boutique-card__condi {
@@ -776,24 +792,27 @@
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    color: var(--bout-or);
+    color: var(--bout-gold-light);
     font-weight: 400;
     line-height: 1.3;
+    opacity: 0.7;
 }
 
 .boutique-card__name {
     font-family: var(--font-display-bout);
-    font-size: 1.2rem;
+    font-size: 1.05rem;
     font-weight: 700;
-    color: var(--bout-rose-dark);
+    color: #F0E8FF;
     line-height: 1.2;
     margin: 0;
+    letter-spacing: 0.03em;
 }
 
 .boutique-card__desc {
     font-family: var(--font-body-bout);
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 300;
+    font-style: italic;
     color: var(--bout-text-muted);
     line-height: 1.6;
     margin-top: 3px;
@@ -808,16 +827,17 @@
     justify-content: space-between;
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1.5px solid var(--bout-cream-dark);
+    border-top: 1px solid var(--bout-border);
     gap: 0.5rem;
 }
 
 .boutique-card__price {
     font-family: var(--font-display-bout);
-    font-size: 1.375rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: var(--bout-gold);
+    color: var(--bout-rose);
     line-height: 1;
+    text-shadow: 0 0 12px rgba(232, 100, 10, 0.4);
 }
 
 .boutique-card__price-old {
@@ -828,6 +848,7 @@
     text-decoration: line-through;
     margin-top: 2px;
     display: block;
+    opacity: 0.6;
 }
 
 .boutique-card__add-btn {
@@ -837,60 +858,58 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: var(--bout-rose-pale2);
-    border: 2px solid var(--bout-rose);
-    color: var(--bout-rose-dark);
+    background: rgba(232, 100, 10, 0.1);
+    border: 1.5px solid rgba(232, 100, 10, 0.4);
+    color: var(--bout-rose);
     font-size: 1.2rem;
     line-height: 1;
     flex-shrink: 0;
     cursor: pointer;
-    transition: background 150ms ease, color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+    transition: background 200ms ease, color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
     font-family: inherit;
 }
 
 .boutique-card__add-btn:hover {
     background: var(--bout-rose-dark);
-    color: var(--bout-white);
-    border-color: var(--bout-rose-dark);
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
+    color: #FFE8D6;
+    border-color: var(--bout-rose);
+    transform: scale(1.12);
+    box-shadow: 0 0 16px rgba(232, 100, 10, 0.5);
 }
 
-/* ── Placeholder ────────────────────────────────────────── */
+/* ── Variante : carte placeholder "Bientôt" ────────────── */
 
 .boutique-card--placeholder {
     border-style: dashed;
-    border-color: var(--bout-cream-deep);
+    border-color: rgba(139, 92, 246, 0.2);
     box-shadow: none;
     background: transparent;
-    opacity: 0.45;
+    opacity: 0.4;
 }
-
-.boutique-card--placeholder::before { display: none; }
 
 .boutique-card--placeholder:hover {
     transform: none;
     box-shadow: none;
-    border-color: var(--bout-cream-deep);
+    border-color: rgba(139, 92, 246, 0.2);
 }
 
-/* ── Rupture de stock ───────────────────────────────────── */
+/* ── Variante : rupture de stock ───────────────────────── */
 
 .boutique-card--rupture {
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .boutique-card--rupture .boutique-card__img {
-    filter: grayscale(0.5) brightness(0.85);
+    filter: grayscale(0.8) brightness(0.5);
 }
 
 .boutique-card--rupture .boutique-card__add-btn {
-    opacity: 0.3;
+    opacity: 0.25;
     pointer-events: none;
 }
 
 /* ══════════════════════════════════════════════════════════
-   SÉPARATEUR — GUIRLANDE
+   SÉPARATEUR ENTRE THÈMES — LIGNE DE SANG
 ══════════════════════════════════════════════════════════ */
 
 .theme-divider {
@@ -898,27 +917,26 @@
     align-items: center;
     gap: 1.5rem;
     margin: 3rem 0;
-    color: var(--bout-or);
-    opacity: 0.7;
+    color: var(--bout-gold);
+    opacity: 0.5;
 }
 
 .theme-divider::before,
 .theme-divider::after {
     content: '';
     flex: 1;
-    height: 2px;
-    background: linear-gradient(to right, transparent, var(--bout-or), transparent);
-    border-radius: 2px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(139, 92, 246, 0.35), transparent);
 }
 
 .theme-divider__icon {
-    font-size: 1.2rem;
-    opacity: 0.9;
-    animation: star-shine 3s ease-in-out infinite;
+    font-size: 1.1rem;
+    opacity: 0.8;
+    filter: drop-shadow(0 0 4px var(--bout-gold));
 }
 
 /* ══════════════════════════════════════════════════════════
-   PAGINATION
+   PAGINATION — GRIMOIRE
 ══════════════════════════════════════════════════════════ */
 
 .boutique-pagination {
@@ -928,7 +946,7 @@
     gap: 6px;
     margin-top: 4rem;
     padding-top: 2rem;
-    border-top: 2px solid var(--bout-cream-dark);
+    border-top: 1px solid var(--bout-border);
 }
 
 .boutique-page-btn {
@@ -938,28 +956,30 @@
     width: 40px;
     height: 40px;
     border-radius: var(--bout-r-sm);
-    border: 1.5px solid var(--bout-border);
-    background: var(--bout-white);
+    border: 1px solid var(--bout-border);
+    background: var(--bout-cream-dark);
     color: var(--bout-text-muted);
-    font-family: var(--font-body-bout);
-    font-size: 0.875rem;
-    font-weight: 700;
+    font-family: var(--font-mono-bout);
+    font-size: 0.85rem;
+    font-weight: 400;
     cursor: pointer;
-    transition: all 150ms ease;
+    transition: all 200ms ease;
     text-decoration: none;
+    letter-spacing: 0.04em;
 }
 
 .boutique-page-btn:hover {
-    border-color: var(--bout-rose);
-    color: var(--bout-rose-dark);
-    background: var(--bout-rose-pale);
+    border-color: var(--bout-gold);
+    color: var(--bout-gold-light);
+    background: var(--bout-gold-pale);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
 }
 
 .boutique-page-btn.active {
-    background: var(--bout-rose-dark);
-    border-color: var(--bout-rose-dark);
-    color: var(--bout-white);
-    box-shadow: 0 2px 10px rgba(139, 0, 0, 0.25);
+    background: linear-gradient(135deg, var(--bout-rose-dark) 0%, #6D1F00 100%);
+    border-color: var(--bout-rose);
+    color: #FFE8D6;
+    box-shadow: 0 0 14px rgba(232, 100, 10, 0.35);
 }
 
 .boutique-page-btn.prev,
@@ -967,12 +987,12 @@
     width: auto;
     padding: 0 1rem;
     gap: 5px;
-    font-size: 0.8125rem;
-    letter-spacing: 0.04em;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
 }
 
 /* ══════════════════════════════════════════════════════════
-   ÉTAT VIDE
+   ÉTAT VIDE — CAVEAU DÉSERT
 ══════════════════════════════════════════════════════════ */
 
 .boutique-empty {
@@ -985,21 +1005,24 @@
     font-size: 4rem;
     margin-bottom: 1.5rem;
     display: block;
-    opacity: 0.4;
-    animation: star-shine 4s ease-in-out infinite;
+    opacity: 0.35;
+    animation: float-ghost 5s ease-in-out infinite;
 }
 
 .boutique-empty__title {
     font-family: var(--font-display-bout);
-    font-size: 1.75rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    color: var(--bout-rose-dark);
+    color: #F0E8FF;
     margin-bottom: 0.75rem;
+    letter-spacing: 0.04em;
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
 }
 
 .boutique-empty__desc {
     font-family: var(--font-body-bout);
-    font-size: 0.9375rem;
+    font-size: 1rem;
+    font-style: italic;
     font-weight: 300;
     color: var(--bout-text-muted);
     margin-bottom: 2rem;
@@ -1027,7 +1050,7 @@
 }
 
 .products-grid.list-view .boutique-card__divider {
-    width: 2px;
+    width: 1px;
     height: auto;
 }
 
@@ -1048,10 +1071,10 @@
 .boutique-view-toggle {
     display: flex;
     gap: 2px;
-    border: 1.5px solid var(--bout-border);
+    border: 1px solid var(--bout-border);
     border-radius: var(--bout-r-sm);
     overflow: hidden;
-    background: var(--bout-white);
+    background: var(--bout-cream-dark);
 }
 
 .boutique-view-btn {
@@ -1066,13 +1089,13 @@
 }
 
 .boutique-view-btn.active {
-    background: var(--bout-rose-dark);
-    color: var(--bout-white);
+    background: linear-gradient(135deg, var(--bout-rose-dark), #5B0E00);
+    color: #FFE8D6;
 }
 
 .boutique-view-btn:hover:not(.active) {
-    background: var(--bout-cream-dark);
-    color: var(--bout-rose-dark);
+    background: var(--bout-cream-deep);
+    color: var(--bout-gold-light);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1093,10 +1116,10 @@
     .products-grid  { grid-template-columns: repeat(2, 1fr); gap: 0.875rem; }
     .boutique-toolbar { flex-direction: column; align-items: flex-start; }
     .rayon-nav { padding-inline: 1rem; gap: 0.5rem; }
-    .rayon-nav__item { padding: 9px 14px; font-size: 11px; }
+    .rayon-nav__item { padding: 9px 14px; font-size: 10px; }
     .boutique-hero__inner { padding-inline: 1rem; }
-    .theme-header__title { font-size: 1.6rem; }
-    .boutique-card__name { font-size: 1.05rem; }
+    .theme-header__title { font-size: 1.4rem; }
+    .boutique-card__name { font-size: 0.95rem; }
 }
 
 @media (max-width: 400px) {

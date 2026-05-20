@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\GestionController;
-use App\Http\Controllers\NewsController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PanierController;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 
 // ── Pages publiques ───────────────────────────────────────────────────────────
 Route::get('/',     [AccueilController::class, 'index'])->name('index');
-Route::get('/news', [NewsController::class,    'index'])->name('news');
+Route::get('/blog', [BlogController::class,    'index'])->name('blog');
 Route::get('/shop/{id}', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/pro',  [ProController::class,    'index'])->name('pro');
 
@@ -109,6 +109,21 @@ Route::get ('/checkout/error',   [CommandeController::class, 'error'])  ->name('
 
 // Hors auth — appelé par Monetico directement
 Route::post('/checkout/retour', [CommandeController::class, 'retour'])->name('checkout.retour');
+
+//Blog
+
+// Réactions (utilisateurs connectés)
+Route::middleware('auth')->group(function () {
+    Route::post('/blog/{blogPost}/react', [BlogController::class, 'react'])->name('blog.react');
+});
+
+// CRUD admin (connecté + rôle vérifié dans le controller)
+Route::middleware('auth')->group(function () {
+    Route::post('/blog',                  [BlogController::class, 'store'])->name('blog.store');
+    Route::put('/blog/{blogPost}',        [BlogController::class, 'update'])->name('blog.update');
+    Route::delete('/blog/{blogPost}',     [BlogController::class, 'destroy'])->name('blog.destroy');
+});
+
 
 
 

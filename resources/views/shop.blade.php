@@ -19,10 +19,20 @@
 {{-- ── EVENT CSS ──────────────────────────────────────────── --}}
 @php
 	$isNoel = $rayonActif?->events->contains(fn($e) => strtolower($e->nom_event) === 'noël') ?? false;
+	$isPaques = $rayonActif?->events->contains(fn($e) => strtolower($e->nom_event) === 'pâques') ?? false;
+	$isHalloween = $rayonActif?->events->contains(fn($e) => strtolower($e->nom_event) === 'halloween') ?? false;
 @endphp
 
 @if($isNoel)
 	@vite('resources/css/event/noel.css')
+@endif
+
+@if($isPaques)
+	@vite('resources/css/event/paques.css')
+@endif
+
+@if($isHalloween)
+	@vite('resources/css/event/halloween.css')
 @endif
 
 
