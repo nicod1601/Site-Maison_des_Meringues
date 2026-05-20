@@ -5,19 +5,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Commande extends Model
 {
-    protected $table      = 'commande';
-    protected $primaryKey = 'id_commande';
+	protected $table      = 'commande';
+	protected $primaryKey = 'id_commande';
 
-    protected $fillable = [
-        'user_id',
-        'reference',
-        'montant',
-        'statut',
-        'monetico_reference',
-    ];
+	protected $fillable = [
+		'user_id',
+		'reference',
+		'montant',
+		'statut',
+		'monetico_reference',
+	];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+	public function user()
+	{
+		return $this->belongsTo(User::class);
+	}
 }

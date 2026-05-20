@@ -14,6 +14,7 @@ export default defineConfig({
 				'resources/css/event/noel.css',
 				'resources/css/event/halloween.css',
 				'resources/css/blog.css',
+				'resources/css/ticket.css',
 				'resources/js/app.js',
 			],
 			refresh: true,

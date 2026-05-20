@@ -13,6 +13,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProController;
+use App\Http\Controllers\TicketCommandeController;
 
 use Illuminate\Http\Request;
 
@@ -123,6 +124,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/blog/{blogPost}',        [BlogController::class, 'update'])->name('blog.update');
     Route::delete('/blog/{blogPost}',     [BlogController::class, 'destroy'])->name('blog.destroy');
 });
+
+//Ticket de commande
+Route::get('/ticketCommande', [TicketCommandeController::class, 'index'])->name('ticketCommande');
 
 
 
