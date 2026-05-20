@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Boutique;
+use App\Models\Conditionnement;
 use App\Models\PanierLigne;
 use App\Models\Panier;
 use App\Models\Rayon;
@@ -153,6 +154,8 @@ class ShopController extends Controller
 					->first();
 		$ListeProduits = $panier ? $panier->lignes : collect();
 
+		$conditionnements = Conditionnement::all();
+
 		return view('shop', compact(
 			'boutique',
 			'rayons',
@@ -164,6 +167,7 @@ class ShopController extends Controller
 			'images',
 			'panier',
 			'ListeProduits',
+			'conditionnements',
 		));
 	}
 }

@@ -67,6 +67,98 @@
 		</div>
 	@else
 
+		<div class="theme-header">
+				<div class="theme-header__left">
+					<p class="theme-header__eyebrow">Models des produits </p>
+					<h2 class="theme-header__title" id="titre-theme-autres">
+						<span aria-hidden="true" style="margin-right:.3em;">🍬</span>
+						<span>
+							Tous les conditionnements
+						</span>
+					</h2>
+					<div class="theme-header__ornament" aria-hidden="true">
+						<span class="theme-header__ornament-line"></span>
+						<span class="theme-header__ornament-dot"></span>
+						<span class="theme-header__ornament-line"></span>
+					</div>
+				</div>
+			</div>
+			<div class="products-grid" id="grille-theme-autres">
+				@php
+					$diffCondi = [];
+					$sachetDejaAjoute = false;
+					$boiteDejaAjoute = false;
+					$typesDejaAjoutes = [];
+					foreach ($conditionnements as $c)
+					{
+						if ($c->type === 'sachet_de_10' || $c->type === 'sachet_de_4')
+						{
+							if (!$sachetDejaAjoute)
+							{
+								$diffCondi[] = (object)['type' => 'sachet'];
+								$sachetDejaAjoute = true;
+							}
+						}
+						else
+						{
+							if ($c->type === 'boite_de_8')
+							{
+								if (!$boiteDejaAjoute)
+								{
+									$diffCondi[] = (object)['type' => 'boite'];
+									$boiteDejaAjoute = true;
+								}
+							}
+							else
+							{
+								if (!in_array($c->type, $typesDejaAjoutes))
+								{
+									$diffCondi[] = $c;
+									$typesDejaAjoutes[] = $c->type;
+								}
+							}
+
+						}
+					}
+				@endphp
+				@foreach ($diffCondi as $condi)
+					<article class="boutique-card" aria-label="{{ $condi->type }}">
+						{{-- Image --}}
+						<div class="boutique-card__img-wrap">
+							<div class="boutique-card__img-placeholder" aria-hidden="true">
+								<img
+									src="{{ asset('fichier/image/meringues/' . $condi->type . '.webp') }}"
+									class="boutique-card__img"
+									alt="{{ $condi->type }}"
+									loading="lazy" decoding="async"
+								>
+							</div>
+							<div class="boutique-card__badges">
+							</div>
+						</div>
+
+						{{-- Corps --}}
+						<div class="boutique-card__body">
+
+							<p class="boutique-card__theme">
+							</p>
+
+							<h3 class="boutique-card__name">
+								{{ $condi->type }}
+							</h3>
+
+
+							<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:var(--space-sm);">
+							</div>
+
+							<div class="boutique-card__footer">
+
+							</div>
+						</div>
+					</article>
+				@endforeach
+			</div>
+
 		{{-- ── SECTIONS PAR THÈME ──────────────────────────────── --}}
 		@forelse($themesAffiches as $themeIndex => $theme)
 

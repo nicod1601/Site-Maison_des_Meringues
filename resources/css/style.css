@@ -404,7 +404,7 @@ hr {
   border-radius: var(--radius-lg);
   min-width: 180px;
   padding: 4px;
-  z-index: var(--z-dropdown);
+  z-index: 300;
   box-shadow: var(--shadow-md);
 }
 .navbar__dropdown.open { display: block; }
