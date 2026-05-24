@@ -14,7 +14,8 @@ class BlogPost extends Model
         'category',
         'content',
         'emoji',
-        'image_url',
+        'image_url',   // Lien externe
+        'image_path',  // Fichier uploadé → public/fichier/image/publication/
     ];
 
     /*
@@ -47,6 +48,16 @@ class BlogPost extends Model
     public function getDislikesCountAttribute(): int
     {
         return $this->reactions->where('type', 'dislike')->count();
+    }
+
+    /** URL finale de l'image : priorité au fichier uploadé, sinon le lien externe */
+    public function getImageDisplayUrlAttribute(): ?string
+    {
+        if ($this->image_path) {
+            return asset($this->image_path);
+        }
+
+        return $this->image_url ?: null;
     }
 
     /** Réaction de l'utilisateur connecté ('like' | 'dislike' | null) */
