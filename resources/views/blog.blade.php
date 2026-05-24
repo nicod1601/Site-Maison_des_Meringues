@@ -1,8 +1,8 @@
-<!--@include('templet.header', [
+@include('templet.header', [
 	'titre' => 'Blog',
 	'note'  => 'Douceurs Artisanales',
 	'title' => 'Blog'
-])-->
+])
 
 @vite(['resources/css/blog.css'])
 
