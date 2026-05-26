@@ -162,7 +162,7 @@
 @include('templet.footer')
 
 <script>
-	const carousel  = document.querySelector('.produits-carousel');
+	const carousel   = document.querySelector('.produits-carousel');
 	const listImages = @json($images);
 	const produits   = @json($produits);
 
@@ -170,22 +170,28 @@
 	const produitsMap = {};
 	produits.forEach(p => { produitsMap[p.id_produit] = p; });
 
-	listImages.forEach(img => {
+	// Garder une seule image par nom de produit
+	const nomsVus      = new Set();
+	const imagesFiltrees = listImages.filter(img => {
 		const produit = produitsMap[img.id_produit];
 		const nom     = produit
 			? (produit.forme?.nom_forme ?? '') + ' — ' + (produit.parfum?.nom_parfum ?? '')
 			: 'Produit';
-		const desc    = (produit?.description) && (produit.description) !== 'Aucune description'
-			? (produit.description)
-			: '';
+
+		if (nomsVus.has(nom)) return false;
+		nomsVus.add(nom);
+		return true;
+	});
+
+	imagesFiltrees.forEach(img => {
+		const produit = produitsMap[img.id_produit];
+		const nom     = produit
+			? (produit.forme?.nom_forme ?? '') + ' — ' + (produit.parfum?.nom_parfum ?? '')
+			: 'Produit';
 
 		const div = document.createElement('div');
 		div.classList.add('produit-item');
 		div.innerHTML = `
-			<div class="produit-item__infos">
-				<p class="produit-item__nom">${nom}</p>
-				${desc ? `<p class="produit-item__desc">${desc}</p>` : ''}
-			</div>
 			<div class="produit-item__img-wrap">
 				<span class="produit-item__label">${nom}</span>
 				<img src="${img.url}"
@@ -194,12 +200,11 @@
 					loading="lazy"
 					decoding="async"
 					fetchpriority="low"
-
 					onerror="
-                        this.dataset.error = 'true';
-                        this.onerror = null;
-                        this.src='/fichier/image/meringues/oups.png';
-                    "
+						this.dataset.error = 'true';
+						this.onerror = null;
+						this.src='/fichier/image/meringues/oups.png';
+					"
 				>
 			</div>
 		`;

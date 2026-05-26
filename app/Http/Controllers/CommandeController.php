@@ -16,6 +16,7 @@ class CommandeController extends Controller
 		$panier = Panier::with([
 			'lignes.produit.forme',
 			'lignes.produit.parfum',
+			'lignes.formeCondi.forme',
 			'lignes.formeCondi.conditionnement',
 		])->where('user_id', auth()->id())->firstOrFail();
 
@@ -30,25 +31,44 @@ class CommandeController extends Controller
 	// ── Lancer le paiement Monetico ───────────────────────────────
 	public function payer(Request $request)
 	{
-		$panier = Panier::with('lignes')
-			->where('user_id', auth()->id())
-			->firstOrFail();
+		$request->validate([
+			'mode_livraison' => ['required', 'in:livraison,expedition'],
+		]);
+
+		$panier = Panier::with([
+			'lignes.formeCondi.forme',
+			'lignes.formeCondi.conditionnement',
+		])->where('user_id', auth()->id())->firstOrFail();
 
 		if ($panier->lignes->isEmpty()) {
 			return redirect()->route('panier.index');
 		}
 
-		// Créer la commande en BDD avec statut "en_attente"
+		// ── Vérification côté serveur si expédition demandée ──────
+		if ($request->mode_livraison === 'expedition') {
+			$expeditionAutorisee = $panier->lignes->every(function ($ligne) {
+				$nomForme  = strtolower($ligne->formeCondi->forme->nom_forme ?? '');
+				$typeCondi = strtolower($ligne->formeCondi->conditionnement->type ?? '');
+				return str_contains($nomForme, 'mini') && $typeCondi === 'individuel';
+			});
+
+			if (! $expeditionAutorisee) {
+				return back()->with('error', 'L\'expédition postale n\'est disponible que pour les meringues mini individuelles.');
+			}
+		}
+
+		// ── Créer la commande en BDD ───────────────────────────────
 		$reference = 'CMD-' . strtoupper(Str::random(8)) . '-' . time();
 
 		Commande::create([
-			'user_id'   => auth()->id(),
-			'reference' => $reference,
-			'montant'   => $panier->total(),
-			'statut'    => 'en_attente',
+			'user_id'        => auth()->id(),
+			'reference'      => $reference,
+			'montant'        => $panier->total(),
+			'mode_livraison' => $request->mode_livraison,
+			'statut'         => 'en_attente',
 		]);
 
-		// Préparer Monetico
+		// ── Préparer Monetico ──────────────────────────────────────
 		$monetico = new Monetico(
 			config('services.monetico.tpe'),
 			config('services.monetico.cle'),
@@ -86,7 +106,6 @@ class CommandeController extends Controller
 	}
 
 	// ── Retour serveur Monetico (POST automatique) ─────────────────
-	// C'est ici qu'on valide VRAIMENT le paiement
 	public function retour(Request $request)
 	{
 		$monetico = new Monetico(
@@ -95,20 +114,15 @@ class CommandeController extends Controller
 			config('services.monetico.societe'),
 		);
 
-		// Vérifier la signature Monetico
-		$data = $request->all();
-
-		// Le code retour "paiement" = succès chez Monetico
 		$codRetour = $request->input('code-retour', '');
 		$reference = $request->input('reference', '');
 
 		$commande = Commande::where('reference', $reference)->first();
 
 		if ($commande && $codRetour === 'paiement') {
-			// Paiement confirmé
 			$commande->update([
-				'statut'              => 'payee',
-				'monetico_reference'  => $request->input('numauto'),
+				'statut'             => 'payee',
+				'monetico_reference' => $request->input('numauto'),
 			]);
 
 			// Vider le panier
@@ -120,7 +134,6 @@ class CommandeController extends Controller
 			$commande->update(['statut' => 'echouee']);
 		}
 
-		// Monetico attend "OK" en réponse
 		return response('OK', 200);
 	}
 }

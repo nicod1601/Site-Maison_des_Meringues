@@ -6,27 +6,35 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
-    {
-        Schema::create('commande', function (Blueprint $table) {
-            $table->id('id_commande');
-            $table->foreignId('user_id')->constrained('users');
-            $table->string('reference')->unique();
-            $table->decimal('montant', 8, 2);
-            $table->string('statut')->default('en_attente');
-            $table->string('monetico_reference')->nullable();
-            $table->timestamps();
-        });
-    }
+	public function up(): void
+	{
+		// ─── Table commande ───────────────────────────────────────
+		Schema::create('commande', function (Blueprint $table) {
+			$table->increments('id_commande');
+			$table->unsignedBigInteger('user_id')->nullable();
+			$table->enum('mode_livraison', ['livraison', 'expedition']);
+			$table->enum('statut', ['en_attente', 'payee', 'expediee', 'annulee'])->default('en_attente');
+			$table->decimal('total', 8, 2);
+			$table->timestamps();
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('commandes');
-    }
+			$table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+		});
+
+		// ─── Table commande_ligne ─────────────────────────────────
+		Schema::create('commande_ligne', function (Blueprint $table) {
+			$table->id('id_ligne');
+			$table->foreignId('id_commande')->constrained('commande', 'id_commande')->cascadeOnDelete();
+			$table->string('designation');
+			$table->string('sous_designation')->nullable();
+			$table->unsignedInteger('quantite');
+			$table->decimal('prix_unitaire', 8, 2);
+			$table->timestamps();
+		});
+	}
+
+	public function down(): void
+	{
+		Schema::dropIfExists('commande_ligne');
+		Schema::dropIfExists('commande');
+	}
 };
