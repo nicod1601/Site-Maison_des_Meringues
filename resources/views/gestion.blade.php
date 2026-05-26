@@ -132,8 +132,8 @@
 			<div class="data-toolbar">
 				<h2 class="data-toolbar__title">
 					Produits <span class="data-count">{{ count($produits) }}</span>
-					@if($rayonId && $rayonId != '-1')
-						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
+					@if($rayon->id_rayon && $rayon->id_rayon != '-1')
+						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayon->id_rayon); @endphp
 						@if($rayonActif)
 							<span class="chip chip--gold">
 								@foreach($rayonActif->events as $e){{ $e->icone }} @endforeach {{ $rayonActif->nom_rayon }}
@@ -143,8 +143,16 @@
 				</h2>
 				<div class="toolbar-actions">
 					<input type="text" id="search-input" class="form-input form-input--sm search-input" placeholder="🔍 Rechercher…">
-					@if($rayonId && $rayonId != '-1')
-						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
+
+					{{-- Bouton export Excel --}}
+					<a href="{{ route('produits.export', $rayon && $rayon != '-1' ? ['rayon' => $rayonId] : []) }}"
+					class="btn btn--ghost btn--sm"
+					title="Exporter tous les produits en Excel">
+						⬇ Export Excel
+					</a>
+
+					@if($rayon->id_rayon && $rayon->id_rayon != '-1')
+						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayon->id_rayon); @endphp
 						@if($rayonActif)
 							<form action="/gestion/rayon/{{ $rayonActif->id_rayon }}/live" method="POST" class="form-inline">
 								@csrf @method('PATCH')

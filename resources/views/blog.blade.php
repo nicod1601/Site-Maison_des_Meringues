@@ -19,7 +19,7 @@
 			<div class="sidebar-profile">
 				<div class="sidebar-avatar">🍬</div>
 				<div class="sidebar-name">La Maison<br>des Meringues</div>
-				<div class="sidebar-tagline">Confiserie artisanale · Paris</div>
+				<div class="sidebar-tagline">Meringue Normandie - Ypreville</div>
 
 				<div class="sidebar-stats">
 					<div class="sidebar-stat">

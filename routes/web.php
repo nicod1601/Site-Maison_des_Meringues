@@ -58,6 +58,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 	Route::get ('/import/clear', [ImportController::class, 'clear']) ->name('import.clear');
 });
 
+Route::get('/gestion/produits/export', [GestionController::class, 'exportProduits'])
+	->name('produits.export');
+
 // Produits
 Route::post  ('/gestion/produit',                 [CreationController::class, 'nvproduit'])       ->name('produit.store');
 Route::delete('/gestion/produit/{id}',            [CreationController::class, 'destroy'])         ->name('produit.destroy');
@@ -115,14 +118,14 @@ Route::post('/checkout/retour', [CommandeController::class, 'retour'])->name('ch
 
 // Réactions (utilisateurs connectés)
 Route::middleware('auth')->group(function () {
-    Route::post('/blog/{blogPost}/react', [BlogController::class, 'react'])->name('blog.react');
+	Route::post('/blog/{blogPost}/react', [BlogController::class, 'react'])->name('blog.react');
 });
 
 // CRUD admin (connecté + rôle vérifié dans le controller)
 Route::middleware('auth')->group(function () {
-    Route::post('/blog',                  [BlogController::class, 'store'])->name('blog.store');
-    Route::put('/blog/{blogPost}',        [BlogController::class, 'update'])->name('blog.update');
-    Route::delete('/blog/{blogPost}',     [BlogController::class, 'destroy'])->name('blog.destroy');
+	Route::post('/blog',                  [BlogController::class, 'store'])->name('blog.store');
+	Route::put('/blog/{blogPost}',        [BlogController::class, 'update'])->name('blog.update');
+	Route::delete('/blog/{blogPost}',     [BlogController::class, 'destroy'])->name('blog.destroy');
 });
 
 //Ticket de commande
