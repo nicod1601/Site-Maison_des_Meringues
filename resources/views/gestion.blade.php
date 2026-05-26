@@ -108,9 +108,9 @@
 
 			<select id="select-rayon" class="form-select form-select--sm select--right">
 				<option value="-1" {{ !$rayonId || $rayonId == '-1' ? 'selected' : '' }}>Tous les rayons</option>
-				@foreach($rayons as $rayon)
-					<option value="{{ $rayon->id_rayon }}" {{ (string)$rayonId === (string)$rayon->id_rayon ? 'selected' : '' }}>
-						{{ $rayon->nom_rayon }}
+				@foreach($rayons as $r)
+					<option value="{{ $r->id_rayon }}" {{ (string)$rayonId === (string)$r->id_rayon ? 'selected' : '' }}>
+						{{ $r->nom_rayon }}
 					</option>
 				@endforeach
 			</select>
@@ -121,34 +121,28 @@
 			<div class="data-toolbar">
 				<h2 class="data-toolbar__title">
 					Produits <span class="data-count">{{ count($produits) }}</span>
-					@if($rayonId && $rayonId != '-1')
-						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
-						@if($rayonActif)
-							<span class="chip chip--gold">{{ $rayonActif->nom_rayon }}</span>
-						@endif
+					@if($rayon)
+						<span class="chip chip--gold">{{ $rayon->nom_rayon }}</span>
 					@endif
 				</h2>
 				<div class="toolbar-actions">
 					<input type="text" id="search-input" class="form-input form-input--sm search-input" placeholder="🔍 Rechercher…">
 
 					{{-- Bouton export Excel --}}
-					<a href="{{ route('produits.export', $rayon && $rayon != '-1' ? ['rayon' => $rayonId] : []) }}"
+					<a href="{{ route('produits.export', $rayon ? ['rayon' => $rayonId] : []) }}"
 					class="btn btn--ghost btn--sm"
 					title="Exporter tous les produits en Excel">
 						⬇ Export Excel
 					</a>
 
-					@if($rayon->id_rayon && $rayon->id_rayon != '-1')
-						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayon->id_rayon); @endphp
-						@if($rayonActif)
-							<form action="/gestion/rayon/{{ $rayonActif->id_rayon }}/live" method="POST" class="form-inline">
-								@csrf @method('PATCH')
-								<label class="toggle-label">
-									<input type="checkbox" name="live_rayon" value="1" {{ $rayonActif->live_rayon ? 'checked' : '' }} onchange="this.form.submit()">
-									<span class="toggle-text">Live rayon</span>
-								</label>
-							</form>
-						@endif
+					@if($rayon)
+						<form action="/gestion/rayon/{{ $rayon->id_rayon }}/live" method="POST" class="form-inline">
+							@csrf @method('PATCH')
+							<label class="toggle-label">
+								<input type="checkbox" name="live_rayon" value="1" {{ $rayon->live_rayon ? 'checked' : '' }} onchange="this.form.submit()">
+								<span class="toggle-text">Live rayon</span>
+							</label>
+						</form>
 					@endif
 				</div>
 			</div>
@@ -298,9 +292,6 @@
 								fetchpriority="low"
 								onerror="this.style.display='none';this.nextElementSibling.style.display='none';this.closest('.image-card__preview').querySelector('.image-error-placeholder').style.display='flex';"
 							>
-							<!--<div class="image-card__overlay">
-								<span>🔍 Voir</span>
-							</div>-->
 							<div class="image-error-placeholder" style="display:none;">
 								<span>⚠️</span>
 								<span>Image introuvable</span>
@@ -395,12 +386,12 @@
 							<tr><th>#</th><th>Nom</th><th>Events</th><th>Stock</th><th class="th-actions">Actions</th></tr>
 						</thead>
 						<tbody>
-							@foreach($rayons as $rayon)
+							@foreach($rayons as $r)
 							<tr>
-								<td class="td-id">{{ $rayon->id_rayon }}</td>
-								<td class="td-name">{{ $rayon->nom_rayon }}</td>
+								<td class="td-id">{{ $r->id_rayon }}</td>
+								<td class="td-name">{{ $r->nom_rayon }}</td>
 								<td>
-									@forelse($rayon->events as $event)
+									@forelse($r->events as $event)
 										<span class="chip chip--dynamic-color" style="background:{{ $event->couleur }}20; border-color:{{ $event->couleur }};">
 											{{ $event->icone }} {{ $event->nom_event }}
 										</span>
@@ -408,11 +399,11 @@
 										<span class="text-muted">—</span>
 									@endforelse
 								</td>
-								<td><span class="stock-badge stock-badge--ok">{{ $rayon->stock_total_rayon }}</span></td>
+								<td><span class="stock-badge stock-badge--ok">{{ $r->stock_total_rayon }}</span></td>
 								<td class="td-actions">
 									<button class="btn-icon btn-icon--edit" title="Modifier les events"
-										onclick="ouvrirModalEditRayon({{ $rayon->id_rayon }}, '{{ $rayon->nom_rayon }}', {{ json_encode($rayon->events->pluck('id_event')) }})">✏️</button>
-									<form action="{{ route('rayon.destroy', $rayon->id_rayon) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce rayon')">
+										onclick="ouvrirModalEditRayon({{ $r->id_rayon }}, '{{ $r->nom_rayon }}', {{ json_encode($r->events->pluck('id_event')) }})">✏️</button>
+									<form action="{{ route('rayon.destroy', $r->id_rayon) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce rayon')">
 										@csrf @method('DELETE')
 										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
 									</form>

@@ -38,6 +38,11 @@ class GestionController extends Controller
 
 		$rayonId = $request->query('rayon');
 
+		// Résoudre l'objet $rayon actif (null si "tous les rayons")
+		$rayon = ($rayonId && $rayonId !== '-1')
+			? $rayons->firstWhere('id_rayon', $rayonId)
+			: null;
+
 		$query = Produit::with([
 			'parfum',
 			'forme.forme_condis.conditionnement',
@@ -46,13 +51,14 @@ class GestionController extends Controller
 			'events',
 		]);
 
-		if ($rayonId && $rayonId !== '-1') {
+		if ($rayon) {
 			$query->whereHas('rayons', function ($q) use ($rayonId) {
 				$q->where('rayon.id_rayon', $rayonId);
 			});
 		}
 
-		$produits    = $query->get();
+		// ⚠️ NE PAS écraser $produits plus bas — c'est l'unique assignation
+		$produits    = $query->orderBy('id_produit')->get();
 		$nb_produits = $produits->count();
 
 		$formes           = Forme::all();
@@ -74,12 +80,11 @@ class GestionController extends Controller
 			'formeCondi.conditionnement',
 		])->paginate(20);
 
-		$produits = Produit::orderBy('id_produit')->get();
-
 		return view('gestion', compact(
 			'datas', 'stock_total', 'nom_boutique', 'nb_produits',
 			'produits', 'formes', 'conditionnements', 'parfums',
-			'forme_condi', 'rayons', 'themes', 'events', 'boutique', 'rayonId',
+			'forme_condi', 'rayons', 'themes', 'events', 'boutique',
+			'rayonId', 'rayon',
 			'produitsByTheme', 'produitsByEvent', 'images',
 		));
 	}
