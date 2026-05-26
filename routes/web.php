@@ -58,8 +58,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 	Route::get ('/import/clear', [ImportController::class, 'clear']) ->name('import.clear');
 });
 
-Route::get('/gestion/produits/export', [GestionController::class, 'exportProduits'])
-	->name('produits.export');
+Route::get('/gestion/produits/export', [GestionController::class, 'exportProduits'])->name('produits.export');
 
 // Produits
 Route::post  ('/gestion/produit',                 [CreationController::class, 'nvproduit'])       ->name('produit.store');
