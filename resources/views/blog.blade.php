@@ -17,7 +17,7 @@
 		<div class="sidebar-card">
 			<div class="sidebar-banner"></div>
 			<div class="sidebar-profile">
-				<div class="sidebar-avatar">🍬</div>
+				<div class="sidebar-avatar"><img src="{{ asset('fichier/image/logo.webp') }}" alt="Logo"></div>
 				<div class="sidebar-name">La Maison<br>des Meringues</div>
 				<div class="sidebar-tagline">Meringue Normandie - Ypreville</div>
 
@@ -199,8 +199,10 @@
 					<div class="aside-about__dot"></div>
 					<div class="aside-about__line"></div>
 				</div>
-				<p>Confiserie artisanale parisienne.<br>
-				   Meringues, caramels et douceurs maison préparés chaque jour avec amour.</p>
+				<p>Création des meringues fait maison. Les Meringues sont fait avec des ingrédients de de très bonne qualité et fait avec
+					beaucoup d'amour. Nous sommes situé en Normandie, plus précisément à Ypreville. Nous espérons que nos meringues vous
+					plairont !
+				</p>
 			</div>
 		</div>
 

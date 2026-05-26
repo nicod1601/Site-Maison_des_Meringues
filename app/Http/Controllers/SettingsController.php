@@ -60,10 +60,7 @@ class SettingsController extends Controller
 	public function deactivate(Request $request)
 	{
 		$user = Auth::user();
-		$user->update(['active' => false]);
-		Auth::logout();
-		$request->session()->invalidate();
-		$request->session()->regenerateToken();
+		$user->delete();
 
 		return redirect('/')->with('info', 'Votre compte a été désactivé.');
 	}

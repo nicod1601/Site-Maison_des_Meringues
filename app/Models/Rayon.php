@@ -42,20 +42,19 @@ class Rayon extends Model
 		$eventIds = $this->events()->pluck('event.id_event')->toArray();
 
 		if (empty($eventIds)) {
+			$this->produits()->detach();
+			$this->recalculerStock();
 			return;
 		}
 
-		$produits = Produit::whereHas('events', function ($q) use ($eventIds) {
+		$produitsEligiblesIds = Produit::whereHas('events', function ($q) use ($eventIds) {
 			$q->whereIn('event.id_event', $eventIds);
-		})->get();
+		})->pluck('id_produit')->toArray();
 
-		foreach ($produits as $produit) {
-			$produit->rayons()->syncWithoutDetaching([$this->id_rayon]);
-		}
+		$this->produits()->sync($produitsEligiblesIds);
 
 		$this->recalculerStock();
 	}
-
 	public function islive(): bool
 	{
 		return $this->live_rayon;
@@ -67,8 +66,8 @@ class Rayon extends Model
 		$this->save();
 	}
 
-    public function events()
-    {
-        return $this->belongsToMany(Event::class, 'rayon_event', 'id_rayon', 'id_event');
-    }
+	public function events()
+	{
+		return $this->belongsToMany(Event::class, 'rayon_event', 'id_rayon', 'id_event');
+	}
 }

@@ -157,6 +157,17 @@
 								{{ $condi->type }}
 							</h3>
 
+							<p class="boutique-card__desc" style="margin-top:.2rem;">
+								@if($condi->type === 'individuel')
+									Conditionnement classique pour une meringue à la fois, idéal pour les dégustations ou les petites envies sucrées.
+								@elseif($condi->type === 'sachet')
+									Nos sachets de 4 ou 10 meringues, parfaits pour partager ou pour les petites familles. Un format pratique pour les goûters ou les desserts improvisés.
+								@elseif($condi->type === 'boite')
+									Nos boîtes de 8 meringues, conçues pour les grandes occasions ou les gourmands invétérés. Idéales pour les fêtes, les anniversaires ou simplement pour se faire plaisir en grande quantité.
+								@else
+									Conditionnement {{ $condi->type }}, pour une expérience unique et adaptée à vos besoins. Chaque format est pensé pour préserver la fraîcheur et le croquant de nos meringues, afin de vous offrir le meilleur de notre savoir-faire artisanal.
+								@endif
+							</p>
 
 							<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto;padding-top:var(--space-sm);">
 							</div>

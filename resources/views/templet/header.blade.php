@@ -11,7 +11,7 @@
 			<div class="navbar__inner">
 
 				<a href="/" class="navbar__logo-zone">
-					<img src="{{ asset('fichier/image/La_Maison_des_Meringues_logo.png') }}"
+					<img src="{{ asset('fichier/image/logo.webp') }}"
 						alt="Logo La Maison des Meringues"
 						class="navbar__logo-img">
 					<span class="navbar__logo-text">
@@ -30,7 +30,7 @@
 
 				@auth
 					<div class="navbar__profile" aria-expanded="false">
-						<div class="navbar__avatar">OR</div>
+						<div class="navbar__avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
 						<span class="navbar__username">{{ Auth::user()->name }}</span>
 						<svg width="14" height="14" viewBox="0 0 14 14" fill="none"
 							stroke="currentColor" stroke-width="1.5">

@@ -74,6 +74,7 @@ class GestionController extends Controller
 			'formeCondi.conditionnement',
 		])->paginate(20);
 
+		$produits = Produit::orderBy('id_produit')->get();
 
 		return view('gestion', compact(
 			'datas', 'stock_total', 'nom_boutique', 'nb_produits',
@@ -87,8 +88,8 @@ class GestionController extends Controller
 	{
 		// Récupère les produits avec leurs relations
 		$produits = Produit::with(['forme', 'parfum', 'rayons', 'theme'])
-        ->orderBy('id_produit')
-        ->get();
+		->orderBy('id_produit')
+		->get();
 
 		$spreadsheet = new Spreadsheet();
 		$sheet = $spreadsheet->getActiveSheet();

@@ -63,6 +63,7 @@ Route::get('/gestion/produits/export', [GestionController::class, 'exportProduit
 // Produits
 Route::post  ('/gestion/produit',                 [CreationController::class, 'nvproduit'])       ->name('produit.store');
 Route::delete('/gestion/produit/{id}',            [CreationController::class, 'destroy'])         ->name('produit.destroy');
+Route::put   ('/gestion/produit/{id}',            [CreationController::class, 'updateProduit'])   ->name('produit.updateProduit');
 Route::patch ('/gestion/produit/{id}/live',       [CreationController::class, 'toggleLive'])      ->name('produit.live');
 Route::patch ('/gestion/produit/{id}/expedition', [CreationController::class, 'toggleExpedition'])->name('produit.expedition');
 Route::patch ('/gestion/produit/{id}/emporter',   [CreationController::class, 'toggleEmporter'])  ->name('produit.emporter');

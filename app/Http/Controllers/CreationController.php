@@ -72,6 +72,35 @@ class CreationController extends Controller
 		return redirect()->back()->with('success', 'Produit supprimé.');
 	}
 
+	public function updateProduit(Request $request, int $id): RedirectResponse
+	{
+		$request->validate([
+			'nom_produit' => 'required|string|max:255',
+			'id_parfum'   => 'required|exists:parfum,id_parfum',
+			'id_forme'    => 'required|exists:forme,id_forme',
+			'id_theme'    => 'nullable|exists:theme,id_theme',
+			'quantite'    => 'required|integer|min:0',
+			'description' => 'nullable|string',
+		]);
+
+		$produit = Produit::findOrFail($id);
+		$produit->update([
+			'nom_produit' => $request->nom_produit,
+			'id_parfum'   => $request->id_parfum,
+			'id_forme'    => $request->id_forme,
+			'id_theme'    => $request->id_theme,
+			'quantite'    => $request->quantite,
+			'description' => $request->description ?? 'Aucune description',
+		]);
+
+		foreach ($produit->rayons as $rayon) {
+			$rayon->recalculerStock();
+		}
+		$this->recalculerStockBoutique();
+
+		return redirect()->back()->with('success', 'Produit modifié avec succès !');
+	}
+
 	public function toggleLive(Request $request, int $id): RedirectResponse
 	{
 		$produit = Produit::findOrFail($id);

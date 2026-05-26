@@ -31,18 +31,6 @@
 							<span class="stat-item__value">{{ count($rayons) }}</span>
 							<span class="stat-item__label">Rayons</span>
 						</div>
-						<div class="stat-item">
-							<span class="stat-item__value">{{ count($themes) }}</span>
-							<span class="stat-item__label">Thèmes</span>
-						</div>
-						<div class="stat-item">
-							<span class="stat-item__value">{{ count($events) }}</span>
-							<span class="stat-item__label">Events</span>
-						</div>
-						<div class="stat-item">
-							<span class="stat-item__value">{{ count($forme_condi) }}</span>
-							<span class="stat-item__label">Prix</span>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -70,34 +58,35 @@
 							↑ Importer
 						</button>
 					</form>
-					<div class="flex gap-sm flex-spacer">
+
+					<p class="card__tag" style="margin-top: 30px">Les Boutons création </p>
+					<div class="grid grid-2 mt-md">
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvrayon" title="Nouveau Rayon">
 							➕ Rayon
 						</button>
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvevent" title="Nouvel Event">
 							🎉 Event
 						</button>
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvproduit" title="Nouveau Produit">
+							➕ Produit
+						</button>
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvparfum" title="Nouveau Parfum">
+							🍓 Parfum
+						</button>
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvforme" title="Nouvelle Forme">
+							🔷 Forme
+						</button>
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvcondi" title="Nouveau Conditionnement">
+							📦 Conditionnement
+						</button>
+						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvtheme2" title="Nouveau Thème">
+							🎨 Thème
+						</button>
+
 					</div>
 				</div>
 			</div>
 
-		</div>
-
-		{{-- Navigation rapide --}}
-		<div class="quick-nav card">
-			<div class="card__body">
-				<p class="card__tag">Navigation rapide</p>
-				<nav class="quick-nav__list mt-md">
-					<button class="quick-nav__item active" data-target="produits">🍬 Produits <span class="quick-nav__count">{{ count($produits) }}</span></button>
-					<button class="quick-nav__item" data-target="rayons">🗂 Rayons <span class="quick-nav__count">{{ count($rayons) }}</span></button>
-					<button class="quick-nav__item" data-target="themes">🎨 Thèmes <span class="quick-nav__count">{{ count($themes) }}</span></button>
-					<button class="quick-nav__item" data-target="events">🎉 Events <span class="quick-nav__count">{{ count($events) }}</span></button>
-					<button class="quick-nav__item" data-target="formes">🔷 Formes <span class="quick-nav__count">{{ count($formes) }}</span></button>
-					<button class="quick-nav__item" data-target="conditionnements">📦 Conditionnements <span class="quick-nav__count">{{ count($conditionnements) }}</span></button>
-					<button class="quick-nav__item" data-target="parfums">🍓 Parfums <span class="quick-nav__count">{{ count($parfums) }}</span></button>
-					<button class="quick-nav__item" data-target="prix">💰 Prix <span class="quick-nav__count">{{ count($forme_condi) }}</span></button>
-				</nav>
-			</div>
 		</div>
 
 	</div>{{-- /gestion-left-panel --}}
@@ -132,12 +121,10 @@
 			<div class="data-toolbar">
 				<h2 class="data-toolbar__title">
 					Produits <span class="data-count">{{ count($produits) }}</span>
-					@if($rayon->id_rayon && $rayon->id_rayon != '-1')
-						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayon->id_rayon); @endphp
+					@if($rayonId && $rayonId != '-1')
+						@php $rayonActif = $rayons->firstWhere('id_rayon', $rayonId); @endphp
 						@if($rayonActif)
-							<span class="chip chip--gold">
-								@foreach($rayonActif->events as $e){{ $e->icone }} @endforeach {{ $rayonActif->nom_rayon }}
-							</span>
+							<span class="chip chip--gold">{{ $rayonActif->nom_rayon }}</span>
 						@endif
 					@endif
 				</h2>
@@ -250,6 +237,21 @@
 									</div>
 								</td>
 								<td class="td-actions">
+									<div class="actions-wrap">
+										<button
+											class="btn-icon btn-icon--edit"
+											title="Modifier"
+											onclick="ouvrirModalModifierProduit(
+												{{ $produit->id_produit }},
+												'{{ addslashes($produit->nom_produit ?? '') }}',
+												{{ $produit->id_parfum ?? 'null' }},
+												{{ $produit->id_forme ?? 'null' }},
+												{{ $produit->id_theme ?? 'null' }},
+												{{ $produit->quantite ?? 0 }},
+												'{{ addslashes($produit->description ?? '') }}'
+											)"
+										>✏️</button>
+									</div>
 									<div class="actions-wrap">
 										<form action="{{ route('produit.destroy', $produit->id_produit) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce produit')">
 											@csrf @method('DELETE')
@@ -649,8 +651,110 @@
 	</div>{{-- /gestion-right-panel --}}
 </div>
 
-{{-- ══ MODALS ══ --}}
-<div id="modal-produit" class="data-modal hidden"></div>
+{{-- ══ MODAL PRODUIT — Création ══ --}}
+<div id="modal-produit" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>Nouveau produit</h2>
+		<form action="/gestion/produit" method="POST">
+			@csrf
+			<input type="hidden" name="id_boutique" value="{{ $boutique->id_boutique }}">
+
+			<label>Nom du produit</label>
+			<input type="text" name="nom_produit" placeholder="Ex : Meringue Framboise Mini…" required>
+
+			<label>Parfum</label>
+			<select name="id_parfum" required>
+				<option value="">— Choisir un parfum —</option>
+				@foreach($parfums as $p)
+					<option value="{{ $p->id_parfum }}">{{ $p->nom_parfum }}</option>
+				@endforeach
+			</select>
+
+			<label>Forme</label>
+			<select name="id_forme" required>
+				<option value="">— Choisir une forme —</option>
+				@foreach($formes as $f)
+					<option value="{{ $f->id_forme }}">{{ $f->nom_forme }}</option>
+				@endforeach
+			</select>
+
+			<label>Rayon</label>
+			<select name="id_rayon" required>
+				<option value="">— Choisir un rayon —</option>
+				@foreach($rayons as $r)
+					<option value="{{ $r->id_rayon }}">{{ $r->nom_rayon }}</option>
+				@endforeach
+			</select>
+
+			<label>Thème <span class="label-hint">(optionnel)</span></label>
+			<select name="id_theme">
+				<option value="">— Aucun thème —</option>
+				@foreach($themes as $t)
+					<option value="{{ $t->id_theme }}">{{ $t->icone }} {{ $t->nom_theme }}</option>
+				@endforeach
+			</select>
+
+			<label>Stock initial</label>
+			<input type="number" name="quantite" min="0" value="0" required>
+
+			<label>Description <span class="label-hint">(optionnel)</span></label>
+			<textarea name="description" rows="3" placeholder="Description du produit…"></textarea>
+
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary">Créer le produit</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+{{-- ══ MODAL PRODUIT — Modification ══ --}}
+<div id="modal-modifier-produit" class="data-modal hidden">
+	<div class="data-modal-content">
+		<h2>Modifier le produit</h2>
+		<form id="form-modifier-produit" method="POST">
+			@csrf @method('PUT')
+
+			<label>Nom du produit</label>
+			<input type="text" id="edit-nom_produit" name="nom_produit" required>
+
+			<label>Parfum</label>
+			<select id="edit-id_parfum" name="id_parfum" required>
+				<option value="">— Choisir un parfum —</option>
+				@foreach($parfums as $p)
+					<option value="{{ $p->id_parfum }}">{{ $p->nom_parfum }}</option>
+				@endforeach
+			</select>
+
+			<label>Forme</label>
+			<select id="edit-id_forme" name="id_forme" required>
+				<option value="">— Choisir une forme —</option>
+				@foreach($formes as $f)
+					<option value="{{ $f->id_forme }}">{{ $f->nom_forme }}</option>
+				@endforeach
+			</select>
+
+			<label>Thème <span class="label-hint">(optionnel)</span></label>
+			<select id="edit-id_theme" name="id_theme">
+				<option value="">— Aucun thème —</option>
+				@foreach($themes as $t)
+					<option value="{{ $t->id_theme }}">{{ $t->icone }} {{ $t->nom_theme }}</option>
+				@endforeach
+			</select>
+
+			<label>Stock</label>
+			<input type="number" id="edit-quantite" name="quantite" min="0" required>
+
+			<label>Description</label>
+			<textarea id="edit-description" name="description" rows="3"></textarea>
+
+			<div class="modal-actions">
+				<button type="button" class="btn-close-modal">Annuler</button>
+				<button type="submit" class="btn btn--primary">💾 Enregistrer</button>
+			</div>
+		</form>
+	</div>
+</div>
 
 {{-- ══ MODAL IMAGE — Ajout ══ --}}
 <div id="modal-image" class="data-modal hidden">
@@ -869,6 +973,7 @@
 		</form>
 	</div>
 </div>
+
 
 <div id="toast" class="toast hidden"></div>
 
@@ -1189,5 +1294,25 @@ function afficherToast(message, type = 'success') {
 	toast.classList.remove('hidden');
 	clearTimeout(toast._timer);
 	toast._timer = setTimeout(() => toast.classList.add('hidden'), 2800);
+}
+
+// ════════════════════════════════════════
+// MODAL MODIFIER PRODUIT
+// ════════════════════════════════════════
+function ouvrirModalModifierProduit(id, nom, idParfum, idForme, idTheme, quantite, description) {
+	document.getElementById('form-modifier-produit').action = '/gestion/produit/' + id;
+	document.getElementById('edit-nom_produit').value      = nom;
+	document.getElementById('edit-quantite').value         = quantite;
+	document.getElementById('edit-description').value      = description;
+
+	const selParfum = document.getElementById('edit-id_parfum');
+	const selForme  = document.getElementById('edit-id_forme');
+	const selTheme  = document.getElementById('edit-id_theme');
+
+	selParfum.value = idParfum ?? '';
+	selForme.value  = idForme  ?? '';
+	selTheme.value  = idTheme  ?? '';
+
+	document.getElementById('modal-modifier-produit').classList.remove('hidden');
 }
 </script>
