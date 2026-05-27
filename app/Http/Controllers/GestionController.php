@@ -56,8 +56,7 @@ class GestionController extends Controller
 				$q->where('rayon.id_rayon', $rayonId);
 			});
 		}
-
-		// ⚠️ NE PAS écraser $produits plus bas — c'est l'unique assignation
+		
 		$produits    = $query->orderBy('id_produit')->get();
 		$nb_produits = $produits->count();
 

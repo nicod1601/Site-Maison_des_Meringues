@@ -3,7 +3,7 @@
 {{-- TOPBAR --}}
 <header class="topbar">
 	<span class="topbar__brand">La Maison des <em>Meringues</em></span>
-	<a href="/" class="topbar__back">← Retour à l'accueil</a>
+	<a href="{{ route('index') }}" class="topbar__back">← Retour à l'accueil</a>
 </header>
 
 <main class="container section">
