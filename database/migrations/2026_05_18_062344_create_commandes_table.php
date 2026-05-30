@@ -8,19 +8,19 @@ return new class extends Migration
 {
 	public function up(): void
 	{
-		// ─── Table commande ───────────────────────────────────────
 		Schema::create('commande', function (Blueprint $table) {
 			$table->increments('id_commande');
 			$table->unsignedBigInteger('user_id')->nullable();
+			$table->string('reference')->unique();
 			$table->enum('mode_livraison', ['livraison', 'expedition']);
 			$table->enum('statut', ['en_attente', 'payee', 'expediee', 'annulee'])->default('en_attente');
-			$table->decimal('total', 8, 2);
+			$table->decimal('montant', 8, 2);
+			$table->string('monetico_reference')->nullable();
 			$table->timestamps();
 
 			$table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
 		});
 
-		// ─── Table commande_ligne ─────────────────────────────────
 		Schema::create('commande_ligne', function (Blueprint $table) {
 			$table->id('id_ligne');
 			$table->foreignId('id_commande')->constrained('commande', 'id_commande')->cascadeOnDelete();
