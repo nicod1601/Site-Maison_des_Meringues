@@ -1243,9 +1243,20 @@ document.querySelectorAll('input[name="live"], input[name="dispo_expedition"], i
 // ════════════════════════════════════════
 document.querySelectorAll('.table-wrapper').forEach(wrapper => {
 	const table = wrapper.querySelector('table');
+	const tbody = table.querySelector('tbody');
 	const rowsPerPage = 10;
 	let currentPage = 1;
-	const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+	const rows = Array.from(tbody.querySelectorAll('tr'))
+		.sort((a, b) => {
+			const idA = parseInt(a.querySelector('.td-id')?.textContent) || 0;
+			const idB = parseInt(b.querySelector('.td-id')?.textContent) || 0;
+			return idA - idB;
+		});
+
+	// Réordonner physiquement les lignes dans le DOM
+	rows.forEach(row => tbody.appendChild(row));
+
 	const totalPages = Math.ceil(rows.length / rowsPerPage);
 	if (totalPages <= 1) return;
 
@@ -1270,8 +1281,8 @@ document.querySelectorAll('.table-wrapper').forEach(wrapper => {
 	paginationControls.append(prevBtn, pageInfo, nextBtn);
 	wrapper.appendChild(paginationControls);
 
-	prevBtn.addEventListener('click', () => { if (currentPage > 1)          { currentPage--; renderTable(); } });
-	nextBtn.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; renderTable(); } });
+	prevBtn.addEventListener('click', () => { if (currentPage > 1)         { currentPage--; renderTable(); } });
+	nextBtn.addEventListener('click', () => { if (currentPage < totalPages){ currentPage++; renderTable(); } });
 	renderTable();
 });
 

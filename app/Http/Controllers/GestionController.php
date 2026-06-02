@@ -56,7 +56,7 @@ class GestionController extends Controller
 				$q->where('rayon.id_rayon', $rayonId);
 			});
 		}
-		
+
 		$produits    = $query->orderBy('id_produit')->get();
 		$nb_produits = $produits->count();
 
@@ -128,12 +128,6 @@ class GestionController extends Controller
 		// ── Données ───────────────────────────────────────────────
 		$row = 2;
 		foreach ($produits as $p) {
-			// Events : on prend les events via les rayons du produit
-			$events = $p->rayons
-				->flatMap(fn($r) => $r->events ?? collect())
-				->unique('id_event')
-				->pluck('nom_event')
-				->implode(', ');
 
 			$sheet->setCellValue('A' . $row, $p->nom_produit ?? '');
 			$sheet->setCellValue('B' . $row, $p->forme->nom_forme ?? '');
@@ -143,8 +137,8 @@ class GestionController extends Controller
 			$sheet->setCellValue('F' . $row, $p->nouveaute ? 'oui' : 'non');
 			$sheet->setCellValue('G' . $row, $p->live      ? 'oui' : 'non');
 			$sheet->setCellValue('H' . $row, $p->theme->nom_theme ?? '');
-			$sheet->setCellValue('I' . $row, $events);
-			$sheet->setCellValue('J' . $row, $p->specialite ?? 'non');
+			$sheet->setCellValue('I' . $row, $p->events()->pluck('nom_event')->implode(', ') ?? ' ');
+			$sheet->setCellValue('J' . $row, $p->special     ? 'oui' : 'non');
 
 			$bgColor = ($row % 2 === 0) ? 'FFFFF8F0' : 'FFFFFFFF';
 			$rowStyle = [

@@ -190,16 +190,7 @@ class CreationController extends Controller
 	{
 		$rayon = Rayon::findOrFail($id);
 
-		$produits = $rayon->produits()->get();
-
 		$rayon->produits()->detach();
-
-		foreach ($produits as $produit) {
-			if ($produit->rayons()->count() === 0) {
-				$produit->delete();
-			}
-		}
-
 		$rayon->events()->detach();
 		$rayon->delete();
 
