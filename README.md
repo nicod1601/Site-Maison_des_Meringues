@@ -48,14 +48,16 @@ Cette application a été développée en tant que projet de stage, mettant en p
 - ✅ **Blog intégré** avec articles curatés
 
 ### 🎛️ Pour les administrateurs
-- ✅ **Gestion complète des produits** (CRUD avec prévisualisation)
-- ✅ **Gestion des rayons et thèmes** pour l'organisation
-- ✅ **Gestion des événements** (Noël, Anniversaire, Printemps, etc.)
+- ✅ **Gestion complète des produits** (CRUD avec prévisualisation et statuts)
+- ✅ **Gestion des rayons et thèmes** pour l'organisation des produits
+- ✅ **Gestion des événements** (Noël, Anniversaire, Printemps, etc.) avec couleurs personnalisées
 - ✅ **Import en masse** de produits via Excel/CSV
 - ✅ **Gestion des formes, parfums et conditionnements**
+- ✅ **Gestion des images produits** avec remontée de fichiers
 - ✅ **Gestion des utilisateurs** (rôles et permissions)
-- ✅ **Gestion des commandes** et suivi client
-- ✅ **Panel d'administration** sécurisé avec authentification
+- ✅ **Gestion des commandes** avec suivi client détaillé
+- ✅ **Panel d'administration** sécurisé avec authentification et validation
+- ✅ **Statistiques** (stock total, nombre de produits, rayons actifs)
 
 ---
 
@@ -293,13 +295,18 @@ Format attendu pour l'import Excel/CSV :
 ├── app/                          # Code applicatif
 │   ├── Http/
 │   │   ├── Controllers/          # Contrôleurs (logique métier)
-│   │   │   ├── AccueilController.php
-│   │   │   ├── ShopController.php
-│   │   │   ├── GestionController.php
-│   │   │   ├── CommandeController.php
-│   │   │   ├── PanierController.php
-│   │   │   ├── CreationController.php
-│   │   │   └── ImportController.php
+│   │   │   ├── AccueilController.php      # Page d'accueil
+│   │   │   ├── ShopController.php         # Boutique et catalogue
+│   │   │   ├── PanierController.php       # Gestion du panier
+│   │   │   ├── CommandeController.php     # Gestion des commandes
+│   │   │   ├── GestionController.php      # Panel d'administration
+│   │   │   ├── CreationController.php     # Création des entités (produits, rayons, etc.)
+│   │   │   ├── ImportController.php       # Import de produits via Excel/CSV
+│   │   │   ├── ImageController.php        # Gestion des images
+│   │   │   ├── BlogController.php         # Gestion du blog
+│   │   │   ├── ProfileController.php      # Profil utilisateur
+│   │   │   ├── SettingsController.php     # Paramètres application
+│   │   │   └── LoginController.php        # Authentification personnalisée
 │   │   ├── Middleware/           # Middlewares (authentification, autorisations)
 │   │   └── Requests/             # Form Requests (validation)
 │   ├── Models/                   # Modèles Eloquent (entités)
@@ -466,11 +473,12 @@ Pour toute question ou bug :
 
 ## 👨‍💻 Auteur
 
-Développé en tant que **projet de stage** - Maison des Meringues
+Développé en tant que **projet de stage** par **Nicolas Delpech**  
+Maison des Meringues
 
 ---
 
-**Dernière mise à jour : Mai 2026**
+**Dernière mise à jour : Juin 2026**
 ├── Models/
 │   ├── Produit.php
 │   ├── Forme.php / Forme_Condi.php
