@@ -4,7 +4,10 @@
 		<meta charset="utf-8">
 		<meta name="csrf-token" content="{{ csrf_token() }}">
 		@vite('resources/css/style.css')
-		<title>{{ $title ?? 'Accueil'}} — La Maison des Meringues'</title>
+
+		<link rel="icon" type="image/webp" href="{{ asset('fichier/image/logo.webp') }}">
+
+		<title>{{ $title ?? 'Accueil' }} — La Maison des Meringues</title>
 	</head>
 	<body>
 		<nav class="navbar">
