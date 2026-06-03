@@ -304,10 +304,28 @@
 											@csrf
 											<input type="hidden" name="id_produit"     value="{{ $produit->id_produit }}">
 											<input type="hidden" name="id_forme_condi" value="{{ $fc->id_forme_condi }}">
-											<input type="hidden" name="quantite"       value="1">
-											<button type="submit" class="boutique-card__add-btn"
-													aria-label="Ajouter {{ $produit->nom_produit }} au panier"
-													title="Ajouter au panier">+</button>
+
+											<div style="display:flex;align-items:center;gap:6px;">
+												<select name="quantite"
+													style="width:52px;padding:5px 4px;border:1px solid var(--color-border);border-radius:6px;font-size:.82rem;text-align:center;background:var(--color-bg,#fff);color:var(--color-text);cursor:pointer;appearance:none;-webkit-appearance:none;">
+													@php
+														$maxQte = match($fc->conditionnement->type) {
+															'sachet_de_10' => (int)floor($produit->quantite / 10),
+															'sachet_de_4'  => (int)floor($produit->quantite / 4),
+															'boite_de_8'   => (int)floor($produit->quantite / 8),
+															default        => min($produit->quantite, 20),
+														};
+														$maxQte = max(1, min($maxQte, 20));
+													@endphp
+													@for($q = 1; $q <= $maxQte; $q++)
+														<option value="{{ $q }}">{{ $q }}</option>
+													@endfor
+												</select>
+
+												<button type="submit" class="boutique-card__add-btn"
+														aria-label="Ajouter {{ $produit->nom_produit }} au panier"
+														title="Ajouter au panier">+</button>
+											</div>
 										</form>
 									@else
 										<span class="boutique-card__add-btn"
