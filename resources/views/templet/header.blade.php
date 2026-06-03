@@ -9,6 +9,11 @@
 
 		<title>{{ $title ?? 'Accueil' }} — La Maison des Meringues</title>
 	</head>
+	<style>
+		*{
+			cursor: url("{{ asset('fichier/image/sourie/cursor-50.png') }}") 0 0, auto !important;
+		}
+	</style>
 	<body>
 		<nav class="navbar">
 			<div class="navbar__inner">
