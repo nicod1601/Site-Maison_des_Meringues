@@ -60,13 +60,23 @@ class CommandeController extends Controller
 		// ── Créer la commande en BDD ───────────────────────────────
 		$reference = 'CMD-' . strtoupper(Str::random(8)) . '-' . time();
 
-		Commande::create([
+		$commande = Commande::create([
 			'user_id'        => auth()->id(),
 			'reference'      => $reference,
 			'montant'        => $panier->total(),
 			'mode_livraison' => $request->mode_livraison,
 			'statut'         => 'en_attente',
 		]);
+
+		// ── Créer les lignes de commande ───────────────────────────────
+		foreach ($panier->lignes as $ligne) {
+			$commande->lignes()->create([
+				'designation'     => $ligne->produit->forme->nom_forme . ' — ' . $ligne->produit->parfum->nom_parfum,
+				'sous_designation'=> $ligne->formeCondi->conditionnement->type,
+				'quantite'        => $ligne->quantite,
+				'prix_unitaire'   => $ligne->prix_unitaire,
+			]);
+		}
 
 		// ── Préparer Monetico ──────────────────────────────────────
 		$monetico = new Monetico(

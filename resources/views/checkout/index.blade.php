@@ -43,7 +43,7 @@
 			{{-- Livraison locale — toujours disponible --}}
 			<div class="mode-card active" data-value="livraison" onclick="choisirMode('livraison')"
 				style="border:1.5px solid var(--color-primary);border-radius:8px;padding:1rem;cursor:pointer;background:#fff;">
-				<strong>🚲 Livraison locale</strong>
+				<strong>🚲 Click & Collect</strong>
 				<p style="font-size:.8rem;color:var(--color-text-muted);margin:.5rem 0 0;">
 					Livraison en main propre ou locale. Toujours disponible.
 				</p>
