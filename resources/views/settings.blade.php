@@ -434,11 +434,7 @@ body {
 {{-- TOPBAR --}}
 <header class="topbar">
 	<span class="topbar__brand">Maison des <em>Meringues</em></span>
-	@if($isAdmin)
-		<a href="{{ route('gestion.index') }}" class="topbar__back">← Administration</a>
-	@else
 		<a href="{{ route('index') }}" class="topbar__back">← Accueil</a>
-	@endif
 </header>
 
 <div class="page">

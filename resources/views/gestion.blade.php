@@ -31,6 +31,10 @@
 							<span class="stat-item__value">{{ count($rayons) }}</span>
 							<span class="stat-item__label">Rayons</span>
 						</div>
+						<div class="stat-item">
+							<span class="stat-item__value">{{ count($parfums) }}</span>
+							<span class="stat-item__label">Parfums</span>
+						</div>
 					</div>
 				</div>
 			</div>
