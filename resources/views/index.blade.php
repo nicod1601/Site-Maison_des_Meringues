@@ -170,7 +170,6 @@
 	const produitsMap = {};
 	produits.forEach(p => { produitsMap[p.id_produit] = p; });
 
-	// Garder une seule image par nom de produit
 	const nomsVus      = new Set();
 	const imagesFiltrees = listImages.filter(img => {
 		const produit = produitsMap[img.id_produit];

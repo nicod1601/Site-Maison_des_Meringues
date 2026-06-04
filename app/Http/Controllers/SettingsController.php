@@ -24,12 +24,18 @@ class SettingsController extends Controller
 			'name'  => 'required|string|max:255',
 			'email' => 'required|email|unique:users,email,' . $user->id,
 			'phone' => 'nullable|string|max:20',
+			'adresse' => 'nullable|string|max:255',
+			'ville' => 'nullable|string|max:100',
+			'code_postal' => 'nullable|string|max:20',
 		]);
 
 		$user->update([
 			'name'  => $request->name,
 			'email' => $request->email,
 			'phone' => $request->phone,
+			'adresse' => $request->adresse,
+			'ville' => $request->ville,
+			'code_postal' => $request->code_postal,
 		]);
 
 		return back()->with('success_profile', 'Profil mis à jour avec succès.');

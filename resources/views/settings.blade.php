@@ -536,6 +536,42 @@ body {
 								<span class="input-hint">Utilisé pour vous contacter concernant vos commandes</span>
 								@error('phone') <span class="field-error">{{ $message }}</span> @enderror
 							</div>
+							<div class="form-group">
+								<label>Adresse</label>
+								<input
+									type="tel"
+									name="adresse"
+									value="{{ old('adresse', $user->adresse ?? '') }}"
+									class="{{ $errors->has('adresse') ? 'is-invalid' : '' }}"
+									placeholder="123 Rue de la Paix"
+								>
+								<span class="input-hint">Adresse de livraison</span>
+								@error('adresse') <span class="field-error">{{ $message }}</span> @enderror
+							</div>
+							<div class="form-group">
+								<label>Ville</label>
+								<input
+									type="tel"
+									name="ville"
+									value="{{ old('ville', $user->ville ?? '') }}"
+									class="{{ $errors->has('ville') ? 'is-invalid' : '' }}"
+									placeholder="Paris"
+								>
+								<span class="input-hint">Ville de livraison</span>
+								@error('ville') <span class="field-error">{{ $message }}</span> @enderror
+							</div>
+							<div class="form-group">
+								<label>Code postal</label>
+								<input
+									type="tel"
+									name="code_postal"
+									value="{{ old('code_postal', $user->code_postal ?? '') }}"
+									class="{{ $errors->has('code_postal') ? 'is-invalid' : '' }}"
+									placeholder="75000"
+								>
+								<span class="input-hint">Code postal de livraison</span>
+								@error('code_postal') <span class="field-error">{{ $message }}</span> @enderror
+							</div>
 						</div>
 
 						<div class="btn-row">

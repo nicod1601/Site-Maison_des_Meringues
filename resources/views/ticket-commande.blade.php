@@ -755,6 +755,12 @@
 						<span class="tk-client-block__icon">📞</span>
 						<span class="tk-client-block__val">{{ $commande->user->phone }}</span>
 					@endif
+
+					@if(!empty($commande->user->adresse ) && !empty($commande->user->ville) && !empty($commande->user->code_postal))
+						<span class="tk-client-block__icon">🏠</span>
+						<span class="tk-client-block__val">{{ ($commande->user->adresse.' '.
+						$commande->user->ville .' '. $commande->user->code_postal)  ?? '—' }}</span>
+					@endif
 				</div>
 				@endif
 
