@@ -217,3 +217,21 @@ body { background: var(--cream); font-family: 'DM Sans', sans-serif; color: var(
   .nav-item { border-bottom: none; border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; flex-shrink: 0; }
   .nav-item.active { border-bottom-color: var(--primary); border-left-color: transparent; }
 }
+.tk-btn-pdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: .4rem .9rem;
+    border-radius: 999px;
+    border: 1.5px solid #bee3f8;
+    background: #f0f7ff;
+    color: #1565c0;
+    font-size: .78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.tk-btn-pdf:hover { background: #e3f2fd; border-color: #42a5f5; }
+.tk-btn-pdf:disabled { opacity: .6; cursor: wait; }

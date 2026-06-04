@@ -492,6 +492,27 @@
 
 .tk-btn-delete:hover { background: #ffebee; border-color: #ef5350; }
 
+/* ── BOUTON PDF ──────────────────────────────────────────────── */
+.tk-btn-print {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: .4rem .9rem;
+	border-radius: 999px;
+	border: 1.5px solid var(--color-border, #E8DEC8);
+	background: #fff;
+	color: var(--color-text, #2E1A10);
+	font-size: .78rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all .15s;
+}
+
+.tk-btn-print:hover {
+	background: #f5f0eb;
+	border-color: #8C7B6A;
+}
+
 /* ── VIDE ────────────────────────────────────────────────────── */
 .tk-empty {
 	text-align: center;
@@ -533,6 +554,37 @@
 	.tk-page { grid-template-columns: 1fr; }
 	.tk-sidebar { position: static; }
 	.tk-client-block { grid-template-columns: auto 1fr; }
+}
+
+/* ── IMPRESSION PDF ──────────────────────────────────────────── */
+@media print {
+	/* Masquer toute la page */
+	body * { visibility: hidden; }
+
+	/* N'afficher que le ticket en cours d'impression */
+	.tk-card--printing,
+	.tk-card--printing * { visibility: visible; }
+
+	.tk-card--printing {
+		position: fixed !important;
+		top: 0;
+		left: 0;
+		width: 100%;
+		margin: 0 !important;
+		border: none !important;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+	}
+
+	/* Masquer les boutons d'action dans le footer */
+	.tk-admin-actions,
+	.tk-btn-print,
+	.tk-btn-delete { display: none !important; }
+
+	/* Fond clair pour l'impression */
+	.tk-card__footer { background: #f9f9f9 !important; }
+	.tk-card__body   { background: #fff !important; }
+	.tk-card__head   { background: #fff !important; }
 }
 </style>
 
@@ -868,6 +920,17 @@
 				</span>
 				@endif
 
+				{{-- ── BOUTON PDF (visible par tous) ── --}}
+				<button
+					class="tk-btn-print"
+					onclick="printTicket(this)"
+					title="Enregistrer en PDF"
+				>
+					🖨️ PDF
+				</button>
+
+				<span class="tk-card__footer-ref">{{ $commande->reference }}</span>
+
 			</div>
 
 		</div>{{-- /tk-card --}}
@@ -898,6 +961,7 @@
 </div>{{-- /tk-page --}}
 
 <script>
+// ── Filtres ───────────────────────────────────────────────────
 const filterBtns = document.querySelectorAll('.tk-filter-btn');
 const navItems   = document.querySelectorAll('.tk-nav__item[data-filter]');
 const cards      = document.querySelectorAll('.tk-card[data-statut]');
@@ -920,6 +984,20 @@ function applyFilter(filter) {
 
 filterBtns.forEach(btn => btn.addEventListener('click', () => applyFilter(btn.dataset.filter)));
 navItems.forEach(item   => item.addEventListener('click', () => applyFilter(item.dataset.filter)));
+
+// ── Impression PDF ────────────────────────────────────────────
+function printTicket(btn) {
+	const card = btn.closest('.tk-card');
+
+	// Ajoute la classe qui isole ce ticket dans le @media print
+	card.classList.add('tk-card--printing');
+
+	// Lance l'impression
+	window.print();
+
+	// Retire la classe après fermeture de la boîte d'impression
+	card.classList.remove('tk-card--printing');
+}
 </script>
 
 @include('templet.footer')
