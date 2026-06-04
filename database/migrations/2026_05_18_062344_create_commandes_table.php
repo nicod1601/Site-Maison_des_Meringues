@@ -13,7 +13,7 @@ return new class extends Migration
 			$table->unsignedBigInteger('user_id')->nullable();
 			$table->string('reference')->unique();
 			$table->enum('mode_livraison', ['livraison', 'expedition']);
-			$table->enum('statut', ['en_attente', 'terminee'])->default('en_attente');
+			$table->enum('statut', ['en_attente','payee','expediee','terminee','emportee','annulee'])->default('en_attente');
 			$table->decimal('montant', 8, 2);
 			$table->string('monetico_reference')->nullable();
 			$table->timestamps();

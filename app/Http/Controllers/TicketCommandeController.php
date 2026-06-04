@@ -31,7 +31,6 @@ class TicketCommandeController extends Controller
 	{
 		$user = Auth::user();
 
-		// Sécurité : seul un admin peut terminer
 		abort_unless($user->isAdmin(), 403);
 
 		$commande = Commande::findOrFail($id);
@@ -40,8 +39,34 @@ class TicketCommandeController extends Controller
 		return back()->with('success', 'Commande #' . $commande->reference . ' marquée comme terminée.');
 	}
 
-	// ── (suppression désactivée pour les clients) ─────────────────────
-	// La route destroy est conservée mais uniquement pour les admins
+	// ── Admin : finaliser une commande (emportée ou expédiée) ─────────
+	// Appelé quand l'admin coche "Emporter" ou "Expédier" après "Terminée"
+	public function finaliser(int $id)
+	{
+		$user = Auth::user();
+
+		abort_unless($user->isAdmin(), 403);
+
+		$commande = Commande::findOrFail($id);
+
+		// On ne finalise que les commandes déjà terminées
+		abort_unless($commande->statut === 'terminee', 422);
+
+		if ($commande->mode_livraison === 'expedition') {
+			$commande->update(['statut' => 'expediee']);
+			$msg = 'Commande #' . $commande->reference . ' marquée comme expédiée.';
+		} else {
+			// click_collect ou autre → emportée (on réutilise le statut "terminee"
+			// avec un flag, ou on crée un statut dédié selon votre modèle.
+			// Ici on ajoute le statut 'emportee' — pensez à l'ajouter en BDD si besoin)
+			$commande->update(['statut' => 'emportee']);
+			$msg = 'Commande #' . $commande->reference . ' marquée comme emportée.';
+		}
+
+		return back()->with('success', $msg);
+	}
+
+	// ── (suppression réservée aux admins) ─────────────────────────────
 	public function destroy(int $id)
 	{
 		abort_unless(Auth::user()->isAdmin(), 403, 'Action non autorisée.');

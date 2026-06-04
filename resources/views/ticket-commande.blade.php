@@ -226,6 +226,8 @@
 .tk-status--terminee::before  { background: #7e57c2; }
 .tk-status--annulee   { background: #ffebee; color: #b71c1c; }
 .tk-status--annulee::before   { background: #ef5350; }
+.tk-status--emportee  { background: #e8f5e9; color: #1b5e20; }
+.tk-status--emportee::before  { background: #43a047; }
 
 /* ── TICKET BODY ─────────────────────────────────────────────── */
 .tk-card__body {
@@ -392,9 +394,10 @@
 	display: flex;
 	align-items: center;
 	gap: .6rem;
+	flex-wrap: wrap;
 }
 
-/* Checkbox "Terminée" ─ */
+/* Checkbox générique ─ */
 .tk-check-label {
 	display: inline-flex;
 	align-items: center;
@@ -428,6 +431,47 @@
 	width: 15px;
 	height: 15px;
 	cursor: pointer;
+}
+
+/* Case "Emporter" (click & collect) ─ */
+.tk-check-label--emporter:hover {
+	border-color: #2e7d32;
+	color: #1b5e20;
+	background: #f1f8e9;
+}
+
+.tk-check-label--emporter.done {
+	border-color: #43a047;
+	color: #1b5e20;
+	background: #e8f5e9;
+}
+
+.tk-check-label--emporter input[type="checkbox"] {
+	accent-color: #43a047;
+}
+
+/* Case "Expédier" (expédition) ─ */
+.tk-check-label--expedier:hover {
+	border-color: #1565c0;
+	color: #0d47a1;
+	background: #e3f2fd;
+}
+
+.tk-check-label--expedier.done {
+	border-color: #42a5f5;
+	color: #0d47a1;
+	background: #e3f2fd;
+}
+
+.tk-check-label--expedier input[type="checkbox"] {
+	accent-color: #42a5f5;
+}
+
+/* Séparateur visuel entre les deux cases ─ */
+.tk-actions-sep {
+	font-size: .75rem;
+	color: var(--color-text-muted, #8C7B6A);
+	padding: 0 .15rem;
 }
 
 /* Bouton supprimer (admin) ─ */
@@ -520,6 +564,10 @@
 				<span class="tk-nav__dot" style="background:#7e57c2;"></span>
 				Terminées
 			</div>
+			<div class="tk-nav__item" data-filter="emportee">
+				<span class="tk-nav__dot" style="background:#43a047;"></span>
+				Emportées
+			</div>
 			<div class="tk-nav__item" data-filter="annulee">
 				<span class="tk-nav__dot" style="background:#ef5350;"></span>
 				Annulées
@@ -549,6 +597,14 @@
 			<div class="tk-summary__row">
 				<span>Terminées</span>
 				<strong>{{ $commandes->where('statut','terminee')->count() }}</strong>
+			</div>
+			<div class="tk-summary__row">
+				<span>Expédiées</span>
+				<strong>{{ $commandes->where('statut','expediee')->count() }}</strong>
+			</div>
+			<div class="tk-summary__row">
+				<span>Emportées</span>
+				<strong>{{ $commandes->where('statut','emportee')->count() }}</strong>
 			</div>
 			@endif
 		</div>
@@ -585,6 +641,7 @@
 			<button class="tk-filter-btn" data-filter="payee">Payées</button>
 			<button class="tk-filter-btn" data-filter="expediee">Expédiées</button>
 			<button class="tk-filter-btn" data-filter="terminee">Terminées</button>
+			<button class="tk-filter-btn" data-filter="emportee">Emportées</button>
 			<button class="tk-filter-btn" data-filter="annulee">Annulées</button>
 		</div>
 
@@ -595,11 +652,12 @@
 
 		@php
 			$statusMap = [
-				'en_attente' => ['label' => 'En attente',       'class' => 'attente'],
-				'payee'      => ['label' => 'Payée',            'class' => 'payee'],
-				'expediee'   => ['label' => 'Expédiée',         'class' => 'expediee'],
-				'terminee'   => ['label' => 'Terminée',         'class' => 'terminee'],
-				'annulee'    => ['label' => 'Annulée',          'class' => 'annulee'],
+				'en_attente' => ['label' => 'En attente', 'class' => 'attente'],
+				'payee'      => ['label' => 'Payée',      'class' => 'payee'],
+				'expediee'   => ['label' => 'Expédiée',   'class' => 'expediee'],
+				'terminee'   => ['label' => 'Terminée',   'class' => 'terminee'],
+				'emportee'   => ['label' => 'Emportée',   'class' => 'emportee'],
+				'annulee'    => ['label' => 'Annulée',    'class' => 'annulee'],
 			];
 			$s = $statusMap[$commande->statut] ?? ['label' => $commande->statut, 'class' => 'attente'];
 		@endphp
@@ -682,15 +740,15 @@
 					</tbody>
 				</table>
 
-				{{-- Totaux --}}
+				{{-- Totaux — TVA 10% --}}
 				<div class="tk-totals">
 					<div class="tk-totals__row">
 						<span>Sous-total HT</span>
-						<span><strong>{{ number_format($commande->montant / 1.2, 2, ',', ' ') }} €</strong></span>
+						<span><strong>{{ number_format($commande->montant / 1.1, 2, ',', ' ') }} €</strong></span>
 					</div>
 					<div class="tk-totals__row">
-						<span>TVA (20%)</span>
-						<span><strong>{{ number_format($commande->montant - ($commande->montant / 1.2), 2, ',', ' ') }} €</strong></span>
+						<span>TVA (10%)</span>
+						<span><strong>{{ number_format($commande->montant - ($commande->montant / 1.1), 2, ',', ' ') }} €</strong></span>
 					</div>
 					<div class="tk-totals__row">
 						<span>Livraison</span>
@@ -722,8 +780,8 @@
 				{{-- Actions admin --}}
 				<div class="tk-admin-actions">
 
-					{{-- Checkbox "Terminée" --}}
-					@if($commande->statut !== 'terminee')
+					{{-- ① Case "Terminée" (visible si pas encore terminée/expédiée/emportée) --}}
+					@if(! in_array($commande->statut, ['terminee', 'expediee', 'emportee']))
 					<form action="{{ route('ticket.terminer', $commande->id_commande) }}" method="POST">
 						@csrf
 						@method('PATCH')
@@ -736,10 +794,56 @@
 							Marquer terminée
 						</label>
 					</form>
-					@else
+
+					{{-- ② Case de finalisation (visible uniquement quand statut = terminee) --}}
+					@elseif($commande->statut === 'terminee')
+
+					{{-- Case "Terminée" verrouillée --}}
 					<label class="tk-check-label done" style="cursor:default;">
 						<input type="checkbox" checked disabled>
 						Terminée ✓
+					</label>
+
+					<span class="tk-actions-sep">→</span>
+
+					{{-- Case conditionnelle selon mode de livraison --}}
+					<form action="{{ route('ticket.finaliser', $commande->id_commande) }}" method="POST">
+						@csrf
+						@method('PATCH')
+						@if($commande->mode_livraison === 'expedition')
+						{{-- Commande en expédition → "Expédier" --}}
+						<label class="tk-check-label tk-check-label--expedier">
+							<input
+								type="checkbox"
+								onchange="this.form.submit()"
+								title="Marquer comme expédiée"
+							>
+							📦 Expédier
+						</label>
+						@else
+						{{-- Commande click & collect → "Emporter" --}}
+						<label class="tk-check-label tk-check-label--emporter">
+							<input
+								type="checkbox"
+								onchange="this.form.submit()"
+								title="Marquer comme emportée"
+							>
+							🚲 Emporter
+						</label>
+						@endif
+					</form>
+
+					{{-- ③ Statut final atteint (expédiée ou emportée) --}}
+					@elseif($commande->statut === 'expediee')
+					<label class="tk-check-label tk-check-label--expedier done" style="cursor:default;">
+						<input type="checkbox" checked disabled>
+						📦 Expédiée ✓
+					</label>
+
+					@elseif($commande->statut === 'emportee')
+					<label class="tk-check-label tk-check-label--emporter done" style="cursor:default;">
+						<input type="checkbox" checked disabled>
+						🚲 Emportée ✓
 					</label>
 					@endif
 

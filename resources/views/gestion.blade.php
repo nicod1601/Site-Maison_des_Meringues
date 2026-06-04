@@ -5,6 +5,11 @@
 	<span class="topbar__brand">La Maison des <em>Meringues</em></span>
 	<a href="{{ route('index') }}" class="topbar__back">← Retour à l'accueil</a>
 </header>
+<style>
+	*{
+		cursor: url("{{ asset('fichier/image/sourie/cursor-50.png') }}") 0 0, auto !important;
+	}
+</style>
 
 <main class="container section">
 <div class="container gestion-layout">
