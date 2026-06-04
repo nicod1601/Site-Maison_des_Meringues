@@ -21,10 +21,17 @@ Découvrez une application web complète dédiée à la vente en ligne de mering
 - [Configuration](#-configuration)
 - [Déploiement](#-déploiement)
 - [Utilisation](#-utilisation)
+- [Modèle de données](#️-modèle-de-données)
+- [Authentification](#-système-dauthentification)
+- [Commandes utiles](#️-commandes-utiles)
 - [Structure du projet](#-structure-du-projet)
-- [Technologies](#-stack-technique)
+- [Stack technique](#-stack-technique)
+- [Tests](#-tests)
+- [Sécurité](#-sécurité)
+- [Troubleshooting](#-troubleshooting)
 - [Contribution](#-contribution)
 - [License](#-license)
+- [Support](#-support)
 
 ---
 
@@ -295,65 +302,144 @@ Format attendu pour l'import Excel/CSV :
 ├── app/                          # Code applicatif
 │   ├── Http/
 │   │   ├── Controllers/          # Contrôleurs (logique métier)
-│   │   │   ├── AccueilController.php      # Page d'accueil
-│   │   │   ├── ShopController.php         # Boutique et catalogue
-│   │   │   ├── PanierController.php       # Gestion du panier
-│   │   │   ├── CommandeController.php     # Gestion des commandes
-│   │   │   ├── GestionController.php      # Panel d'administration
-│   │   │   ├── CreationController.php     # Création des entités (produits, rayons, etc.)
-│   │   │   ├── ImportController.php       # Import de produits via Excel/CSV
-│   │   │   ├── ImageController.php        # Gestion des images
-│   │   │   ├── BlogController.php         # Gestion du blog
-│   │   │   ├── ProfileController.php      # Profil utilisateur
-│   │   │   ├── SettingsController.php     # Paramètres application
-│   │   │   └── LoginController.php        # Authentification personnalisée
-│   │   ├── Middleware/           # Middlewares (authentification, autorisations)
+│   │   │   ├── AccueilController.php       # Page d'accueil
+│   │   │   ├── ShopController.php          # Boutique et catalogue
+│   │   │   ├── PanierController.php        # Gestion du panier
+│   │   │   ├── CommandeController.php      # Gestion des commandes
+│   │   │   ├── GestionController.php       # Panel d'administration
+│   │   │   ├── CreationController.php      # Création entités (CRUD)
+│   │   │   ├── ImportController.php        # Import produits Excel/CSV
+│   │   │   ├── ImageController.php         # Gestion images produits
+│   │   │   ├── BlogController.php          # Blog et articles
+│   │   │   ├── ProfileController.php       # Profil utilisateur
+│   │   │   ├── SettingsController.php      # Configuration appli
+│   │   │   └── LoginController.php         # Authentification custom
+│   │   ├── Middleware/           # Middlewares (auth, authorization)
 │   │   └── Requests/             # Form Requests (validation)
+│   │
 │   ├── Models/                   # Modèles Eloquent (entités)
-│   │   ├── User.php
-│   │   ├── Produit.php
-│   │   ├── Commande.php
-│   │   ├── PanierLigne.php
-│   │   ├── Rayon.php
-│   │   ├── BlogPost.php
-│   │   └── ...
+│   │   ├── User.php              # Utilisateurs (client/admin)
+│   │   ├── Produit.php           # Produits (meringues)
+│   │   ├── Forme.php             # Types (Mini, Nid)
+│   │   ├── Forme_Condi.php       # Conditionnements produits
+│   │   ├── Conditionnement.php   # Tailles (sachet 10g, boîte 8, etc.)
+│   │   ├── Parfum.php            # Saveurs (Fraise, Nature, etc.)
+│   │   ├── Rayon.php             # Catégories (Classiques, Fruits)
+│   │   ├── Theme.php             # Thèmes visuels
+│   │   ├── Event.php             # Événements saisonniers
+│   │   ├── Boutique.php          # Boutique principale
+│   │   ├── Panier.php            # Panier utilisateur
+│   │   ├── PanierLigne.php       # Lignes du panier
+│   │   ├── Commande.php          # Commandes clients
+│   │   ├── CommandeLigne.php     # Lignes des commandes
+│   │   ├── BlogPost.php          # Articles blog
+│   │   ├── BlogReaction.php      # Réactions sur articles
+│   │   └── Image.php             # Images produits
+│   │
 │   ├── Mail/                     # Notifications email
-│   ├── Imports/                  # Imports (Excel)
-│   └── Listeners/                # Event Listeners
+│   │   ├── WelcomeMail.php       # Email bienvenue
+│   │   └── TestMail.php          # Email de test
+│   │
+│   ├── Imports/
+│   │   └── UsersImport.php       # Import utilisateurs Excel
+│   │
+│   ├── Listeners/
+│   │   └── TransfererPanierApresLogin.php  # Fusion panier session→compte
+│   │
+│   ├── Providers/
+│   │   └── AppServiceProvider.php  # Configuration services
+│   │
+│   └── View/
+│       └── Components/            # Composants réutilisables Blade
 │
 ├── bootstrap/                    # Fichiers de démarrage
-├── config/                       # Fichiers de configuration
+├── config/                       # Configuration applicatio
+│   ├── app.php                   # Config générale
+│   ├── database.php              # Config BD
+│   ├── auth.php                  # Config authentification
+│   ├── cache.php                 # Config cache
+│   ├── mail.php                  # Config email
+│   ├── session.php               # Config sessions
+│   └── ...
+│
 ├── database/
 │   ├── migrations/               # Migrations BD
+│   │   ├── 2024_01_01_000000_create_all_tables.php
+│   │   ├── 2026_04_29_135146_create_users_table.php
+│   │   ├── 2026_04_29_135146_create_panier_tables.php
+│   │   ├── 2026_05_18_062344_create_commandes_table.php
+│   │   └── ...
 │   ├── factories/                # Model factories (tests)
-│   └── seeders/                  # Seeders (données initiales)
+│   │   └── UserFactory.php
+│   └── seeders/                  # Données initiales
 │
-├── public/                       # Assets publics (compilés)
+├── public/                       # Assets publics
+│   ├── index.php                 # Point d'entrée
 │   ├── build/                    # Assets compilés par Vite
-│   └── fichier/                  # Uploads utilisateurs
+│   │   ├── app.js
+│   │   ├── app.css
+│   │   └── manifest.json
+│   ├── fichier/                  # Uploads utilisateurs
+│   │   └── image/meringues/      # Images produits
+│   │       ├── Mini/
+│   │       ├── Nid/
+│   │       └── ...
+│   └── robots.txt
 │
 ├── resources/
-│   ├── views/                    # Vue Blade (templates)
-│   ├── js/                       # Scripts JavaScript/Alpine
-│   └── css/                      # Feuilles de style
+│   ├── views/                    # Templates Blade
+│   │   ├── index.blade.php       # Accueil
+│   │   ├── shop.blade.php        # Boutique
+│   │   ├── panier.blade.php      # Panier client
+│   │   ├── gestion.blade.php     # Panel admin
+│   │   ├── auth/
+│   │   │   ├── login.blade.php   # Connexion (design custom)
+│   │   │   └── register.blade.php # Inscription (design custom)
+│   │   ├── templet/              # Composants réutilisables
+│   │   │   ├── header.blade.php
+│   │   │   └── footer.blade.php
+│   │   └── layouts/
+│   │       └── app.blade.php     # Layout principal
+│   ├── js/
+│   │   └── app.js                # Entrée Vite JavaScript
+│   └── css/
+│       ├── app.css               # Entrée Vite CSS
+│       ├── style.css             # Design system global
+│       ├── boutique.css          # Styles boutique
+│       ├── gestion.css           # Styles admin
+│       ├── login.css             # Styles auth
+│       └── index.css             # Styles accueil
 │
 ├── routes/                       # Routes application
-│   ├── web.php                   # Routes web
+│   ├── web.php                   # Routes web principales
 │   ├── auth.php                  # Routes authentification
 │   └── console.php               # Commandes console
 │
-├── storage/                      # Fichiers générés (logs, cache)
+├── storage/                      # Fichiers générés
+│   ├── app/                      # Fichiers applicatifs
+│   ├── framework/                # Cache/sessions
+│   └── logs/                     # Fichiers logs
+│
 ├── tests/                        # Tests unitaires & fonctionnels
-├── vendor/                       # Dépendances Composer
+│   ├── Feature/                  # Tests fonctionnels
+│   ├── Unit/                     # Tests unitaires
+│   └── TestCase.php              # Classe de base tests
+│
+├── vendor/                       # Dépendances Composer (auto-généré)
 │
 ├── .env.example                  # Modèle de configuration
+├── .gitignore                    # Fichiers ignorés Git
 ├── composer.json                 # Dépendances PHP
+├── composer.lock                 # Lock versions dépendances PHP
 ├── package.json                  # Dépendances Node.js
+├── package-lock.json             # Lock versions dépendances Node.js
 ├── tailwind.config.js            # Configuration Tailwind CSS
-├── vite.config.js                # Configuration Vite
+├── vite.config.js                # Configuration Vite (bundler)
 ├── postcss.config.js             # Configuration PostCSS
-├── phpunit.xml                   # Configuration PHPUnit
-└── artisan                       # CLI Laravel
+├── phpunit.xml                   # Configuration PHPUnit (tests)
+├── artisan                       # CLI Laravel
+├── README.md                     # Ce fichier
+└── LICENSE                       # Licence MIT
 ```
 
 ---
@@ -372,23 +458,244 @@ Format attendu pour l'import Excel/CSV :
 | Technologie | Version | Rôle |
 |-------------|---------|------|
 | **Node.js** | 20.19+ / 22.12+ | Runtime JavaScript |
-| **Vite** | 7.0+ | Bundler & dev server |
-| **Tailwind CSS** | 3.1+ | Framework CSS utility-first |
-| **Alpine.js** | 3.4+ | Interactivité légère |
+| **Vite** | 7.0.7 | Bundler & dev server |
+| **Tailwind CSS** | 3.1.0 | Framework CSS utility-first |
+| **Alpine.js** | 3.4.2 | Interactivité légère |
 | **Axios** | 1.11+ | Requêtes HTTP |
+| **PostCSS** | 8.4.31 | Transformation CSS |
+| **Autoprefixer** | 10.4.2 | Préfixes navigateurs |
 
-### Autres dépendances
+### Dépendances critiques
 | Librairie | Version | Utilité |
 |-----------|---------|---------|
 | **Maatwebsite/Excel** | 3.1 | Import/Export Excel |
-| **Intervention/Image** | 1.5 | Traitement images |
-| **Monetico-PHP** | 2.0 | Paiement Monetico |
-| **Laravel Tinker** | 3.0 | REPL console |
-| **PHPUnit** | 11.5+ | Tests unitaires |
+| **Intervention/Image** | 1.5 | Traitement & redimensionnement images |
+| **Monetico-PHP** | 2.0 | Intégration paiement Monetico |
+| **Laravel Breeze** | 2.4 | Authentification & scaffolding |
+| **Laravel Pail** | 1.2.2 | Suivi des logs en temps réel |
+| **Laravel Tinker** | 3.0 | REPL console interactive |
+| **PHPUnit** | 11.5.50 | Tests unitaires & fonctionnels |
+| **Faker** | 1.23 | Données fictives pour tests |
 
 ---
 
-## 🧪 Tests
+## 🗄️ Modèle de données
+
+### Hiérarchie des entités
+
+```
+users
+    ├── role (admin / client)
+    ├── email, password, name
+    └── panier (via user_id) — nullable pour visiteurs anonymes
+
+boutique
+    └── rayon (many-to-many)
+            └── produit (many-to-many)
+
+produit
+    ├── forme (Forme.php)
+    │   └── forme_condi (Forme_Condi.php)
+    │       ├── conditionnement (Conditionnement.php)
+    │       ├── prix_unitaire
+    │       ├── stock
+    │       └── images (many)
+    ├── parfum (Parfum.php)
+    ├── theme (Theme.php — optionnel pour tri visuel)
+    └── events (many-to-many via produit_event)
+
+panier
+    ├── user_id (nullable — null = visiteur anonyme)
+    ├── session_id (pour les visiteurs)
+    └── panier_ligne (many)
+            ├── produit_id
+            ├── forme_condi_id
+            ├── quantite
+            └── prix_unitaire
+
+commande
+    ├── user_id
+    ├── reference_commande (unique)
+    ├── montant_total
+    ├── statut (pending, confirmed, shipped, delivered, cancelled)
+    └── commande_ligne (many)
+            ├── produit_id
+            ├── forme_condi_id
+            ├── quantite
+            └── prix_unitaire
+
+image
+    ├── produit_id
+    ├── forme_condi_id
+    └── path (ex: `fichier/image/meringues/Mini/sachet_de_10/Ananas.jpg`)
+```
+
+### Relations principales
+
+- **1 Produit** → **N Formes** (ex: Mini, Nid)
+- **1 Forme** → **N Forme_Condi** (ex: sachet_de_10, boîte_de_8)
+- **1 Forme_Condi** → **N Images** (galerie du conditionnement)
+- **1 Panier** → **N Panier_Ligne** → **1 Produit** + **1 Forme_Condi**
+- **1 Commande** → **N Commande_Ligne** (copie du panier au moment de la commande)
+
+---
+
+## 👤 Système d'authentification
+
+### Flux d'authentification
+
+1. **Inscription** (`/register`) :
+   - Création de compte avec rôle `client` par défaut
+   - Email de bienvenue envoyé
+   - Redirection vers profil
+
+2. **Connexion** (`/login`) :
+   - Authentification via email + mot de passe
+   - **Fusion du panier** : panier session → compte utilisateur via listener `TransfererPanierApresLogin`
+   - Redirection vers accueil
+
+3. **Rôles & Permissions** :
+   - `client` : accès à la boutique, mon compte, panier, commandes
+   - `admin` : accès à `/gestion` (panel d'administration complet)
+
+4. **Gestion des sessions** :
+   - Session visiteur anonyme : panier stocké en session
+   - Session connecté : panier liée au compte utilisateur
+   - Récupération du panier post-connexion via listener
+
+---
+
+## 🛠️ Commandes utiles
+
+### Démarrage et développement
+
+```bash
+# ✨ Lancer TOUT en une commande (développement)
+composer run dev
+# Démarre : Serveur Laravel + Queue + Logs (Pail) + Vite
+
+# 📦 Initialisation première utilisation
+composer run setup
+# Install Composer + .env + key + migrate + npm install + build
+
+# 🔵 Serveur Laravel uniquement
+php artisan serve
+
+# 🟣 Worker de queue (jobs asynchrones)
+php artisan queue:listen
+
+# 🟠 Vite dev server (rebuild CSS/JS à chaque changement)
+npm run dev
+
+# 🟡 Compiler les assets en mode production
+npm run build
+
+# 🔴 Logs en temps réel
+php artisan pail
+```
+
+### Migrations et base de données
+
+```bash
+# Exécuter toutes les migrations
+php artisan migrate
+
+# Créer et exécuter une nouvelle migration
+php artisan make:migration nom_de_la_migration
+
+# Rollback dernière migration
+php artisan migrate:rollback
+
+# Rollback tout et refaire depuis le début
+php artisan migrate:refresh
+
+# Avec seeders
+php artisan migrate:fresh --seed
+```
+
+### Génération de modèles et contrôleurs
+
+```bash
+# Modèle + factory + migration + seeder
+php artisan make:model Produit -mfsc
+
+# Contrôleur avec méthodes resource
+php artisan make:controller ProduitController -r
+
+# Mail
+php artisan make:mail NotificationCommande
+
+# Job (queue)
+php artisan make:job TraiterCommande
+```
+
+### Console interactive
+
+```bash
+# REPL interactive PHP
+php artisan tinker
+
+# Exemples dans Tinker :
+$user = App\Models\User::first();
+$user->update(['role' => 'admin']);
+$produits = App\Models\Produit::all();
+```
+
+### Tests
+
+```bash
+# Lancer tous les tests
+php artisan test
+
+# Tests spécifiques
+php artisan test tests/Feature/CommandeControllerTest.php
+
+# Avec couverture de code
+php artisan test --coverage
+
+# Créer un test
+php artisan make:test CommandeControllerTest
+```
+
+### Optimisation production
+
+```bash
+# Cache configuration
+php artisan config:cache
+
+# Cache routes
+php artisan route:cache
+
+# Cache views
+php artisan view:cache
+
+# Optimiser autoloader Composer
+composer install --optimize-autoloader --no-dev
+
+# Optimize Laravel
+php artisan optimize
+```
+
+### Utilitaires
+
+```bash
+# Vider le cache
+php artisan cache:clear
+
+# Vider les logs
+php artisan cache:clear
+
+# Storage link (pour public/storage)
+php artisan storage:link
+
+# Afficher toutes les routes
+php artisan route:list
+
+# Afficher la config
+php artisan config:show
+```
+
+---
 
 ### Lancer les tests
 
@@ -437,7 +744,43 @@ php artisan make:test MonTest
 
 ---
 
-## 🤝 Contribution
+## 🐛 Troubleshooting
+
+### Problèmes courants
+
+| Problème | Solution |
+|----------|----------|
+| **"SQLSTATE\[08006\]" — Connexion BD échouée** | Vérifiez PostgreSQL est en cours d'exécution et les credentials `.env` sont corrects |
+| **"Class not found" — Erreur autoloader** | Lancez `composer dump-autoload` |
+| **Assets CSS/JS ne se compilent pas** | Lancez `npm run build` ou `npm run dev` |
+| **Session panier perdue après connexion** | Vérifiez le listener `TransfererPanierApresLogin` est enregistré dans `EventServiceProvider` |
+| **Erreur 404 sur `/gestion`** | Connectez-vous avec un compte `admin` (rôle dans BD) |
+| **"The stream or file ... is not writable"** | Changez les permissions : `chmod -R 775 storage bootstrap/cache` |
+| **Migrations échouent** | Lancez `php artisan migrate:fresh` pour réinitialiser la BD |
+| **Vite dev server refuse la connexion** | Changez le port dans `vite.config.js` ou tuez le processus qui l'utilise |
+
+### Variables d'environnement critiques
+
+```env
+# ✅ À configurer absolument
+APP_ENV=local              # local, staging, production
+APP_DEBUG=true             # false en production
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=maison_meringues
+DB_USERNAME=postgres
+DB_PASSWORD=votre_motdepasse
+
+# ✅ Email (pour notifications)
+MAIL_MAILER=smtp
+MAIL_FROM_ADDRESS=noreply@maisondesmeringues.local
+
+# ⚠️ En production uniquement
+APP_URL=https://maisondesmeringues.fr
+LARAVEL_HORIZON_BALANCING_OPTIONS=...
+```
+
+---
 
 Les contributions sont les bienvenues ! Pour contribuer :
 
@@ -524,127 +867,6 @@ public/
         ├── boite_de_8/
         └── individuelle/
 ```
-
----
-
-## 🗄 Modèle de données
-
-```
-users
-    ├── role (admin / client)
-    └── panier (via user_id)
-
-boutique
-    └── rayon (many)
-            └── produit (many-to-many via produit_rayon)
-
-produit
-    ├── forme → forme_condi → conditionnement
-    ├── parfum
-    ├── theme (optionnel — tri visuel)
-    ├── events (many-to-many via produit_event)
-    └── images (par forme_condi)
-
-rayon
-    └── events (many-to-many via rayon_event)
-
-panier
-    ├── user_id (nullable — null = visiteur anonyme)
-    ├── session_id (pour les visiteurs)
-    └── panier_ligne (many)
-            ├── id_produit
-            ├── id_forme_condi
-            ├── quantite
-            └── prix_unitaire
-
-image
-    ├── id_produit
-    ├── id_forme_condi
-    └── url  (ex: fichier/image/meringues/Mini/sachet_de_10/Ananas.jpg)
-```
-
----
-
-## ⚙️ Installation
-
-### 1. Cloner le projet
-
-```bash
-git clone https://github.com/votre-repo/maison-des-meringues.git
-cd maison-des-meringues
-```
-
-### 2. Installer les dépendances
-
-```bash
-composer install
-npm install
-```
-
-### 3. Configurer l'environnement
-
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-Modifier `.env` avec vos paramètres PostgreSQL :
-
-```env
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=meringue
-DB_USERNAME=votre_user
-DB_PASSWORD=votre_password
-
-CACHE_STORE=file
-SESSION_DRIVER=file
-```
-
-### 4. Migrations et seeders
-
-```bash
-php artisan migrate
-php artisan db:seed
-```
-
-Les seeders créent :
-- Les **formes** (Mini, Nid)
-- Les **conditionnements** (sachet_de_4, boite_de_8, sachet_de_10, individuelle, vrac)
-- Les **prix** (forme_condi)
-- Les **parfums** de base
-- Les **thèmes** (Fleurs, Fruits, Desserts, Epices, Saveur-Normandi)
-- Les **events** (Printemps, Noël, Anniversaire)
-- La **boutique** et le **rayon Base**
-
-### 5. Lancer l'application
-
-```bash
-npm run dev
-php artisan serve
-```
-
-### 6. Créer le premier compte admin
-
-```bash
-php artisan tinker
-```
-
-```php
-$user = App\Models\User::where('email', 'votre@email.com')->first();
-$user->role = 'admin';
-$user->save();
-```
-
----
-
-## 👤 Système d'authentification
-
-- **Inscription** : `/register` — compte créé avec rôle `client` par défaut
-- **Connexion** : `/login` — redirige vers l'accueil après connexion
-- **Déconnexion** : bouton dans le menu navbar (formulaire POST)
-- **Rôles** : `admin` (accès gestion) / `client` (accès boutique + panier)
 
 ---
 
