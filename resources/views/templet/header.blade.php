@@ -58,17 +58,18 @@
 									Gestion des données
 								</a>
 
-								<a href="/ticketCommande" class="navbar__dropdown-item">
-									<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
-										<rect x="1" y="3" width="12" height="8" rx="2"/>
-										<line x1="1" y1="5.5" x2="13" y2="5.5"/>
-										<line x1="1" y1="8.5" x2="13" y2="8.5"/>
-										<line x1="4.5" y1="3" x2="4.5" y2="11"/>
-										<line x1="9.5" y1="3" x2="9.5" y2="11"/>
-									</svg>
-									Ticket de commande
-								</a>
 							@endif
+
+							<a href="/ticketCommande" class="navbar__dropdown-item">
+								<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+									<rect x="1" y="3" width="12" height="8" rx="2"/>
+									<line x1="1" y1="5.5" x2="13" y2="5.5"/>
+									<line x1="1" y1="8.5" x2="13" y2="8.5"/>
+									<line x1="4.5" y1="3" x2="4.5" y2="11"/>
+									<line x1="9.5" y1="3" x2="9.5" y2="11"/>
+								</svg>
+								Ticket de commande
+							</a>
 
 							<a href="/settings" class="navbar__dropdown-item">
 								<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">

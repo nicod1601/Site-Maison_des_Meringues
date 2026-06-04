@@ -61,6 +61,10 @@ Route::middleware(['auth'])->group(function () {
 	->name('ticket.destroy')
 	->middleware('auth');
 
+    Route::patch('/ticketCommande/{id}/terminer', [TicketCommandeController::class, 'terminer'])
+    ->name('ticket.terminer')
+    ->middleware(['auth', 'admin']);
+
 	// Blog — réactions et CRUD admin
 	Route::post  ('/blog/{blogPost}/react', [BlogController::class, 'react'])  ->name('blog.react');
 	Route::post  ('/blog',                  [BlogController::class, 'store'])  ->name('blog.store');

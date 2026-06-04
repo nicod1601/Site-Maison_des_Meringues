@@ -5,27 +5,48 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Commande;
-use App\Models\CommandeLigne;
 
 class TicketCommandeController extends Controller
 {
+	// ── Liste des commandes ───────────────────────────────────────────
 	public function index()
+	{
+		$user    = Auth::user();
+		$isAdmin = $user->isAdmin();
+
+		// L'admin voit TOUTES les commandes, le client seulement les siennes
+		$query = Commande::with(['lignes', 'user'])->latest();
+
+		if (! $isAdmin) {
+			$query->where('user_id', $user->id);
+		}
+
+		$commandes = $query->get();
+
+		return view('ticket-commande', compact('commandes', 'isAdmin'));
+	}
+
+	// ── Admin : marquer une commande comme terminée ───────────────────
+	public function terminer(int $id)
 	{
 		$user = Auth::user();
 
-		$commandes = Commande::with(['lignes', 'user'])
-		->where('user_id', $user->id)
-		->latest()
-		->get();
+		// Sécurité : seul un admin peut terminer
+		abort_unless($user->isAdmin(), 403);
 
-		return view('ticket-commande', compact('commandes'));
+		$commande = Commande::findOrFail($id);
+		$commande->update(['statut' => 'terminee']);
+
+		return back()->with('success', 'Commande #' . $commande->reference . ' marquée comme terminée.');
 	}
 
+	// ── (suppression désactivée pour les clients) ─────────────────────
+	// La route destroy est conservée mais uniquement pour les admins
 	public function destroy(int $id)
 	{
-		$commande = Commande::where('id_commande', $id)
-			->where('user_id', Auth::id())
-			->firstOrFail();
+		abort_unless(Auth::user()->isAdmin(), 403, 'Action non autorisée.');
+
+		$commande = Commande::findOrFail($id);
 
 		$commande->lignes()->delete();
 		$commande->delete();
