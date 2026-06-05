@@ -8,9 +8,66 @@
 		$typeCondi  = strtolower($formeCondi->conditionnement->type ?? '');
 		return str_contains($nomForme, 'mini') && $typeCondi === 'individuel';
 	});
+
+	$tauxTVA    = 0.10;
+	$totalTTC   = $panier->total();
+	$totalHT    = $totalTTC / (1 + $tauxTVA);
+	$montantTVA = $totalTTC - $totalHT;
 @endphp
 
+{{-- ── ICÔNES SVG (sprite inline) ──────────────────────────────────────────── --}}
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+	{{-- shopping-cart --}}
+	<symbol id="ico-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+		<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+	</symbol>
+	{{-- truck --}}
+	<symbol id="ico-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+		<circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+	</symbol>
+	{{-- bike --}}
+	<symbol id="ico-bike" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/>
+		<path d="M15 6a1 1 0 0 0-1-1h-1"/>
+		<path d="m9 15 2-6 4 4 2-4"/>
+		<path d="m9 15-3.5 2.5"/>
+	</symbol>
+	{{-- package --}}
+	<symbol id="ico-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+		<polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+	</symbol>
+	{{-- info --}}
+	<symbol id="ico-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+	</symbol>
+	{{-- lock --}}
+	<symbol id="ico-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+		<path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+	</symbol>
+	{{-- chevron-left --}}
+	<symbol id="ico-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<polyline points="15 18 9 12 15 6"/>
+	</symbol>
+	{{-- receipt / TVA --}}
+	<symbol id="ico-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
+		<path d="M16 8H8m8 4H8m5 4H8"/>
+	</symbol>
+</svg>
+
 <style>
+.ico {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	vertical-align: middle;
+	flex-shrink: 0;
+}
+
 /* ── RESET & BASE ──────────────────────────────────────────── */
 .co-page {
 	max-width: 1100px;
@@ -35,6 +92,12 @@
 	display: flex;
 	align-items: center;
 	gap: .5rem;
+}
+
+.co-section-title .ico {
+	width: 1.1rem;
+	height: 1.1rem;
+	color: var(--color-primary, #C0395A);
 }
 
 /* ── CARD CONTAINER ────────────────────────────────────────── */
@@ -145,13 +208,24 @@
 	font-size: 1.4rem;
 	margin-bottom: .45rem;
 	display: block;
+	color: var(--color-text-muted, #8C7B6A);
 }
+
+.co-mode__icon .ico {
+	width: 1.4rem;
+	height: 1.4rem;
+}
+
+.co-mode.active .co-mode__icon { color: var(--color-primary, #C0395A); }
 
 .co-mode__title {
 	font-weight: 700;
 	font-size: .9rem;
 	color: var(--color-text, #2E1A10);
 	margin: 0 0 4px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
 }
 
 .co-mode__desc {
@@ -184,8 +258,7 @@
 	border-radius: 50%;
 	border: 2px solid var(--color-border, #E8DEC8);
 	display: inline-block;
-	margin-right: 6px;
-	vertical-align: middle;
+	flex-shrink: 0;
 	position: relative;
 	transition: border-color .15s;
 }
@@ -242,6 +315,12 @@
 .co-recap__line strong {
 	color: var(--color-text, #2E1A10);
 	font-weight: 600;
+}
+
+.co-recap__line--tva {
+	font-size: .78rem;
+	color: var(--color-text-muted, #8C7B6A);
+	font-style: italic;
 }
 
 .co-recap__divider {
@@ -309,6 +388,12 @@
 	color: var(--color-text-muted, #8C7B6A);
 }
 
+.co-secure .ico {
+	width: .85rem;
+	height: .85rem;
+	color: #2d6a4f;
+}
+
 /* ── NOTICE EXPÉDITION ─────────────────────────────────────── */
 .co-notice {
 	background: #fffbea;
@@ -319,6 +404,17 @@
 	color: #7a5a00;
 	margin-top: .85rem;
 	line-height: 1.55;
+	display: flex;
+	gap: .5rem;
+	align-items: flex-start;
+}
+
+.co-notice .ico {
+	width: 1rem;
+	height: 1rem;
+	flex-shrink: 0;
+	margin-top: .1rem;
+	color: #e5a000;
 }
 
 /* ── MOBILE ────────────────────────────────────────────────── */
@@ -370,6 +466,11 @@
 	transition: color .15s;
 }
 
+.co-back .ico {
+	width: .85rem;
+	height: .85rem;
+}
+
 .co-back:hover { color: var(--color-primary, #C0395A); }
 </style>
 
@@ -386,13 +487,15 @@
 	<div>
 
 		<a href="{{ route('panier.index') }}" class="co-back">
-			← Retour au panier
+			<svg class="ico"><use href="#ico-chevron-left"/></svg>
+			Retour au panier
 		</a>
 
 		{{-- ── ARTICLES ── --}}
 		<div class="co-card">
 			<h2 class="co-section-title">
-				🛒 Articles ({{ $panier->lignes->count() }})
+				<svg class="ico"><use href="#ico-cart"/></svg>
+				Articles ({{ $panier->lignes->count() }})
 			</h2>
 
 			@foreach($panier->lignes as $ligne)
@@ -426,7 +529,8 @@
 		{{-- ── MODE DE LIVRAISON ── --}}
 		<div class="co-card">
 			<h2 class="co-section-title">
-				🚚 Mode de livraison
+				<svg class="ico"><use href="#ico-truck"/></svg>
+				Mode de livraison
 			</h2>
 
 			<div class="co-modes">
@@ -434,7 +538,9 @@
 				{{-- Click & Collect — toujours dispo --}}
 				<div class="co-mode active" id="mode-livraison" onclick="choisirMode('livraison')">
 					<span class="co-mode__badge">Gratuit</span>
-					<span class="co-mode__icon">🚲</span>
+					<span class="co-mode__icon">
+						<svg class="ico"><use href="#ico-bike"/></svg>
+					</span>
 					<p class="co-mode__title">
 						<span class="co-mode__radio"></span>
 						Click & Collect
@@ -456,7 +562,9 @@
 						<span class="co-mode__badge co-mode__badge--warn">Non dispo</span>
 					@endif
 
-					<span class="co-mode__icon">📦</span>
+					<span class="co-mode__icon">
+						<svg class="ico"><use href="#ico-package"/></svg>
+					</span>
 					<p class="co-mode__title">
 						<span class="co-mode__radio"></span>
 						Expédition postale
@@ -476,9 +584,12 @@
 
 			@unless($expeditionAutorisee)
 			<div class="co-notice">
-				ℹ️ L'expédition postale n'est possible que si votre panier contient
-				uniquement des meringues au format <strong>mini individuel</strong>.
-				Modifiez votre panier pour débloquer cette option.
+				<svg class="ico"><use href="#ico-info"/></svg>
+				<span>
+					L'expédition postale n'est possible que si votre panier contient
+					uniquement des meringues au format <strong>mini individuel</strong>.
+					Modifiez votre panier pour débloquer cette option.
+				</span>
 			</div>
 			@endunless
 		</div>
@@ -522,8 +633,13 @@
 			<hr class="co-recap__divider">
 
 			<div class="co-recap__line">
-				<span>Sous-total</span>
-				<strong>{{ number_format($panier->total(), 2, ',', ' ') }} €</strong>
+				<span>Sous-total HT</span>
+				<strong>{{ number_format($totalHT, 2, ',', ' ') }} €</strong>
+			</div>
+
+			<div class="co-recap__line co-recap__line--tva">
+				<span>TVA (10 %)</span>
+				<strong>{{ number_format($montantTVA, 2, ',', ' ') }} €</strong>
 			</div>
 
 			<div class="co-recap__line" id="recap-livraison">
@@ -536,18 +652,19 @@
 			<div class="co-recap__total">
 				<span class="co-recap__total-label">Total TTC</span>
 				<span class="co-recap__total-amount">
-					{{ number_format($panier->total(), 2, ',', ' ') }} €
+					{{ number_format($totalTTC, 2, ',', ' ') }} €
 				</span>
 			</div>
 
 			{{-- Bouton payer --}}
 			<button type="submit" class="co-pay-btn" id="btn-payer">
-				Payer {{ number_format($panier->total(), 2, ',', ' ') }} € →
+				Payer {{ number_format($totalTTC, 2, ',', ' ') }} €
 			</button>
 
 			{{-- Sécurité --}}
 			<div class="co-secure">
-				🔒 Paiement sécurisé CIC Monetico
+				<svg class="ico"><use href="#ico-lock"/></svg>
+				Paiement sécurisé CIC Monetico
 			</div>
 
 			{{-- Logos CB --}}
