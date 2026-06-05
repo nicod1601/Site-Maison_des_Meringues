@@ -138,15 +138,15 @@
 
 		{{-- Onglets --}}
 		<div class="tabs">
-			<button class="tab active" data-tab="produits">🍬 Produits</button>
-			<button class="tab" data-tab="images">🖼️ Images</button>
-			<button class="tab" data-tab="rayons">🗂 Rayons</button>
-			<button class="tab" data-tab="formes">🔷 Formes</button>
-			<button class="tab" data-tab="conditionnements">📦 Condi.</button>
-			<button class="tab" data-tab="parfums">🍓 Parfums</button>
-			<button class="tab" data-tab="themes">🎨 Thèmes</button>
-			<button class="tab" data-tab="events">🎉 Events</button>
-			<button class="tab" data-tab="prix">💰 Prix</button>
+			<button class="tab active" data-tab="produits">Produits</button>
+			<button class="tab" data-tab="images">Images</button>
+			<button class="tab" data-tab="rayons">Rayons</button>
+			<button class="tab" data-tab="formes">Formes</button>
+			<button class="tab" data-tab="conditionnements">Condi.</button>
+			<button class="tab" data-tab="parfums">Parfums</button>
+			<button class="tab" data-tab="themes">Thèmes</button>
+			<button class="tab" data-tab="events">Events</button>
+			<button class="tab" data-tab="prix">Prix</button>
 
 			<select id="select-rayon" class="form-select form-select--sm select--right">
 				<option value="-1" {{ !$rayonId || $rayonId == '-1' ? 'selected' : '' }}>Tous les rayons</option>
@@ -202,9 +202,9 @@
 								<th>Rayons</th>
 								<th>Thème</th>
 								<th>Stock</th>
-								<th title="Nouveauté">🆕</th>
-								<th title="À emporter">🛍️</th>
-								<th title="Expédition">📦</th>
+								<th title="Nouveauté">Nouveau</th>
+								<th title="À emporter">Emporter</th>
+								<th title="Expédition">Expédition</th>
 								<th title="Live" class="th-actions">Live</th>
 								<th class="th-actions">Actions</th>
 							</tr>

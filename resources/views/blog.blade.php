@@ -52,7 +52,7 @@
 		{{-- Barre "créer une publication" (admin) --}}
 		@if($isAdmin)
 		<div class="blog-toolbar" id="adminToolbar">
-			<div class="blog-toolbar__avatar">🍬</div>
+			<div class="blog-toolbar__avatar"><img src="{{ asset('fichier/image/logo.webp') }}" alt="Logo"></div>
 			<div class="blog-toolbar__fake-input" onclick="openModal()">
 				Publier une nouvelle annonce…
 			</div>
@@ -89,10 +89,15 @@
 				<div class="post-card__admin-actions">
 					<button class="post-card__admin-btn post-card__admin-btn--edit"
 							onclick="editPost({{ json_encode($post) }})"
-							title="Modifier">✏️</button>
+							title="Modifier">
+						✎
+					</button>
+
 					<button class="post-card__admin-btn post-card__admin-btn--delete"
 							onclick="deletePost({{ $post['id'] }})"
-							title="Supprimer">🗑</button>
+							title="Supprimer">
+						×
+					</button>
 				</div>
 				@endif
 			</div>
