@@ -12,6 +12,39 @@
 </style>
 
 <main class="container section">
+{{-- ══ LIVE RAYONS BANNER ══ --}}
+<div style="margin-bottom:1rem;background:#fff;border:0.5px solid var(--color-border);border-radius:var(--radius-lg);padding:14px 18px;">
+
+	<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+		<span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-muted);">
+			📡 Rayons en vitrine
+		</span>
+		<span style="font-size:12px;color:var(--color-text-muted);">
+			{{ $rayons->where('live_rayon', true)->count() }} / {{ count($rayons) }} en live
+		</span>
+	</div>
+
+	<div style="display:flex;flex-wrap:wrap;gap:8px;">
+		@foreach($rayons as $r)
+		<form action="/gestion/rayon/{{ $r->id_rayon }}/live" method="POST"
+			  style="display:contents;">
+			@csrf @method('PATCH')
+			<button type="submit" name="live_rayon" value="{{ $r->live_rayon ? '0' : '1' }}"
+				style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px 6px 9px;
+					   border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;
+					   border:1.5px solid {{ $r->live_rayon ? '#22c55e' : 'var(--color-border)' }};
+					   background:{{ $r->live_rayon ? '#f0fdf4' : 'var(--color-bg-muted,#f5f0eb)' }};
+					   color:{{ $r->live_rayon ? '#15803d' : 'var(--color-text-muted)' }};">
+				<span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;
+							 background:{{ $r->live_rayon ? '#22c55e' : '#ccc' }};
+							 {{ $r->live_rayon ? 'box-shadow:0 0 0 3px #bbf7d0' : '' }};">
+				</span>
+				{{ $r->nom_rayon }}
+			</button>
+		</form>
+		@endforeach
+	</div>
+</div>
 <div class="container gestion-layout">
 
 	{{-- ══ COLONNE GAUCHE ══ --}}

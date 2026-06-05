@@ -148,23 +148,5 @@
 
 @include('templet.footer')
 
-<script>
-	const profileBtn = document.querySelector('.navbar__profile');
-	const dropdown   = document.querySelector('.navbar__dropdown');
-	if (profileBtn && dropdown) {
-		profileBtn.addEventListener('click', function () {
-			const isOpen = dropdown.classList.contains('open');
-			dropdown.classList.toggle('open', !isOpen);
-			profileBtn.setAttribute('aria-expanded', !isOpen);
-		});
-		document.addEventListener('click', function (e) {
-			if (!profileBtn.contains(e.target)) {
-				dropdown.classList.remove('open');
-				profileBtn.setAttribute('aria-expanded', false);
-			}
-		});
-	}
-</script>
-
 </body>
 </html>
