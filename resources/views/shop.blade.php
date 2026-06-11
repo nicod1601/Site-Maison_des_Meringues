@@ -352,7 +352,7 @@
 				<p>
 					@if(request()->hasAny(['filtre', 'theme', 'rayon']))
 						Aucun produit ne correspond à ces filtres.<br>
-						<a href="{{ route('shop', $boutique->id_boutique) }}"
+						<a href="{{ route('shop.index', $boutique->id_boutique) }}"
 						   class="btn btn--ghost btn--sm mt-md">Réinitialiser les filtres</a>
 					@else
 						Notre boutique est en cours de préparation. Revenez bientôt&nbsp;!

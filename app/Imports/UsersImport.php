@@ -60,7 +60,7 @@ class UsersImport implements ToCollection
 			$quantite    = (int) ($row[4] ?? 0);
 			$nouveaute   = strtolower(trim($row[5] ?? '')) === 'oui';
 			$live        = strtolower(trim($row[6] ?? '')) === 'oui';
-			$expedition  = strtolower($forme->nom_forme) === 'mini';
+			$expedition  = strtolower($forme->nom_forme)   === 'mini';
 			$special     = strtolower(trim($row[9] ?? '')) === 'oui';
 
 			// ── Theme ─────────────────────────────
