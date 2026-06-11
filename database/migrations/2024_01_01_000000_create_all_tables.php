@@ -20,7 +20,7 @@ return new class extends Migration
 			$table->string('type');
 		});
 
-		// ─── Forme_Condi (pivot avec données : prix) ──────────────────────────
+		// ─── Forme_Condi ──────────────────────────
 		Schema::create('forme_condi', function (Blueprint $table) {
 			$table->increments('id_forme_condi');
 			$table->unsignedInteger('id_forme');
@@ -30,7 +30,6 @@ return new class extends Migration
 			$table->foreign('id_forme')->references('id_forme')->on('forme')->onDelete('cascade');
 			$table->foreign('id_condi')->references('id_condi')->on('conditionnement')->onDelete('cascade');
 
-			// Une combinaison forme + conditionnement est unique
 			$table->unique(['id_forme', 'id_condi']);
 		});
 
@@ -40,7 +39,7 @@ return new class extends Migration
 			$table->string('nom_parfum');
 		});
 
-		// ─── Thème (indicateur de tri pour les produits) ──────────────────────
+		// ─── Thème ──────────────────────
 		Schema::create('theme', function (Blueprint $table) {
 			$table->increments('id_theme');
 			$table->string('nom_theme');
@@ -48,7 +47,7 @@ return new class extends Migration
 			$table->string('couleur')->nullable();
 		});
 
-		// ─── Event (indicateur d'occasion : Noël, Printemps, Anniversaire…) ──
+		// ─── Event ──
 		Schema::create('event', function (Blueprint $table) {
 			$table->increments('id_event');
 			$table->string('nom_event');
@@ -139,7 +138,6 @@ return new class extends Migration
 
 	public function down(): void
 	{
-		// Suppression dans l'ordre inverse des dépendances
 		Schema::dropIfExists('image');
 		Schema::dropIfExists('produit_event');
 		Schema::dropIfExists('rayon_event');

@@ -11,8 +11,8 @@ return new class extends Migration
         // Table panier
         Schema::create('panier', function (Blueprint $table) {
             $table->increments('id_panier');
-            $table->unsignedBigInteger('user_id')->nullable(); // null = visiteur anonyme
-            $table->string('session_id')->nullable();          // pour les visiteurs
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('session_id')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
