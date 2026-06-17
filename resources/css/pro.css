@@ -1,13 +1,11 @@
 /* ═══════════════════════════════════════════════════════════
    pro.css – Espace Professionnel · La Maison des Meringues
-   Palette fidèle au logo : rose framboise + vert sauge + crème
    ═══════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap');
 
 /* ── Variables ─────────────────────────────────────────────── */
 :root {
-    /* Palette logo */
     --rose:       #9B2257;
     --rose-lt:    #C4527A;
     --rose-bg:    #F9EDF3;
@@ -16,7 +14,6 @@
     --vert-lt:    #6B8460;
     --vert-bg:    #EDF2E9;
 
-    /* Neutres */
     --creme:      #F5EFE8;
     --creme-dk:   #EDE4D9;
     --sand:       #D9CEBF;
@@ -24,12 +21,10 @@
     --brun-mid:   #6B4E35;
     --white:      #ffffff;
 
-    /* Texte */
     --text:       #2A1A10;
     --text-mid:   #7A5A45;
     --text-lt:    #A88B78;
 
-    /* Layout */
     --radius-sm:  8px;
     --radius-md:  14px;
     --radius-lg:  22px;
@@ -108,7 +103,6 @@
     display: inline-flex;
     align-items: center;
     gap: .5rem;
-    font-family: var(--ff-body);
     font-size: .72rem;
     font-weight: 500;
     letter-spacing: .15em;
@@ -119,7 +113,6 @@
     border-radius: 100px;
     margin-bottom: 1.6rem;
 }
-.hero__eyebrow i { font-size: .95rem; }
 
 .hero__title {
     font-family: var(--ff-display);
@@ -164,7 +157,6 @@
     box-shadow: 0 8px 28px rgba(0,0,0,.18);
 }
 
-/* Déco cercles */
 .hero__deco { position: absolute; inset: 0; pointer-events: none; }
 .hero__deco-ring {
     position: absolute;
@@ -176,10 +168,48 @@
 .hero__deco-ring--3 { width: 180px; height: 180px; right: 220px; top: 170px; border-color: rgba(255,255,255,.1); }
 
 /* ════════════════════════════════════════════════════════════
+   STATS STRIP
+   ════════════════════════════════════════════════════════════ */
+.stats-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--white);
+    border-bottom: 1px solid var(--creme-dk);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    border-right: 1px solid var(--creme-dk);
+    text-align: center;
+}
+.stat-item:last-child { border-right: none; }
+
+.stat-item__number {
+    font-family: var(--ff-display);
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--rose);
+    line-height: 1;
+    margin-bottom: .3rem;
+}
+
+.stat-item__label {
+    font-size: .72rem;
+    font-weight: 400;
+    color: var(--text-mid);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+/* ════════════════════════════════════════════════════════════
    AVANTAGES
    ════════════════════════════════════════════════════════════ */
 .avantages {
-    background: var(--white);
+    background: var(--creme);
     padding: clamp(3.5rem, 8vw, 5.5rem) var(--gap);
 }
 .avantages__inner {
@@ -193,7 +223,7 @@
 }
 
 .avantage-card {
-    background: var(--creme);
+    background: var(--white);
     border: 1px solid var(--creme-dk);
     border-radius: var(--radius-md);
     padding: 1.85rem 1.65rem;
@@ -233,7 +263,7 @@
    CATALOGUE
    ════════════════════════════════════════════════════════════ */
 .catalogue {
-    background: var(--creme);
+    background: var(--white);
     padding: clamp(3.5rem, 8vw, 5.5rem) var(--gap);
 }
 .catalogue__inner {
@@ -250,7 +280,6 @@
     .catalogue__layout { grid-template-columns: 1fr; }
 }
 
-/* ── Bloc catégorie ── */
 .cat-block { margin-bottom: 3rem; }
 .cat-block:last-child { margin-bottom: 0; }
 
@@ -271,7 +300,6 @@
     font-size: 1.15rem;
 }
 
-/* ── Grille produits ── */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
@@ -279,7 +307,7 @@
 }
 
 .prod-card {
-    background: var(--white);
+    background: var(--creme);
     border: 1px solid var(--creme-dk);
     border-radius: var(--radius-md);
     overflow: hidden;
@@ -292,8 +320,11 @@
 }
 .prod-card__img-wrap {
     aspect-ratio: 1 / 1;
-    background: var(--creme);
+    background: var(--rose-bg);
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .prod-card__img {
     width: 100%;
@@ -327,9 +358,9 @@
     letter-spacing: .04em;
 }
 
-/* ── Panneau parfums ── */
+/* ── Parfums ── */
 .parfums-panel {
-    background: var(--white);
+    background: var(--creme);
     border: 1px solid var(--creme-dk);
     border-radius: var(--radius-lg);
     padding: 1.85rem 1.65rem;
@@ -340,9 +371,6 @@
 
 .parfums-list {
     list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
     margin-bottom: 1.2rem;
 }
 .parfum-item {
@@ -371,7 +399,6 @@
     font-style: italic;
     color: var(--text-lt);
     line-height: 1.55;
-    margin-top: .5rem;
 }
 .parfums-note i {
     color: var(--vert);
@@ -392,7 +419,7 @@
     margin: 0 auto;
 }
 .contact__sub {
-    color: rgba(245,239,232,.6);
+    color: rgba(245,239,232,.55);
     font-size: .97rem;
     font-weight: 300;
     max-width: 540px;
@@ -444,6 +471,7 @@
     text-decoration: none;
     line-height: 1.55;
     font-weight: 300;
+    display: block;
 }
 a.contact-info-card__val:hover { text-decoration: underline; }
 
@@ -453,4 +481,7 @@ a.contact-info-card__val:hover { text-decoration: underline; }
     .hero__title          { font-size: 2.2rem; }
     .contact__grid        { grid-template-columns: 1fr; }
     .avantages__grid      { grid-template-columns: 1fr; }
+    .stats-strip          { grid-template-columns: 1fr; }
+    .stat-item            { border-right: none; border-bottom: 1px solid var(--creme-dk); }
+    .stat-item:last-child { border-bottom: none; }
 }

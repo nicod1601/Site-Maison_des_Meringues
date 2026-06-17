@@ -5,13 +5,17 @@
 ])
 @vite('resources/css/pro.css')
 
-{{-- Tabler Icons CDN --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 
 <main class="pro-body" id="pro-contenu">
 
     {{-- ── Hero ── --}}
     <section class="hero" aria-label="Introduction professionnelle">
+        <div class="hero__deco" aria-hidden="true">
+            <span class="hero__deco-ring hero__deco-ring--1"></span>
+            <span class="hero__deco-ring hero__deco-ring--2"></span>
+            <span class="hero__deco-ring hero__deco-ring--3"></span>
+        </div>
         <div class="hero__inner">
             <span class="hero__eyebrow">
                 <i class="ti ti-building-store" aria-hidden="true"></i>
@@ -24,12 +28,23 @@
                 Prendre contact
             </a>
         </div>
-        <div class="hero__deco" aria-hidden="true">
-            <span class="hero__deco-ring hero__deco-ring--1"></span>
-            <span class="hero__deco-ring hero__deco-ring--2"></span>
-            <span class="hero__deco-ring hero__deco-ring--3"></span>
-        </div>
     </section>
+
+    {{-- ── Stats strip ── --}}
+    <div class="stats-strip" aria-label="Chiffres clés">
+        <div class="stat-item">
+            <span class="stat-item__number">100%</span>
+            <span class="stat-item__label">Artisanal</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-item__number">+20</span>
+            <span class="stat-item__label">Parfums disponibles</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-item__number">Sur mesure</span>
+            <span class="stat-item__label">Commandes pro</span>
+        </div>
+    </div>
 
     {{-- ── Pourquoi nous choisir ── --}}
     <section class="avantages" aria-labelledby="titre-avantages">
@@ -137,7 +152,7 @@
                                         loading="lazy" decoding="async"
                                     >
                                 </div>
-                                <p class="prod-card__name">{{ ucfirst($condi->type) }}</p>
+                                <p class="prod-card__name">{{ ucfirst(str_replace('_', ' ', $condi->type)) }}</p>
                                 @if ($condi->type === 'sachet')
                                 <div class="prod-card__badges">
                                     <span class="badge">× 4</span>
