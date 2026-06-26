@@ -234,10 +234,24 @@
 									@endif
 								</td>
 								<td>
-									@if($produit->quantite > 0)
-										<span class="stock-badge stock-badge--ok">{{ $produit->quantite }}</span>
-									@else
+									@if($produit->stocks->isEmpty())
 										<span class="stock-badge stock-badge--rupture">Rupture</span>
+									@else
+										<div style="display:flex;flex-direction:column;gap:3px;">
+											@foreach($produit->stocks as $stock)
+												<span style="font-size:.78rem;white-space:nowrap;">
+													<span class="text-muted" style="text-transform:capitalize;">
+														{{ str_replace('_', ' ', $stock->formeCondi->conditionnement->type ?? '?') }} :
+													</span>
+													@if($stock->quantite > 0)
+														<span class="stock-badge stock-badge--ok" style="font-size:.75rem;padding:1px 6px;">{{ $stock->quantite }}</span>
+													@else
+														<span class="stock-badge stock-badge--rupture" style="font-size:.75rem;padding:1px 6px;">0</span>
+													@endif
+												</span>
+											@endforeach
+											<span class="stock-total-line">Total : {{ $produit->quantite }}</span>
+										</div>
 									@endif
 								</td>
 								<td>
@@ -283,8 +297,8 @@
 												{{ $produit->id_parfum ?? 'null' }},
 												{{ $produit->id_forme ?? 'null' }},
 												{{ $produit->id_theme ?? 'null' }},
-												{{ $produit->quantite ?? 0 }},
-												'{{ addslashes($produit->description ?? '') }}'
+												'{{ addslashes($produit->description ?? '') }}',
+	     										{{ $produit->stocks->pluck('quantite', 'id_forme_condi')->toJson() }}
 											)"
 										>✏️</button>
 									</div>
@@ -704,8 +718,8 @@
 			</select>
 
 			<label>Forme</label>
-			<select name="id_forme" required>
-				<option value="">— Choisir une forme —</option>
+			<select name="id_forme" id="create-id_forme" required>
+      			<option value="">— Choisir une forme —</option>
 				@foreach($formes as $f)
 					<option value="{{ $f->id_forme }}">{{ $f->nom_forme }}</option>
 				@endforeach
@@ -727,8 +741,10 @@
 				@endforeach
 			</select>
 
-			<label>Stock initial</label>
-			<input type="number" name="quantite" min="0" value="0" required>
+			<label>Stock par conditionnement</label>
+			<div id="stocks-par-condi" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+			    <p class="text-muted" style="font-size:.8rem;margin:0;">Choisissez d'abord une forme.</p>
+			</div>
 
 			<label>Description <span class="label-hint">(optionnel)</span></label>
 			<textarea name="description" rows="3" placeholder="Description du produit…"></textarea>
@@ -775,8 +791,10 @@
 				@endforeach
 			</select>
 
-			<label>Stock</label>
-			<input type="number" id="edit-quantite" name="quantite" min="0" required>
+			<label>Stock par conditionnement</label>
+			<div id="edit-stocks-par-condi" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+			    <p class="text-muted" style="font-size:.8rem;margin:0;">Choisissez d'abord une forme.</p>
+			</div>
 
 			<label>Description</label>
 			<textarea id="edit-description" name="description" rows="3"></textarea>
@@ -1343,10 +1361,9 @@ function afficherToast(message, type = 'success') {
 // ════════════════════════════════════════
 // MODAL MODIFIER PRODUIT
 // ════════════════════════════════════════
-function ouvrirModalModifierProduit(id, nom, idParfum, idForme, idTheme, quantite, description) {
+function ouvrirModalModifierProduit(id, nom, idParfum, idForme, idTheme, description, stocks) {
 	document.getElementById('form-modifier-produit').action = '/gestion/produit/' + id;
 	document.getElementById('edit-nom_produit').value      = nom;
-	document.getElementById('edit-quantite').value         = quantite;
 	document.getElementById('edit-description').value      = description;
 
 	const selParfum = document.getElementById('edit-id_parfum');
@@ -1357,6 +1374,52 @@ function ouvrirModalModifierProduit(id, nom, idParfum, idForme, idTheme, quantit
 	selForme.value  = idForme  ?? '';
 	selTheme.value  = idTheme  ?? '';
 
++	renderStockInputs('edit-stocks-par-condi', idForme, stocks || {});
+
 	document.getElementById('modal-modifier-produit').classList.remove('hidden');
 }
+
+// ════════════════════════════════════════
+// STOCK PAR CONDITIONNEMENT (création / édition produit)
+// ════════════════════════════════════════
+@php $formeCondiJson = $forme_condi->map(fn($fc) => [
+    'id_forme_condi' => $fc->id_forme_condi,
+    'id_forme'       => $fc->id_forme,
+    'type'           => $fc->conditionnement->type,
+    'prix'           => $fc->prix,
+]); @endphp
+
+const FORME_CONDIS = {!! json_encode($formeCondiJson) !!};
+
+function renderStockInputs(containerId, idForme, existingStocks = {}) {
+    const container = document.getElementById(containerId);
+    const matches = FORME_CONDIS.filter(fc => String(fc.id_forme) === String(idForme));
+
+    if (!idForme || matches.length === 0) {
+        container.innerHTML = '<p class="text-muted" style="font-size:.8rem;margin:0;">Choisissez d\'abord une forme.</p>';
+        return;
+    }
+
+    container.innerHTML = matches.map(fc => {
+        const valeur = existingStocks[fc.id_forme_condi] ?? 0;
+        const label  = fc.type.replace(/_/g, ' ');
+        return `
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="flex:1;font-size:.85rem;text-transform:capitalize;">
+                    ${label} <span class="text-muted">(${fc.prix} €)</span>
+                </span>
+                <input type="number" name="stocks[${fc.id_forme_condi}]" min="0"
+                       value="${valeur}"
+                       style="width:90px;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;">
+            </div>`;
+    }).join('');
+}
+
+document.getElementById('create-id_forme').addEventListener('change', function () {
+    renderStockInputs('stocks-par-condi', this.value);
+});
+
+document.getElementById('edit-id_forme').addEventListener('change', function () {
+    renderStockInputs('edit-stocks-par-condi', this.value);
+});
 </script>

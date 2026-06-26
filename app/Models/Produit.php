@@ -34,7 +34,6 @@ class Produit extends Model
         'special'          => 'boolean',
 	];
 
-	// Un produit appartient à plusieurs rayons (many-to-many)
 	public function rayons()
 	{
 		return $this->belongsToMany(
@@ -70,14 +69,44 @@ class Produit extends Model
 		return $this->belongsTo(Parfum::class, 'id_parfum', 'id_parfum');
 	}
 
+	// ── Stock par conditionnement ──────────────────────────────────
+
+	public function stocks()
+	{
+		return $this->hasMany(ProduitFormeCondi::class, 'id_produit', 'id_produit');
+	}
+
+	/**
+	 * Stock disponible pour un conditionnement (forme_condi) précis.
+	 */
+	public function stockPour(int $idFormeCondi): int
+	{
+		if ($this->relationLoaded('stocks')) {
+			return $this->stocks->firstWhere('id_forme_condi', $idFormeCondi)?->quantite ?? 0;
+		}
+
+		return (int) $this->stocks()->where('id_forme_condi', $idFormeCondi)->value('quantite');
+	}
+
+	/**
+	 * Recalcule le stock total = somme des stocks par conditionnement.
+	 * À appeler après toute modification de $this->stocks.
+	 */
+	public function recalculerStock(): void
+	{
+		$this->quantite = $this->stocks()->sum('quantite');
+		$this->save();
+	}
+
 	public function image($id_forme_condi)
 	{
 		$image = Image::where('id_produit', $this->id_produit)
 			->where('id_forme_condi', $id_forme_condi)
 			->first();
 
-		return $image->url;
+		return $image->url ?? 'fichier/image/meringues/oups.png';
 	}
+
 	public function isnouveaute(): bool        { return (bool) $this->nouveaute; }
 	public function islive(): bool             { return (bool) $this->live; }
 	public function isdispo_emporter(): bool   { return (bool) $this->dispo_emporter; }

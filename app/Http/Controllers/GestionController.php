@@ -49,6 +49,7 @@ class GestionController extends Controller
 			'rayons',
 			'theme',
 			'events',
+			'stocks',
 		]);
 
 		if ($rayon) {
@@ -90,30 +91,51 @@ class GestionController extends Controller
 
 	public function exportProduits()
 	{
-		// Récupère les produits avec leurs relations
-		$produits = Produit::with(['forme', 'parfum', 'rayons', 'theme'])
-		->orderBy('id_produit')
-		->get();
+		$produits = Produit::with([
+			'forme.forme_condis.conditionnement',
+			'parfum',
+			'rayons',
+			'theme',
+			'stocks',
+		])
+			->orderBy('id_produit')
+			->get();
+
+		$conditionnementTypes = Conditionnement::orderBy('id_condi')->pluck('type');
 
 		$spreadsheet = new Spreadsheet();
 		$sheet = $spreadsheet->getActiveSheet();
 		$sheet->setTitle('Produits');
 
+		// ── En-têtes fixes ───────────────────────────────────────
 		$headers = [
 			'A' => 'Nom_produit',
 			'B' => 'Forme',
 			'C' => 'Parfum',
 			'D' => 'Description',
-			'E' => 'Stock',
-			'F' => 'Nouveauté',
-			'G' => 'Live',
-			'H' => 'Theme',
-			'I' => 'Event',
-			'J' => 'Specialité',
+			'E' => 'Nouveauté',
+			'F' => 'Live',
+			'G' => 'Theme',
+			'H' => 'Event',
+			'I' => 'Specialité',
 		];
 
-		foreach ($headers as $col => $label) {
-			$sheet->setCellValue($col . '1', $label);
+		// ── En-têtes dynamiques : une colonne de stock par conditionnement ──
+		$stockCols = []; // type => lettre de colonne
+		$col = 'J';
+		foreach ($conditionnementTypes as $type) {
+			$headers[$col]    = 'Stock_' . $type;
+			$stockCols[$type] = $col;
+			$col++;
+		}
+
+		// ── Colonne informative, ignorée à l'import ──────────────
+		$headers[$col]  = 'Stock_total';
+		$colStockTotal  = $col;
+		$lastCol        = $col;
+
+		foreach ($headers as $colLetter => $label) {
+			$sheet->setCellValue($colLetter . '1', $label);
 		}
 
 		$headerStyle = [
@@ -122,7 +144,7 @@ class GestionController extends Controller
 			'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
 			'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FFD4A574']]],
 		];
-		$sheet->getStyle('A1:J1')->applyFromArray($headerStyle);
+		$sheet->getStyle("A1:{$lastCol}1")->applyFromArray($headerStyle);
 		$sheet->getRowDimension(1)->setRowHeight(20);
 
 		// ── Données ───────────────────────────────────────────────
@@ -133,12 +155,28 @@ class GestionController extends Controller
 			$sheet->setCellValue('B' . $row, $p->forme->nom_forme ?? '');
 			$sheet->setCellValue('C' . $row, $p->parfum->nom_parfum ?? '');
 			$sheet->setCellValue('D' . $row, $p->description ?? '');
-			$sheet->setCellValue('E' . $row, (int) ($p->quantite ?? 0));
-			$sheet->setCellValue('F' . $row, $p->nouveaute ? 'oui' : 'non');
-			$sheet->setCellValue('G' . $row, $p->live      ? 'oui' : 'non');
-			$sheet->setCellValue('H' . $row, $p->theme->nom_theme ?? '');
-			$sheet->setCellValue('I' . $row, $p->events()->pluck('nom_event')->implode(', ') ?? ' ');
-			$sheet->setCellValue('J' . $row, $p->special     ? 'oui' : 'non');
+			$sheet->setCellValue('E' . $row, $p->nouveaute ? 'oui' : 'non');
+			$sheet->setCellValue('F' . $row, $p->live      ? 'oui' : 'non');
+			$sheet->setCellValue('G' . $row, $p->theme->nom_theme ?? '');
+			$sheet->setCellValue('H' . $row, $p->events()->pluck('nom_event')->implode(', ') ?? ' ');
+			$sheet->setCellValue('I' . $row, $p->special     ? 'oui' : 'non');
+
+			// Stock par conditionnement : vide si ce conditionnement n'existe
+			// pas pour la forme du produit, sinon la quantité (0 par défaut).
+			foreach ($stockCols as $type => $colLetter) {
+				$fc = $p->forme?->forme_condis->first(
+					fn($fc) => $fc->conditionnement->type === $type
+				);
+
+				$valeur = '';
+				if ($fc) {
+					$valeur = $p->stocks->firstWhere('id_forme_condi', $fc->id_forme_condi)?->quantite ?? 0;
+				}
+
+				$sheet->setCellValue($colLetter . $row, $valeur);
+			}
+
+			$sheet->setCellValue($colStockTotal . $row, (int) ($p->quantite ?? 0));
 
 			$bgColor = ($row % 2 === 0) ? 'FFFFF8F0' : 'FFFFFFFF';
 			$rowStyle = [
@@ -146,33 +184,31 @@ class GestionController extends Controller
 				'fill'    => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => $bgColor]],
 				'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FFE8D5C0']]],
 			];
-			$sheet->getStyle('A' . $row . ':J' . $row)->applyFromArray($rowStyle);
+			$sheet->getStyle("A{$row}:{$lastCol}{$row}")->applyFromArray($rowStyle);
 
-			// Stock en rouge si rupture
-			if ((int)($p->quantite ?? 0) === 0) {
-				$sheet->getStyle('E' . $row)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFCC3333'));
-				$sheet->getStyle('E' . $row)->getFont()->setBold(true);
+			if ((int) ($p->quantite ?? 0) === 0) {
+				$sheet->getStyle($colStockTotal . $row)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFCC3333'));
+				$sheet->getStyle($colStockTotal . $row)->getFont()->setBold(true);
 			}
 
 			$row++;
 		}
 
 		// ── Largeurs colonnes ──────────────────────────────────────
-		$widths = ['A' => 14, 'B' => 12, 'C' => 16, 'D' => 35, 'E' => 8, 'F' => 12, 'G' => 8, 'H' => 18, 'I' => 20, 'J' => 12];
-		foreach ($widths as $col => $width) {
-			$sheet->getColumnDimension($col)->setWidth($width);
+		$widths = ['A' => 14, 'B' => 12, 'C' => 16, 'D' => 35, 'E' => 12, 'F' => 8, 'G' => 18, 'H' => 20, 'I' => 12];
+		foreach ($widths as $colLetter => $width) {
+			$sheet->getColumnDimension($colLetter)->setWidth($width);
 		}
+		foreach ($stockCols as $colLetter) {
+			$sheet->getColumnDimension($colLetter)->setWidth(16);
+		}
+		$sheet->getColumnDimension($colStockTotal)->setWidth(13);
 
-		// ── Figer la ligne d'en-tête ──────────────────────────────
 		$sheet->freezePane('A2');
+		$sheet->setAutoFilter("A1:{$lastCol}1");
 
-		// ── Auto-filtre ───────────────────────────────────────────
-		$sheet->setAutoFilter('A1:J1');
-
-		// ── Réponse HTTP ──────────────────────────────────────────
 		$filename = 'produits_export_' . now()->format('Ymd_His') . '.xlsx';
-
-		$writer = new Xlsx($spreadsheet);
+		$writer   = new Xlsx($spreadsheet);
 
 		return response()->streamDownload(
 			function () use ($writer) {
@@ -180,8 +216,8 @@ class GestionController extends Controller
 			},
 			$filename,
 			[
-				'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-				'Cache-Control'       => 'max-age=0',
+				'Content-Type'  => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				'Cache-Control' => 'max-age=0',
 			]
 		);
 	}

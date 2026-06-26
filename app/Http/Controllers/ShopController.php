@@ -58,6 +58,7 @@ class ShopController extends Controller
 				'images'            => collect(),
 				'panier'            => null,
 				'ListeProduits'     => collect(),
+				'conditionnements'  => Conditionnement::all(), // ← manquait, évite une erreur dans la vue
 			]);
 		}
 
@@ -66,6 +67,7 @@ class ShopController extends Controller
 				'theme',
 				'forme.forme_condis.conditionnement',
 				'parfum',
+				'stocks.formeCondi', // ← charge les stocks ET leur forme_condi associée
 			])
 			->where('live', true)
 			->whereHas('rayons', fn($q) =>

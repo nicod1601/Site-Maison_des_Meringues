@@ -68,6 +68,7 @@
 {{-- ── CORPS ───────────────────────────────────────────────── --}}
 <main class="boutique-body {{ $isNoel ? 'event--noel' : '' }}" id="boutique-contenu">
 
+
 	@if($rayonsActifsCount === 0)
 		{{-- Aucun rayon actif --}}
 		<div class="boutique-empty">
@@ -221,6 +222,25 @@
 
 					@foreach($theme->produits_affiches as $produit)
 						@foreach($produit->forme->forme_condis as $fc)
+						@php
+						
+							$stockCondi = $produit->stocks
+								->firstWhere('id_forme_condi', $fc->id_forme_condi)
+								?->quantite ?? 0;
+
+							$uniteParCondi = match($fc->conditionnement->type) {
+								'sachet_de_10' => 10,
+								'sachet_de_4'  => 4,
+								'boite_de_8'   => 8,
+								default        => 1,
+							};
+
+							$dispo   = $stockCondi >= $uniteParCondi;
+							$maxQte  = $dispo ? max(1, min((int) floor($stockCondi / $uniteParCondi), 20)) : 0;
+						@endphp
+
+						{{-- N'afficher la carte que si le stock de ce conditionnement est > 0 --}}
+						@if($stockCondi > 0)
 						<article class="boutique-card" aria-label="{{ $produit->nom_produit }}">
 
 							{{-- Image --}}
@@ -235,18 +255,14 @@
 										loading="lazy"
 										decoding="async"
 										fetchpriority="low"
-
-										onerror="
-											console.log('Erreur image ❌');
-											this.src='/fichier/image/meringues/oups.png";
-										"
+										onerror="this.src='/fichier/image/meringues/oups.webp';"
 									>
 								</div>
 								<div class="boutique-card__badges">
 									@if($produit->nouveaute)
 										<span class="badge badge--new">Nouveau</span>
 									@endif
-									@if($produit->quantite == 0)
+									@if(!$dispo)
 										<span class="badge badge--close">Épuisé</span>
 									@endif
 								</div>
@@ -273,7 +289,7 @@
 									@if($produit->dispo_emporter)
 										<span class="badge badge--cream" style="font-size:10px;">🛍 Emporter</span>
 									@endif
-									@if($produit->dispo_expedition && $fc->conditionnement->type == 'individuel')
+									@if($produit->dispo_expedition && $fc->conditionnement->type === 'individuel')
 										<span class="badge badge--cream" style="font-size:10px;">📦 Expédition</span>
 									@endif
 								</div>
@@ -289,16 +305,6 @@
 										@endif
 									</div>
 
-									@php
-										$dispo = match($fc->conditionnement->type) {
-											'individuel' => $produit->quantite > 0,
-											'sachet_de_10' => $produit->quantite >= 10,
-											'sachet_de_4'  => $produit->quantite >= 4,
-											'boite_de_8'   => $produit->quantite >= 8,
-											default        => false,
-										};
-									@endphp
-
 									@if($dispo)
 										<form class="form-ajout-panier" action="{{ route('panier.ajouter') }}" method="POST">
 											@csrf
@@ -308,15 +314,6 @@
 											<div style="display:flex;align-items:center;gap:6px;">
 												<select name="quantite"
 													style="width:52px;padding:5px 4px;border:1px solid var(--color-border);border-radius:6px;font-size:.82rem;text-align:center;background:var(--color-bg,#fff);color:var(--color-text);cursor:pointer;appearance:none;-webkit-appearance:none;">
-													@php
-														$maxQte = match($fc->conditionnement->type) {
-															'sachet_de_10' => (int)floor($produit->quantite / 10),
-															'sachet_de_4'  => (int)floor($produit->quantite / 4),
-															'boite_de_8'   => (int)floor($produit->quantite / 8),
-															default        => min($produit->quantite, 20),
-														};
-														$maxQte = max(1, min($maxQte, 20));
-													@endphp
 													@for($q = 1; $q <= $maxQte; $q++)
 														<option value="{{ $q }}">{{ $q }}</option>
 													@endfor
@@ -336,6 +333,7 @@
 								</div>
 							</div>
 						</article>
+						@endif
 						@endforeach
 					@endforeach
 

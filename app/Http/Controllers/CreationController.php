@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produit;
+use App\Models\ProduitFormeCondi;
 use App\Models\Rayon;
 use App\Models\Theme;
 use App\Models\Event;
@@ -21,13 +22,14 @@ class CreationController extends Controller
 	public function nvproduit(Request $request): RedirectResponse
 	{
 		$request->validate([
-			'nom_produit'    => 'required|string|max:255',
-			'id_parfum'      => 'required|exists:parfum,id_parfum',
-			'id_forme' => 'required|exists:forme,id_forme',
-			'id_rayon'       => 'required|exists:rayon,id_rayon',
-			'id_theme'       => 'nullable|exists:theme,id_theme',
-			'quantite'       => 'required|integer|min:0',
-			'description'    => 'nullable|string',
+			'nom_produit' => 'required|string|max:255',
+			'id_parfum'   => 'required|exists:parfum,id_parfum',
+			'id_forme'    => 'required|exists:forme,id_forme',
+			'id_rayon'    => 'required|exists:rayon,id_rayon',
+			'id_theme'    => 'nullable|exists:theme,id_theme',
+			'description' => 'nullable|string',
+			'stocks'      => 'nullable|array',
+			'stocks.*'    => 'nullable|integer|min:0',
 		]);
 
 		$produit = Produit::create([
@@ -36,12 +38,14 @@ class CreationController extends Controller
 			'id_forme'         => $request->id_forme,
 			'id_theme'         => $request->id_theme,
 			'description'      => $request->description ?? 'Aucune description',
-			'quantite'         => $request->quantite,
+			'quantite'         => 0, // recalculé juste après depuis les stocks
 			'nouveaute'        => false,
 			'live'             => false,
 			'dispo_emporter'   => false,
 			'dispo_expedition' => false,
 		]);
+
+		$this->syncStocks($produit, $request->input('stocks', []));
 
 		$produit->rayons()->attach($request->id_rayon);
 
@@ -60,7 +64,7 @@ class CreationController extends Controller
 
 		$rayonIds = $produit->rayons()->pluck('rayon.id_rayon');
 
-		$produit->delete(); // cascade supprime produit_rayon et produit_event
+		$produit->delete(); // cascade supprime produit_rayon, produit_event et produit_forme_condi
 
 		foreach ($rayonIds as $rayonId) {
 			$rayon = Rayon::find($rayonId);
@@ -79,8 +83,9 @@ class CreationController extends Controller
 			'id_parfum'   => 'required|exists:parfum,id_parfum',
 			'id_forme'    => 'required|exists:forme,id_forme',
 			'id_theme'    => 'nullable|exists:theme,id_theme',
-			'quantite'    => 'required|integer|min:0',
 			'description' => 'nullable|string',
+			'stocks'      => 'nullable|array',
+			'stocks.*'    => 'nullable|integer|min:0',
 		]);
 
 		$produit = Produit::findOrFail($id);
@@ -89,9 +94,18 @@ class CreationController extends Controller
 			'id_parfum'   => $request->id_parfum,
 			'id_forme'    => $request->id_forme,
 			'id_theme'    => $request->id_theme,
-			'quantite'    => $request->quantite,
 			'description' => $request->description ?? 'Aucune description',
 		]);
+
+		// Si la forme a changé, les stocks liés aux anciens forme_condi
+		// (qui ne correspondent plus à la nouvelle forme) sont supprimés.
+		$idsFormeCondiValides = Forme_Condi::where('id_forme', $request->id_forme)
+			->pluck('id_forme_condi')
+			->toArray();
+
+		$produit->stocks()->whereNotIn('id_forme_condi', $idsFormeCondiValides)->delete();
+
+		$this->syncStocks($produit, $request->input('stocks', []));
 
 		foreach ($produit->rayons as $rayon) {
 			$rayon->recalculerStock();
@@ -99,6 +113,24 @@ class CreationController extends Controller
 		$this->recalculerStockBoutique();
 
 		return redirect()->back()->with('success', 'Produit modifié avec succès !');
+	}
+
+	/**
+	 * Met à jour le stock du produit pour chaque conditionnement transmis,
+	 * puis recalcule le stock total.
+	 *
+	 * @param array<int, int> $stocks  [id_forme_condi => quantite]
+	 */
+	private function syncStocks(Produit $produit, array $stocks): void
+	{
+		foreach ($stocks as $idFormeCondi => $quantite) {
+			ProduitFormeCondi::updateOrCreate(
+				['id_produit' => $produit->id_produit, 'id_forme_condi' => (int) $idFormeCondi],
+				['quantite'   => max(0, (int) $quantite)]
+			);
+		}
+
+		$produit->recalculerStock();
 	}
 
 	public function toggleLive(Request $request, int $id): RedirectResponse
@@ -156,17 +188,13 @@ class CreationController extends Controller
 		]);
 
 		if ($request->filled('id_events')) {
-			//themes()->sync → events()->sync
 			$rayon->events()->sync($request->id_events);
-
-			//méthode du modèle pour lier les produits existants éligibles
 			$rayon->syncProduitsDepuisEvents();
 			$this->recalculerStockBoutique();
 		}
 
 		return redirect()->back()->with('success', 'Rayon créé avec succès !');
 	}
-
 
 	public function updateRayon(Request $request, int $id): RedirectResponse
 	{
@@ -177,15 +205,13 @@ class CreationController extends Controller
 
 		$rayon = Rayon::findOrFail($id);
 
-		// Mettre à jour les events du rayon
 		$rayon->events()->sync($request->id_events ?? []);
-
-		// Re-synchroniser les produits selon les nouveaux events
 		$rayon->syncProduitsDepuisEvents();
 		$this->recalculerStockBoutique();
 
 		return redirect()->back()->with('success', 'Rayon mis à jour.');
 	}
+
 	public function destroyRayon(int $id): RedirectResponse
 	{
 		$rayon = Rayon::findOrFail($id);
@@ -206,7 +232,6 @@ class CreationController extends Controller
 		$rayon->save();
 		return redirect()->back();
 	}
-
 
 	// ── THÈMES ───────────────────────────────────────────────────────────
 
@@ -257,8 +282,8 @@ class CreationController extends Controller
 	public function destroyEvent(int $id): RedirectResponse
 	{
 		$event = Event::findOrFail($id);
-		$event->rayons()->detach();   // nettoyer rayon_event
-		$event->produits()->detach(); // nettoyer produit_event
+		$event->rayons()->detach();
+		$event->produits()->detach();
 		$event->delete();
 
 		return redirect()->back()->with('success', 'Événement supprimé.');
@@ -304,7 +329,6 @@ class CreationController extends Controller
 			'prix'     => 'required|numeric|min:0',
 		]);
 
-		// ✅ Corrigé : FormeCondi → Forme_Condi
 		Forme_Condi::create([
 			'id_forme' => $request->id_forme,
 			'id_condi' => $request->id_condi,
@@ -316,7 +340,6 @@ class CreationController extends Controller
 
 	public function destroyFormeCondi(int $id): RedirectResponse
 	{
-		// ✅ Corrigé : FormeCondi → Forme_Condi
 		Forme_Condi::findOrFail($id)->delete();
 		return redirect()->back()->with('success', 'Prix supprimé.');
 	}

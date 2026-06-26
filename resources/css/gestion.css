@@ -756,7 +756,7 @@ a:hover    { color: var(--accent-dark); }
 .table-wrapper thead th:nth-child(5)  { width: 140px; }
 .table-wrapper thead th:nth-child(6)  { width: 84px;  }
 .table-wrapper thead th:nth-child(7)  { width: 114px; }
-.table-wrapper thead th:nth-child(8)  { width: 58px;  }
+.table-wrapper thead th:nth-child(8)  { width: 110px; }
 .table-wrapper thead th:nth-child(9)  { width: 50px;  }
 .table-wrapper thead th:nth-child(10) { width: 50px;  }
 .table-wrapper thead th:nth-child(11) { width: 54px;  }
@@ -784,7 +784,8 @@ a:hover    { color: var(--accent-dark); }
 
 .table-wrapper tbody td {
     padding: 11px 12px;
-    height: 52px;
+    height: auto;          /* ← était 52px, maintenant flexible */
+    min-height: 52px;      /* ← garde un minimum propre */
     border-bottom: 1px solid var(--border-light);
     font-size: var(--text-xs);
     color: var(--text-secondary);
@@ -891,14 +892,25 @@ td.td-actions {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 36px;
-    height: 22px;
-    padding: 0 8px;
+    min-width: 32px;
+    height: 18px;          
+    padding: 0 6px;
     border-radius: var(--r-full);
-    font-size: var(--text-2xs);
+    font-size: 0.65rem;     
     font-weight: 700;
     white-space: nowrap;
     font-family: var(--font-mono);
+}
+
+.stock-total-line {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-light);
+    margin-top: 3px;
+    padding-top: 3px;
+    display: block;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
 }
 
 .stock-badge--ok      { background: var(--success-bg); color: var(--success); border: 1px solid rgba(26, 122, 82, 0.2); }
