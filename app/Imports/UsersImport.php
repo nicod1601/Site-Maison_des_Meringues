@@ -19,6 +19,12 @@ use Intervention\Image\Laravel\Facades\Image as ImageManager;
 
 class UsersImport implements ToCollection
 {
+	/**
+	 * ID du rayon de base (rayon par défaut, premier rayon).
+	 * Tous les produits sans event y sont rangés.
+	 * Les produits avec event non spéciaux y sont aussi rangés (en plus du rayon event).
+	 * Les produits spéciaux avec event ne sont PAS dans ce rayon.
+	 */
 	private const RAYON_BASE_ID = 1;
 
 	public function collection(Collection $rows)
@@ -66,15 +72,14 @@ class UsersImport implements ToCollection
 			return $row[$colIndex[$label]] ?? $default;
 		};
 
-		// ── Cache des rayons par nom ───────────────────────────────────
-		$rayonsCache  = Rayon::all()->keyBy('nom_rayon');
+		// ── Cache ──────────────────────────────────────────────────────
 		$formesCache  = [];
 		$parfumsCache = [];
 		$themesCache  = [];
 		$eventsCache  = [];
 
-		// Pour nettoyer le rayon base à la fin
-		$produitsImportesIds = [];
+		// Cache des rayons par event : id_event → Rayon (si un rayon porte le nom de l'event)
+		$rayonsParEvent = [];
 
 		foreach ($rows as $index => $row) {
 
@@ -83,7 +88,7 @@ class UsersImport implements ToCollection
 			$nomProduit = trim((string) $cell($row, 'Nom_produit'));
 			if ($nomProduit === '') continue;
 
-			// ── Forme ─────────────────────────────
+			// ── Forme ─────────────────────────────────────────────────
 			$nomForme = trim((string) $cell($row, 'Forme'));
 			if (!isset($formesCache[$nomForme])) {
 				$formesCache[$nomForme] = Forme::where('nom_forme', $nomForme)->first();
@@ -91,7 +96,7 @@ class UsersImport implements ToCollection
 			$forme = $formesCache[$nomForme];
 			if (!$forme) continue;
 
-			// ── Parfum ─────────────────────────────
+			// ── Parfum ────────────────────────────────────────────────
 			$nomParfum = trim((string) $cell($row, 'Parfum'));
 			if (!isset($parfumsCache[$nomParfum])) {
 				$parfumsCache[$nomParfum] = Parfum::where('nom_parfum', $nomParfum)->first();
@@ -99,24 +104,16 @@ class UsersImport implements ToCollection
 			$parfum = $parfumsCache[$nomParfum];
 			if (!$parfum) continue;
 
-			// ── Champs ─────────────────────────────
+			// ── Champs simples ────────────────────────────────────────
 			$description = trim((string) $cell($row, 'Description')) ?: 'Aucune description';
-			$nouveaute   = strtolower(trim((string) $cell($row, 'Nouveauté'))) === 'oui';
-			$live        = strtolower(trim((string) $cell($row, 'Live')))      === 'oui';
+			$nouveaute   = strtolower(trim((string) $cell($row, 'Nouveauté')))  === 'oui';
+			$live        = strtolower(trim((string) $cell($row, 'Live')))       === 'oui';
 			$expedition  = strtolower($forme->nom_forme) === 'mini';
 			$special     = strtolower(trim((string) $cell($row, 'Specialité'))) === 'oui';
 
-			// ── Rayon ─────────────────────────────
-			// Colonne "Rayon" dans le fichier Excel : nom du rayon (ex: "Base")
-			// Si vide ou introuvable, on utilise le rayon par défaut (id=1)
-			$nomRayon      = trim((string) $cell($row, 'Rayon'));
-			$rayonCible    = $nomRayon !== '' ? ($rayonsCache[$nomRayon] ?? null) : null;
-			$rayonCibleId  = $rayonCible?->id_rayon ?? self::RAYON_BASE_ID;
-
-			// ── Theme ─────────────────────────────
+			// ── Thème ─────────────────────────────────────────────────
 			$nomTheme = trim((string) $cell($row, 'Theme'));
 			$idTheme  = null;
-
 			if ($nomTheme !== '') {
 				if (!isset($themesCache[$nomTheme])) {
 					$themesCache[$nomTheme] = Theme::where('nom_theme', $nomTheme)->first();
@@ -125,17 +122,25 @@ class UsersImport implements ToCollection
 				if ($theme) $idTheme = $theme->id_theme;
 			}
 
-			// ── Events ─────────────────────────────
+			// ── Events ────────────────────────────────────────────────
 			$eventIds  = [];
 			$nomEvents = trim((string) $cell($row, 'Event'));
 
 			if ($nomEvents !== '') {
 				foreach (array_map('trim', explode(',', $nomEvents)) as $nomEvent) {
+					if ($nomEvent === '') continue;
 					if (!isset($eventsCache[$nomEvent])) {
 						$eventsCache[$nomEvent] = Event::where('nom_event', $nomEvent)->first();
 					}
 					$event = $eventsCache[$nomEvent];
-					if ($event) $eventIds[] = $event->id_event;
+					if ($event) {
+						$eventIds[] = $event->id_event;
+
+						// Charger le rayon associé à cet event (s'il existe) une seule fois
+						if (!array_key_exists($event->id_event, $rayonsParEvent)) {
+							$rayonsParEvent[$event->id_event] = Rayon::where('nom_rayon', $nomEvent)->first();
+						}
+					}
 				}
 			}
 
@@ -145,7 +150,7 @@ class UsersImport implements ToCollection
 				$stocksParType[$type] = (int) ($row[$idx] ?? 0);
 			}
 
-			// ── Produit ─────────────────────────────
+			// ── Produit (upsert) ──────────────────────────────────────
 			$produit = Produit::updateOrCreate(
 				[
 					'nom_produit' => $nomProduit,
@@ -163,7 +168,7 @@ class UsersImport implements ToCollection
 				]
 			);
 
-			// ── Images + stocks par conditionnement ────────────────────
+			// ── Images + stocks par conditionnement ───────────────────
 			$images = [];
 
 			$conditionnements = Forme_Condi::where('id_forme', $produit->id_forme)
@@ -216,22 +221,54 @@ class UsersImport implements ToCollection
 
 			$produit->recalculerStock();
 
-			// ── Events sync ────────────────────────────────────────────
+			// ── Sync events ───────────────────────────────────────────
 			if (!empty($eventIds)) {
 				$produit->events()->sync($eventIds);
 			} else {
 				$produit->events()->detach();
 			}
 
-			// ── Rattachement au rayon ──────────────────────────────────
-			// On détache tous les rayons existants puis on attache le rayon cible.
-			// Cela garantit qu'un produit est toujours dans exactement un rayon.
-			$produit->rayons()->sync([$rayonCibleId]);
+			// ── Logique de rangement dans les rayons ──────────────────
+			//
+			//  Cas 1 — Pas d'event
+			//           → rayon de base uniquement
+			//
+			//  Cas 2 — Event(s) présent(s) + NON spécial
+			//           → rayon de base + rayon(s) de l'event
+			//
+			//  Cas 3 — Event(s) présent(s) + spécial
+			//           → rayon(s) de l'event uniquement (pas de rayon de base)
+			//
+			$rayonIds = [];
 
-			$produitsImportesIds[] = $produit->id_produit;
+			if (empty($eventIds)) {
+				// Cas 1
+				$rayonIds[] = self::RAYON_BASE_ID;
+			} else {
+				// Récupérer les ids des rayons liés aux events du produit
+				$rayonEventIds = [];
+				foreach ($eventIds as $idEvent) {
+					$rayonEvent = $rayonsParEvent[$idEvent] ?? null;
+					if ($rayonEvent) {
+						$rayonEventIds[] = $rayonEvent->id_rayon;
+					}
+				}
+
+				if ($special) {
+					// Cas 3 : spécial + event → uniquement les rayons event
+					// Si aucun rayon event n'est trouvé, on replie sur le rayon de base
+					// pour ne pas laisser le produit orphelin.
+					$rayonIds = !empty($rayonEventIds) ? $rayonEventIds : [self::RAYON_BASE_ID];
+				} else {
+					// Cas 2 : non spécial + event → rayon de base + rayons event
+					$rayonIds = array_unique(array_merge([self::RAYON_BASE_ID], $rayonEventIds));
+				}
+			}
+
+			$produit->rayons()->sync($rayonIds);
 		}
 
-		// ── Recalcul des stocks de tous les rayons touchés ────────────
+		// ── Recalcul des stocks de tous les rayons + boutique ─────────
 		Rayon::all()->each(fn($r) => $r->recalculerStock());
 		$boutique->recalculerStock();
 	}
