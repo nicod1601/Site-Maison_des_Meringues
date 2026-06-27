@@ -223,20 +223,12 @@
 					@foreach($theme->produits_affiches as $produit)
 						@foreach($produit->forme->forme_condis as $fc)
 						@php
-						
 							$stockCondi = $produit->stocks
 								->firstWhere('id_forme_condi', $fc->id_forme_condi)
 								?->quantite ?? 0;
 
-							$uniteParCondi = match($fc->conditionnement->type) {
-								'sachet_de_10' => 10,
-								'sachet_de_4'  => 4,
-								'boite_de_8'   => 8,
-								default        => 1,
-							};
-
-							$dispo   = $stockCondi >= $uniteParCondi;
-							$maxQte  = $dispo ? max(1, min((int) floor($stockCondi / $uniteParCondi), 20)) : 0;
+							$dispo  = $stockCondi > 0;
+							$maxQte = $dispo ? min($stockCondi, 20) : 0;
 						@endphp
 
 						{{-- N'afficher la carte que si le stock de ce conditionnement est > 0 --}}

@@ -96,6 +96,7 @@ class GestionController extends Controller
 			'parfum',
 			'rayons',
 			'theme',
+			'events',
 			'stocks',
 		])
 			->orderBy('id_produit')
@@ -118,11 +119,12 @@ class GestionController extends Controller
 			'G' => 'Theme',
 			'H' => 'Event',
 			'I' => 'Specialité',
+			'J' => 'Rayon',  // ← colonne rayon pour l'import
 		];
 
 		// ── En-têtes dynamiques : une colonne de stock par conditionnement ──
 		$stockCols = []; // type => lettre de colonne
-		$col = 'J';
+		$col = 'K';
 		foreach ($conditionnementTypes as $type) {
 			$headers[$col]    = 'Stock_' . $type;
 			$stockCols[$type] = $col;
@@ -160,6 +162,7 @@ class GestionController extends Controller
 			$sheet->setCellValue('G' . $row, $p->theme->nom_theme ?? '');
 			$sheet->setCellValue('H' . $row, $p->events()->pluck('nom_event')->implode(', ') ?? ' ');
 			$sheet->setCellValue('I' . $row, $p->special     ? 'oui' : 'non');
+			$sheet->setCellValue('J' . $row, $p->rayons->first()?->nom_rayon ?? '');
 
 			// Stock par conditionnement : vide si ce conditionnement n'existe
 			// pas pour la forme du produit, sinon la quantité (0 par défaut).
@@ -195,7 +198,7 @@ class GestionController extends Controller
 		}
 
 		// ── Largeurs colonnes ──────────────────────────────────────
-		$widths = ['A' => 14, 'B' => 12, 'C' => 16, 'D' => 35, 'E' => 12, 'F' => 8, 'G' => 18, 'H' => 20, 'I' => 12];
+		$widths = ['A' => 14, 'B' => 12, 'C' => 16, 'D' => 35, 'E' => 12, 'F' => 8, 'G' => 18, 'H' => 20, 'I' => 12, 'J' => 16];
 		foreach ($widths as $colLetter => $width) {
 			$sheet->getColumnDimension($colLetter)->setWidth($width);
 		}

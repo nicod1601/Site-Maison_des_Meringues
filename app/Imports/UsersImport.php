@@ -14,6 +14,7 @@ use App\Models\Parfum;
 use App\Models\Theme;
 use App\Models\Event;
 use App\Models\Image;
+use App\Models\Boutique;
 use Intervention\Image\Laravel\Facades\Image as ImageManager;
 
 class UsersImport implements ToCollection
@@ -26,11 +27,9 @@ class UsersImport implements ToCollection
 			return;
 		}
 
-		$rayon    = Rayon::with('boutique')->findOrFail(self::RAYON_BASE_ID);
-		$boutique = $rayon->boutique;
+		$boutique = Boutique::first();
 
 		// ── Lecture de l'en-tête : nom de colonne → index ─────────────
-		// On ne dépend plus de l'ordre des colonnes dans le fichier.
 		$colIndex = [];
 		foreach ($rows->first() as $idx => $label) {
 			$label = trim((string) $label);
@@ -40,13 +39,6 @@ class UsersImport implements ToCollection
 		}
 
 		// Colonnes "Stock_xxx" présentes dans le fichier → type de conditionnement
-		// Le nom après "Stock_" doit correspondre (insensible à la casse / espaces)
-		// au champ "type" de la table "conditionnement".
-		//
-		// Table d'alias : permet de gérer des noms de colonnes raccourcis dans le
-		// fichier Excel (ex. "Stock_boite" → type BDD "boite_de_8").
-		// Clé   = suffixe normalisé tel qu'il apparaît dans le fichier Excel
-		// Valeur = type exact stocké dans la table "conditionnement"
 		$stockAliases = [
 			'boite'          => 'boite_de_8',
 			'sachet'         => 'sachet_de_4',
@@ -57,12 +49,11 @@ class UsersImport implements ToCollection
 			'vrac'           => 'vrac',
 		];
 
-		$stockColumns = []; // ex: 'individuel' => 12
+		$stockColumns = [];
 		foreach ($colIndex as $label => $idx) {
 			if (Str::startsWith($label, 'Stock_')) {
 				$rawType = strtolower(trim(Str::after($label, 'Stock_')));
 				if ($rawType === '') continue;
-				// Résolution via alias, puis fallback sur la valeur brute
 				$resolvedType = $stockAliases[$rawType] ?? $rawType;
 				$stockColumns[$resolvedType] = $idx;
 			}
@@ -75,12 +66,15 @@ class UsersImport implements ToCollection
 			return $row[$colIndex[$label]] ?? $default;
 		};
 
-		$produitsImportesIds = [];
-
+		// ── Cache des rayons par nom ───────────────────────────────────
+		$rayonsCache  = Rayon::all()->keyBy('nom_rayon');
 		$formesCache  = [];
 		$parfumsCache = [];
 		$themesCache  = [];
 		$eventsCache  = [];
+
+		// Pour nettoyer le rayon base à la fin
+		$produitsImportesIds = [];
 
 		foreach ($rows as $index => $row) {
 
@@ -112,6 +106,13 @@ class UsersImport implements ToCollection
 			$expedition  = strtolower($forme->nom_forme) === 'mini';
 			$special     = strtolower(trim((string) $cell($row, 'Specialité'))) === 'oui';
 
+			// ── Rayon ─────────────────────────────
+			// Colonne "Rayon" dans le fichier Excel : nom du rayon (ex: "Base")
+			// Si vide ou introuvable, on utilise le rayon par défaut (id=1)
+			$nomRayon      = trim((string) $cell($row, 'Rayon'));
+			$rayonCible    = $nomRayon !== '' ? ($rayonsCache[$nomRayon] ?? null) : null;
+			$rayonCibleId  = $rayonCible?->id_rayon ?? self::RAYON_BASE_ID;
+
 			// ── Theme ─────────────────────────────
 			$nomTheme = trim((string) $cell($row, 'Theme'));
 			$idTheme  = null;
@@ -138,7 +139,7 @@ class UsersImport implements ToCollection
 				}
 			}
 
-			// ── Stock par conditionnement (colonnes Stock_xxx présentes) ──
+			// ── Stock par conditionnement ──────────────────────────────
 			$stocksParType = [];
 			foreach ($stockColumns as $type => $idx) {
 				$stocksParType[$type] = (int) ($row[$idx] ?? 0);
@@ -162,7 +163,7 @@ class UsersImport implements ToCollection
 				]
 			);
 
-			// ── IMAGES OPTIMISÉES WEBP + STOCK PAR CONDITIONNEMENT ──
+			// ── Images + stocks par conditionnement ────────────────────
 			$images = [];
 
 			$conditionnements = Forme_Condi::where('id_forme', $produit->id_forme)
@@ -174,21 +175,13 @@ class UsersImport implements ToCollection
 
 				$slugForme  = Str::slug($produit->forme->nom_forme);
 				$slugParfum = Str::slug($produit->parfum->nom_parfum);
+				$typeKey    = strtolower(trim($condi->type));
+				$typeSlug   = Str::slug($condi->type);
 
-				// $typeKey : utilisé pour matcher la colonne "Stock_<type>" du fichier Excel
-				// (doit rester identique au texte stocké en BDD, juste normalisé en minuscule/trim).
-				$typeKey = strtolower(trim($condi->type));
-
-				// $typeSlug : utilisé pour les noms de fichiers/dossiers (évite espaces, accents, etc.
-				// ex: "sachet de 4" → "sachet-de-4"), utile si un type contient des caractères spéciaux.
-				$typeSlug = Str::slug($condi->type);
-
-				$filename = "{$slugForme}-{$typeSlug}-{$slugParfum}.webp";
-
+				$filename     = "{$slugForme}-{$typeSlug}-{$slugParfum}.webp";
 				$relativePath = "fichier/image/meringues/{$filename}";
 				$fullPath     = public_path($relativePath);
-
-				$sourcePath = public_path(
+				$sourcePath   = public_path(
 					"fichier/image/meringues/{$slugForme}/{$typeSlug}/{$slugParfum}.jpg"
 				);
 
@@ -205,10 +198,6 @@ class UsersImport implements ToCollection
 					'url'            => $relativePath,
 				];
 
-				// Stock : si la colonne Stock_<type> est présente dans le
-				// fichier, on écrase la valeur. Si elle est absente (vieux
-				// fichier sans cette colonne), on ne touche pas au stock
-				// existant — on ne crée la ligne qu'à 0 si elle n'existe pas.
 				if (array_key_exists($typeKey, $stockColumns)) {
 					ProduitFormeCondi::updateOrCreate(
 						['id_produit' => $produit->id_produit, 'id_forme_condi' => $condi->id_forme_condi],
@@ -227,51 +216,23 @@ class UsersImport implements ToCollection
 
 			$produit->recalculerStock();
 
-			// ── Events sync ─────────────────────────────
+			// ── Events sync ────────────────────────────────────────────
 			if (!empty($eventIds)) {
 				$produit->events()->sync($eventIds);
 			} else {
 				$produit->events()->detach();
 			}
 
-			// ── Rayons ─────────────────────────────
-			if ($produit->special && !empty($eventIds)) {
-
-				$rayonIds = Rayon::whereHas('events', function ($q) use ($eventIds) {
-						$q->whereIn('event.id_event', $eventIds);
-					})
-					->where('id_boutique', $boutique->id_boutique)
-					->pluck('id_rayon')
-					->toArray();
-
-				if (!empty($rayonIds)) {
-					$produit->rayons()->detach(self::RAYON_BASE_ID);
-					$produit->rayons()->syncWithoutDetaching($rayonIds);
-				}
-
-			} else {
-
-				$rayonsEvents = Rayon::whereHas('events')
-					->where('id_boutique', $boutique->id_boutique)
-					->pluck('id_rayon')
-					->toArray();
-
-				$produit->rayons()->detach($rayonsEvents);
-				$produit->rayons()->syncWithoutDetaching([self::RAYON_BASE_ID]);
-			}
+			// ── Rattachement au rayon ──────────────────────────────────
+			// On détache tous les rayons existants puis on attache le rayon cible.
+			// Cela garantit qu'un produit est toujours dans exactement un rayon.
+			$produit->rayons()->sync([$rayonCibleId]);
 
 			$produitsImportesIds[] = $produit->id_produit;
 		}
 
-		// ── Nettoyage rayons ─────────────────────────────
-		$produitsActuelsIds = $rayon->produits()->pluck('produit.id_produit')->toArray();
-		$aDetacher          = array_diff($produitsActuelsIds, $produitsImportesIds);
-
-		if (!empty($aDetacher)) {
-			$rayon->produits()->detach($aDetacher);
-		}
-
-		$rayon->recalculerStock();
+		// ── Recalcul des stocks de tous les rayons touchés ────────────
+		Rayon::all()->each(fn($r) => $r->recalculerStock());
 		$boutique->recalculerStock();
 	}
 }
