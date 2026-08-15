@@ -21,6 +21,7 @@ Route::get('/',      [AccueilController::class, 'index'])->name('index');
 Route::get('/blog',  [BlogController::class,    'index'])->name('blog');
 Route::get('/shop/{id}', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/pro',   [ProController::class,     'index'])->name('pro');
+Route::post('/pro/contact', [ProController::class, 'contact'])->name('pro.contact');
 
 // ── Panier (accessible sans compte) ──────────────────────────
 Route::get   ('/panier',            [PanierController::class, 'index'])    ->name('panier.index');

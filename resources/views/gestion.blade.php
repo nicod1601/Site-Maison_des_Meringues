@@ -1,44 +1,67 @@
 @vite('resources/css/gestion.css')
 
+@once
+@php
+if (!function_exists('gicon')) {
+	function gicon($name, $class = '') {
+		$icons = [
+			'plus'      => '<path d="M12 5v14M5 12h14"/>',
+			'search'    => '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>',
+			'download'  => '<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/>',
+			'upload'    => '<path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/>',
+			'edit'      => '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+			'trash'     => '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>',
+			'refresh'   => '<path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+			'close'     => '<path d="M18 6 6 18"/><path d="M6 6l12 12"/>',
+			'check'     => '<path d="M20 6 9 17l-5-5"/>',
+			'warning'   => '<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>',
+			'image'     => '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+			'folder'    => '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+			'tag'       => '<path d="M20.59 13.41 12 22l-9-9L11.59 2 20.59 11a2 2 0 0 1 0 2.41Z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+			'calendar'  => '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',
+			'diamond'   => '<path d="M6 3h12l4 6-10 12L2 9Z"/>',
+			'package'   => '<path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>',
+			'coin'      => '<circle cx="12" cy="12" r="9"/><path d="M9 9.5c0-1.1 1.2-2 3-2s3 .9 3 2-1.2 1.5-3 1.5-3 .6-3 1.7 1.2 2 3 2 3-.9 3-2"/><path d="M12 6.5v11"/>',
+			'bag'       => '<path d="M6 7h12l1 13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/>',
+			'star'      => '<path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L6 21l1.7-7L2.3 9.2l7.1-.6Z"/>',
+			'inbox'     => '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/>',
+			'chevron-l' => '<path d="M15 18l-6-6 6-6"/>',
+			'chevron-r' => '<path d="M9 18l6-6-6-6"/>',
+			'radio'     => '<circle cx="12" cy="12" r="3"/>',
+		];
+		$path = $icons[$name] ?? '';
+		return '<svg class="icon '.$class.'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$path.'</svg>';
+	}
+}
+@endphp
+@endonce
+
 {{-- TOPBAR --}}
 <header class="topbar">
 	<span class="topbar__brand">La Maison des <em>Meringues</em></span>
-	<a href="{{ route('index') }}" class="topbar__back">← Retour à l'accueil</a>
+	<a href="{{ route('index') }}" class="topbar__back">{!! gicon('chevron-l') !!} Retour à l'accueil</a>
 </header>
-<style>
-	*{
-		cursor: url("{{ asset('fichier/image/sourie/cursor-50.png') }}") 0 0, auto !important;
-	}
-</style>
 
 <main class="container section">
 {{-- ══ LIVE RAYONS BANNER ══ --}}
-<div style="margin-bottom:1rem;background:#fff;border:0.5px solid var(--color-border);border-radius:var(--radius-lg);padding:14px 18px;">
+<div class="live-banner">
 
-	<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-		<span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-muted);">
-			📡 Rayons en vitrine
+	<div class="live-banner__head">
+		<span class="live-banner__label">
+			{!! gicon('radio') !!} Rayons en vitrine
 		</span>
-		<span style="font-size:12px;color:var(--color-text-muted);">
+		<span class="live-banner__count">
 			{{ $rayons->where('live_rayon', true)->count() }} / {{ count($rayons) }} en live
 		</span>
 	</div>
 
-	<div style="display:flex;flex-wrap:wrap;gap:8px;">
+	<div class="live-banner__list">
 		@foreach($rayons as $r)
-		<form action="/gestion/rayon/{{ $r->id_rayon }}/live" method="POST"
-			  style="display:contents;">
+		<form action="/gestion/rayon/{{ $r->id_rayon }}/live" method="POST" class="live-banner__form">
 			@csrf @method('PATCH')
 			<button type="submit" name="live_rayon" value="{{ $r->live_rayon ? '0' : '1' }}"
-				style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px 6px 9px;
-					   border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;
-					   border:1.5px solid {{ $r->live_rayon ? '#22c55e' : 'var(--color-border)' }};
-					   background:{{ $r->live_rayon ? '#f0fdf4' : 'var(--color-bg-muted,#f5f0eb)' }};
-					   color:{{ $r->live_rayon ? '#15803d' : 'var(--color-text-muted)' }};">
-				<span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;
-							 background:{{ $r->live_rayon ? '#22c55e' : '#ccc' }};
-							 {{ $r->live_rayon ? 'box-shadow:0 0 0 3px #bbf7d0' : '' }};">
-				</span>
+				class="live-pill {{ $r->live_rayon ? 'live-pill--on' : '' }}">
+				<span class="live-pill__dot"></span>
 				{{ $r->nom_rayon }}
 			</button>
 		</form>
@@ -84,7 +107,7 @@
 					<form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data" id="import-form">
 						@csrf
 						<label for="file-input" class="drop-zone mt-md" id="drop-zone">
-							<div class="drop-zone__icon">📥</div>
+							<div class="drop-zone__icon">{!! gicon('upload') !!}</div>
 							<div class="drop-zone__label">
 								<strong id="name-file">Choisir un fichier</strong>
 								<span class="hint">.xlsx, .csv</span>
@@ -92,37 +115,37 @@
 							<input type="file" id="file-input" name="file" accept=".xlsx,.xls,.csv" hidden>
 						</label>
 						<div id="file-name-badge">
-							<span class="file-icon">📄</span>
+							<span class="file-icon">{!! gicon('package') !!}</span>
 							<span id="file-name-text">fichier.xlsx</span>
-							<span class="remove-file" id="remove-file" title="Retirer le fichier">✕</span>
+							<span class="remove-file" id="remove-file" title="Retirer le fichier">{!! gicon('close') !!}</span>
 						</div>
 						<button type="submit" class="btn btn--primary btn--sm w-full btn-submit-modal">
-							↑ Importer
+							{!! gicon('upload') !!} Importer
 						</button>
 					</form>
 
 					<p class="card__tag" style="margin-top: 30px">Les Boutons création </p>
 					<div class="grid grid-2 mt-md">
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvrayon" title="Nouveau Rayon">
-							➕ Rayon
+							{!! gicon('plus') !!} Rayon
 						</button>
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvevent" title="Nouvel Event">
-							🎉 Event
+							{!! gicon('calendar') !!} Event
 						</button>
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvproduit" title="Nouveau Produit">
-							➕ Produit
+							{!! gicon('plus') !!} Produit
 						</button>
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvparfum" title="Nouveau Parfum">
-							🍓 Parfum
+							{!! gicon('star') !!} Parfum
 						</button>
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvforme" title="Nouvelle Forme">
-							🔷 Forme
+							{!! gicon('diamond') !!} Forme
 						</button>
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvcondi" title="Nouveau Conditionnement">
-							📦 Conditionnement
+							{!! gicon('package') !!} Conditionnement
 						</button>
 						<button class="btn btn--ghost btn--sm btn--flex-shrink" id="btn-nvtheme2" title="Nouveau Thème">
-							🎨 Thème
+							{!! gicon('tag') !!} Thème
 						</button>
 
 					</div>
@@ -168,13 +191,13 @@
 					@endif
 				</h2>
 				<div class="toolbar-actions">
-					<input type="text" id="search-input" class="form-input form-input--sm search-input" placeholder="🔍 Rechercher…">
+					<input type="text" id="search-input" class="form-input form-input--sm search-input" placeholder="Rechercher…">
 
 					{{-- Bouton export Excel --}}
 					<a href="{{ route('produits.export', $rayon ? ['rayon' => $rayonId] : []) }}"
 					class="btn btn--ghost btn--sm"
 					title="Exporter tous les produits en Excel">
-						⬇ Export Excel
+						{!! gicon('download') !!} Export Excel
 					</a>
 
 					@if($rayon)
@@ -202,11 +225,11 @@
 								<th>Rayons</th>
 								<th>Thème</th>
 								<th>Stock</th>
-								<th title="Nouveauté">Nouveau</th>
-								<th title="À emporter">Emporter</th>
-								<th title="Expédition">Expédition</th>
-								<th title="Live" class="th-actions">Live</th>
-								<th class="th-actions">Actions</th>
+								<th title="Nouveauté" class="th-toggle">{!! gicon('star') !!}</th>
+								<th title="Disponible à emporter" class="th-toggle">{!! gicon('bag') !!}</th>
+								<th title="Disponible en expédition" class="th-toggle">{!! gicon('package') !!}</th>
+								<th title="Visible en live" class="th-toggle th-actions">{!! gicon('radio') !!}</th>
+								<th title="Actions" class="th-actions">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -237,20 +260,23 @@
 									@if($produit->stocks->isEmpty())
 										<span class="stock-badge stock-badge--rupture">Rupture</span>
 									@else
-										<div style="display:flex;flex-direction:column;gap:3px;">
-											@foreach($produit->stocks as $stock)
-												<span style="font-size:.78rem;white-space:nowrap;">
-													<span class="text-muted" style="text-transform:capitalize;">
-														{{ str_replace('_', ' ', $stock->formeCondi->conditionnement->type ?? '?') }} :
+										<div class="stock-cell">
+											<span class="stock-cell__total {{ $produit->quantite > 0 ? '' : 'stock-cell__total--rupture' }}">
+												{{ $produit->quantite }} <span class="stock-cell__total-label">en stock</span>
+											</span>
+											<div class="stock-cell__detail">
+												@foreach($produit->stocks as $stock)
+													@php
+														$typeLabel = str_replace('_', ' ', $stock->formeCondi->conditionnement->type ?? '?');
+													@endphp
+													<span
+														class="stock-chip {{ $stock->quantite > 0 ? 'stock-chip--ok' : 'stock-chip--rupture' }}"
+														title="{{ ucfirst($typeLabel) }} : {{ $stock->quantite }}"
+													>
+														{{ Str::limit(ucfirst($typeLabel), 10) }} · {{ $stock->quantite }}
 													</span>
-													@if($stock->quantite > 0)
-														<span class="stock-badge stock-badge--ok" style="font-size:.75rem;padding:1px 6px;">{{ $stock->quantite }}</span>
-													@else
-														<span class="stock-badge stock-badge--rupture" style="font-size:.75rem;padding:1px 6px;">0</span>
-													@endif
-												</span>
-											@endforeach
-											<span class="stock-total-line">Total : {{ $produit->quantite }}</span>
+												@endforeach
+											</div>
 										</div>
 									@endif
 								</td>
@@ -300,12 +326,12 @@
 												'{{ addslashes($produit->description ?? '') }}',
 	     										{{ $produit->stocks->pluck('quantite', 'id_forme_condi')->toJson() }}
 											)"
-										>✏️</button>
+										>{!! gicon('edit') !!}</button>
 									</div>
 									<div class="actions-wrap">
 										<form action="{{ route('produit.destroy', $produit->id_produit) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce produit')">
 											@csrf @method('DELETE')
-											<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+											<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">{!! gicon('trash') !!}</button>
 										</form>
 									</div>
 								</td>
@@ -316,7 +342,7 @@
 				</div>
 			@else
 				<div class="data-empty">
-					<p class="data-empty__icon">🍬</p>
+					<p class="data-empty__icon">{!! gicon('inbox') !!}</p>
 					<p class="data-empty__text">Aucun produit enregistré.</p>
 				</div>
 			@endif
@@ -329,8 +355,8 @@
 					Images <span class="data-count">{{ $images->total() }}</span>
 				</h2>
 				<div class="toolbar-actions">
-					<input type="text" id="search-input-images" class="form-input form-input--sm search-input" placeholder="🔍 Rechercher…">
-					<button class="btn btn--primary btn--sm" id="btn-nvimage">📤 Ajouter une image</button>
+					<input type="text" id="search-input-images" class="form-input form-input--sm search-input" placeholder="Rechercher…">
+					<button class="btn btn--primary btn--sm" id="btn-nvimage">{!! gicon('upload') !!} Ajouter une image</button>
 				</div>
 			</div>
 
@@ -349,7 +375,7 @@
 								onerror="this.style.display='none';this.nextElementSibling.style.display='none';this.closest('.image-card__preview').querySelector('.image-error-placeholder').style.display='flex';"
 							>
 							<div class="image-error-placeholder" style="display:none;">
-								<span>⚠️</span>
+								<span>{!! gicon('warning') !!}</span>
 								<span>Image introuvable</span>
 							</div>
 						</div>
@@ -371,7 +397,7 @@
 										'{{ route('image.remplacer', $image->id_image) }}',
 										'{{ addslashes($image->produit->nom_produit ?? 'Image #'.$image->id_image) }}'
 									)"
-								>🔄</button>
+								>{!! gicon('refresh') !!}</button>
 								<form
 									action="{{ route('image.destroy', $image->id_image) }}"
 									method="POST"
@@ -380,7 +406,7 @@
 									onsubmit="return confirmSuppr('cette image')"
 								>
 									@csrf @method('DELETE')
-									<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+									<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">{!! gicon('trash') !!}</button>
 								</form>
 							</div>
 						</div>
@@ -396,9 +422,9 @@
 						</span>
 						<div class="pagination-btns">
 							@if($images->onFirstPage())
-								<button class="btn-pagination" disabled>← Précédent</button>
+								<button class="btn-pagination" disabled>{!! gicon('chevron-l') !!} Précédent</button>
 							@else
-								<a href="{{ $images->previousPageUrl() }}&tab=images{{ request('rayon') ? '&rayon='.request('rayon') : '' }}" class="btn-pagination">← Précédent</a>
+								<a href="{{ $images->previousPageUrl() }}&tab=images{{ request('rayon') ? '&rayon='.request('rayon') : '' }}" class="btn-pagination">{!! gicon('chevron-l') !!} Précédent</a>
 							@endif
 
 							@foreach($images->getUrlRange(1, $images->lastPage()) as $page => $url)
@@ -410,9 +436,9 @@
 							@endforeach
 
 							@if($images->hasMorePages())
-								<a href="{{ $images->nextPageUrl() }}&tab=images{{ request('rayon') ? '&rayon='.request('rayon') : '' }}" class="btn-pagination">Suivant →</a>
+								<a href="{{ $images->nextPageUrl() }}&tab=images{{ request('rayon') ? '&rayon='.request('rayon') : '' }}" class="btn-pagination">Suivant {!! gicon('chevron-r') !!}</a>
 							@else
-								<button class="btn-pagination" disabled>Suivant →</button>
+								<button class="btn-pagination" disabled>Suivant {!! gicon('chevron-r') !!}</button>
 							@endif
 						</div>
 					</div>
@@ -420,10 +446,10 @@
 
 			@else
 				<div class="data-empty">
-					<p class="data-empty__icon">🖼️</p>
+					<p class="data-empty__icon">{!! gicon('image') !!}</p>
 					<p class="data-empty__text">Aucune image enregistrée.</p>
 					<button class="btn btn--primary btn--sm" onclick="document.getElementById('modal-image').classList.remove('hidden')">
-						📤 Ajouter une première image
+						{!! gicon('upload') !!} Ajouter une première image
 					</button>
 				</div>
 			@endif
@@ -458,10 +484,10 @@
 								<td><span class="stock-badge stock-badge--ok">{{ $r->stock_total_rayon }}</span></td>
 								<td class="td-actions">
 									<button class="btn-icon btn-icon--edit" title="Modifier les events"
-										onclick="ouvrirModalEditRayon({{ $r->id_rayon }}, '{{ $r->nom_rayon }}', {{ json_encode($r->events->pluck('id_event')) }})">✏️</button>
+										onclick="ouvrirModalEditRayon({{ $r->id_rayon }}, '{{ $r->nom_rayon }}', {{ json_encode($r->events->pluck('id_event')) }})">{!! gicon('edit') !!}</button>
 									<form action="{{ route('rayon.destroy', $r->id_rayon) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce rayon')">
 										@csrf @method('DELETE')
-										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">{!! gicon('trash') !!}</button>
 									</form>
 								</td>
 							</tr>
@@ -471,7 +497,7 @@
 				</div>
 			@else
 				<div class="data-empty">
-					<p class="data-empty__icon">🗂</p>
+					<p class="data-empty__icon">{!! gicon('folder') !!}</p>
 					<p class="data-empty__text">Aucun rayon enregistré.</p>
 				</div>
 			@endif
@@ -505,7 +531,7 @@
 								<td class="td-actions">
 									<form action="{{ route('theme.destroy', $theme->id_theme) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce thème')">
 										@csrf @method('DELETE')
-										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">{!! gicon('trash') !!}</button>
 									</form>
 								</td>
 							</tr>
@@ -515,7 +541,7 @@
 				</div>
 			@else
 				<div class="data-empty">
-					<p class="data-empty__icon">🎨</p>
+					<p class="data-empty__icon">{!! gicon('tag') !!}</p>
 					<p class="data-empty__text">Aucun thème enregistré.</p>
 				</div>
 			@endif
@@ -550,7 +576,7 @@
 								<td class="td-actions">
 									<form action="{{ route('event.destroy', $event->id_event) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('cet event')">
 										@csrf @method('DELETE')
-										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">🗑️</button>
+										<button type="submit" class="btn-icon btn-icon--delete" title="Supprimer">{!! gicon('trash') !!}</button>
 									</form>
 								</td>
 							</tr>
@@ -560,7 +586,7 @@
 				</div>
 			@else
 				<div class="data-empty">
-					<p class="data-empty__icon">🎉</p>
+					<p class="data-empty__icon">{!! gicon('calendar') !!}</p>
 					<p class="data-empty__text">Aucun event enregistré.</p>
 				</div>
 			@endif
@@ -584,7 +610,7 @@
 								<td class="td-actions">
 									<form action="{{ route('forme.destroy', $forme->id_forme) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('cette forme')">
 										@csrf @method('DELETE')
-										<button type="submit" class="btn-icon btn-icon--delete">🗑️</button>
+										<button type="submit" class="btn-icon btn-icon--delete">{!! gicon('trash') !!}</button>
 									</form>
 								</td>
 							</tr>
@@ -593,7 +619,7 @@
 					</table>
 				</div>
 			@else
-				<div class="data-empty"><p class="data-empty__icon">🔷</p><p class="data-empty__text">Aucune forme.</p></div>
+				<div class="data-empty"><p class="data-empty__icon">{!! gicon('diamond') !!}</p><p class="data-empty__text">Aucune forme.</p></div>
 			@endif
 		</div>
 
@@ -615,7 +641,7 @@
 								<td class="td-actions">
 									<form action="{{ route('conditionnement.destroy', $cond->id_condi) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce conditionnement')">
 										@csrf @method('DELETE')
-										<button type="submit" class="btn-icon btn-icon--delete">🗑️</button>
+										<button type="submit" class="btn-icon btn-icon--delete">{!! gicon('trash') !!}</button>
 									</form>
 								</td>
 							</tr>
@@ -624,7 +650,7 @@
 					</table>
 				</div>
 			@else
-				<div class="data-empty"><p class="data-empty__icon">📦</p><p class="data-empty__text">Aucun conditionnement.</p></div>
+				<div class="data-empty"><p class="data-empty__icon">{!! gicon('package') !!}</p><p class="data-empty__text">Aucun conditionnement.</p></div>
 			@endif
 		</div>
 
@@ -648,7 +674,7 @@
 								<td class="td-actions">
 									<form action="{{ route('formecondi.destroy', $fc->id_forme_condi) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce prix')">
 										@csrf @method('DELETE')
-										<button type="submit" class="btn-icon btn-icon--delete">🗑️</button>
+										<button type="submit" class="btn-icon btn-icon--delete">{!! gicon('trash') !!}</button>
 									</form>
 								</td>
 							</tr>
@@ -657,7 +683,7 @@
 					</table>
 				</div>
 			@else
-				<div class="data-empty"><p class="data-empty__icon">💰</p><p class="data-empty__text">Aucun prix.</p></div>
+				<div class="data-empty"><p class="data-empty__icon">{!! gicon('coin') !!}</p><p class="data-empty__text">Aucun prix.</p></div>
 			@endif
 		</div>
 
@@ -666,7 +692,7 @@
 			<div class="data-toolbar">
 				<h2 class="data-toolbar__title">
 					Parfums <span class="data-count">{{ count($parfums) }}</span>
-					<input type="text" id="search-input-parfums" class="form-input form-input--sm search-input" placeholder="🔍 Rechercher…">
+					<input type="text" id="search-input-parfums" class="form-input form-input--sm search-input" placeholder="Rechercher…">
 				</h2>
 				<button class="btn btn--primary btn--sm" id="btn-nvparfum">+ Nouveau parfum</button>
 			</div>
@@ -682,7 +708,7 @@
 								<td class="td-actions">
 									<form action="{{ route('parfum.destroy', $parfum->id_parfum) }}" method="POST" class="form-delete" onsubmit="return confirmSuppr('ce parfum')">
 										@csrf @method('DELETE')
-										<button type="submit" class="btn-icon btn-icon--delete">🗑️</button>
+										<button type="submit" class="btn-icon btn-icon--delete">{!! gicon('trash') !!}</button>
 									</form>
 								</td>
 							</tr>
@@ -691,7 +717,7 @@
 					</table>
 				</div>
 			@else
-				<div class="data-empty"><p class="data-empty__icon">🍓</p><p class="data-empty__text">Aucun parfum.</p></div>
+				<div class="data-empty"><p class="data-empty__icon">{!! gicon('star') !!}</p><p class="data-empty__text">Aucun parfum.</p></div>
 			@endif
 		</div>
 
@@ -801,7 +827,7 @@
 
 			<div class="modal-actions">
 				<button type="button" class="btn-close-modal">Annuler</button>
-				<button type="submit" class="btn btn--primary">💾 Enregistrer</button>
+				<button type="submit" class="btn btn--primary">{!! gicon('check') !!} Enregistrer</button>
 			</div>
 		</form>
 	</div>
@@ -836,7 +862,7 @@
 
 			<div class="modal-actions">
 				<button type="button" class="btn-close-modal">Annuler</button>
-				<button type="submit" class="btn btn--primary">↑ Envoyer</button>
+				<button type="submit" class="btn btn--primary">{!! gicon('upload') !!} Envoyer</button>
 			</div>
 		</form>
 	</div>
@@ -859,7 +885,7 @@
 			<input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,.gif" required>
 			<div class="modal-actions">
 				<button type="button" class="btn-close-modal">Annuler</button>
-				<button type="submit" class="btn btn--primary">🔄 Remplacer</button>
+				<button type="submit" class="btn btn--primary">{!! gicon('refresh') !!} Remplacer</button>
 			</div>
 		</form>
 	</div>
@@ -883,7 +909,7 @@
 				@endforeach
 			</div>
 			<div id="preview-produits" class="preview-produits" style="display:none;">
-				🔍 <span id="preview-text">0 produit(s) seront liés à ce rayon</span>
+				{!! gicon('search') !!} <span id="preview-text">0 produit(s) seront liés à ce rayon</span>
 			</div>
 			<div class="modal-actions">
 				<button type="button" class="btn-close-modal">Annuler</button>
@@ -1292,7 +1318,7 @@ document.querySelectorAll('input[name="live"], input[name="dispo_expedition"], i
 		fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() })
 		.then(res => {
 			if (!res.ok) { this.checked = !checked; afficherToast('Erreur lors de la mise à jour', 'error'); }
-			else { afficherToast('Mise à jour effectuée ✓', 'success'); }
+			else { afficherToast('Mise à jour effectuée', 'success'); }
 		})
 		.catch(() => { this.checked = !checked; afficherToast('Erreur réseau', 'error'); });
 	});
@@ -1332,10 +1358,10 @@ document.querySelectorAll('.table-wrapper').forEach(wrapper => {
 	const paginationControls = document.createElement('div');
 	paginationControls.className = 'pagination-controls';
 	const prevBtn = document.createElement('button');
-	prevBtn.textContent = '← Précédent';
+	prevBtn.innerHTML = '{!! gicon('chevron-l') !!} Précédent';
 	prevBtn.className = 'btn-pagination';
 	const nextBtn = document.createElement('button');
-	nextBtn.textContent = 'Suivant →';
+	nextBtn.innerHTML = 'Suivant {!! gicon('chevron-r') !!}';
 	nextBtn.className = 'btn-pagination';
 	const pageInfo = document.createElement('span');
 	paginationControls.append(prevBtn, pageInfo, nextBtn);

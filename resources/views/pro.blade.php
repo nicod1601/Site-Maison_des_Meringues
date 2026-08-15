@@ -349,6 +349,27 @@
                     <form method="POST" action="{{ url('/pro/contact') }}" novalidate>
                         @csrf
 
+                        @if(session('pro_contact_success'))
+                        <div class="form-alert form-alert--success">
+                            <i class="ti ti-circle-check" aria-hidden="true"></i>
+                            {{ session('pro_contact_success') }}
+                        </div>
+                        @endif
+
+                        @if(session('pro_contact_error'))
+                        <div class="form-alert form-alert--error">
+                            <i class="ti ti-alert-circle" aria-hidden="true"></i>
+                            {{ session('pro_contact_error') }}
+                        </div>
+                        @endif
+
+                        @if($errors->any())
+                        <div class="form-alert form-alert--error">
+                            <i class="ti ti-alert-circle" aria-hidden="true"></i>
+                            Merci de corriger les champs indiqués ci-dessous.
+                        </div>
+                        @endif
+
                         <div class="form-row">
                             <div>
                                 <label class="form-label" for="prenom">Prénom</label>
@@ -356,10 +377,12 @@
                                     type="text"
                                     id="prenom"
                                     name="prenom"
-                                    class="form-input"
+                                    class="form-input @error('prenom') form-input--error @enderror"
                                     placeholder="Marie"
+                                    value="{{ old('prenom') }}"
                                     required
                                 >
+                                @error('prenom')<span class="form-error">{{ $message }}</span>@enderror
                             </div>
                             <div>
                                 <label class="form-label" for="nom">Nom</label>
@@ -367,10 +390,12 @@
                                     type="text"
                                     id="nom"
                                     name="nom"
-                                    class="form-input"
+                                    class="form-input @error('nom') form-input--error @enderror"
                                     placeholder="Dupont"
+                                    value="{{ old('nom') }}"
                                     required
                                 >
+                                @error('nom')<span class="form-error">{{ $message }}</span>@enderror
                             </div>
                         </div>
 
@@ -382,6 +407,7 @@
                                 name="societe"
                                 class="form-input"
                                 placeholder="Épicerie du Marché"
+                                value="{{ old('societe') }}"
                             >
                         </div>
 
@@ -392,10 +418,12 @@
                                     type="email"
                                     id="email"
                                     name="email"
-                                    class="form-input"
+                                    class="form-input @error('email') form-input--error @enderror"
                                     placeholder="vous@exemple.fr"
+                                    value="{{ old('email') }}"
                                     required
                                 >
+                                @error('email')<span class="form-error">{{ $message }}</span>@enderror
                             </div>
                             <div>
                                 <label class="form-label" for="telephone">Téléphone</label>
@@ -405,20 +433,22 @@
                                     name="telephone"
                                     class="form-input"
                                     placeholder="06 00 00 00 00"
+                                    value="{{ old('telephone') }}"
                                 >
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label" for="type_pro">Type d'activité</label>
-                            <select id="type_pro" name="type_pro" class="form-select">
-                                <option value="" disabled selected>Choisir votre activité…</option>
-                                <option value="epicerie">Épicerie fine</option>
-                                <option value="restaurant">Restaurant / Hôtel</option>
-                                <option value="revendeur">Revendeur</option>
-                                <option value="evenement">Événementiel</option>
-                                <option value="autre">Autre</option>
+                            <select id="type_pro" name="type_pro" class="form-select @error('type_pro') form-input--error @enderror">
+                                <option value="" disabled {{ old('type_pro') ? '' : 'selected' }}>Choisir votre activité…</option>
+                                <option value="epicerie"   {{ old('type_pro') === 'epicerie'   ? 'selected' : '' }}>Épicerie fine</option>
+                                <option value="restaurant" {{ old('type_pro') === 'restaurant' ? 'selected' : '' }}>Restaurant / Hôtel</option>
+                                <option value="revendeur"  {{ old('type_pro') === 'revendeur'  ? 'selected' : '' }}>Revendeur</option>
+                                <option value="evenement"  {{ old('type_pro') === 'evenement'  ? 'selected' : '' }}>Événementiel</option>
+                                <option value="autre"      {{ old('type_pro') === 'autre'      ? 'selected' : '' }}>Autre</option>
                             </select>
+                            @error('type_pro')<span class="form-error">{{ $message }}</span>@enderror
                         </div>
 
                         <div class="form-group">
@@ -426,10 +456,11 @@
                             <textarea
                                 id="message"
                                 name="message"
-                                class="form-textarea"
+                                class="form-textarea @error('message') form-input--error @enderror"
                                 placeholder="Décrivez votre projet, vos volumes estimés, vos questions…"
                                 required
-                            ></textarea>
+                            >{{ old('message') }}</textarea>
+                            @error('message')<span class="form-error">{{ $message }}</span>@enderror
                         </div>
 
                         <button type="submit" class="btn-submit">
@@ -503,6 +534,12 @@
 </main>
 
 <script>
+@if(session('pro_contact_success') || session('pro_contact_error') || $errors->any())
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+@endif
+
 /* Filtre parfums en live */
 document.getElementById('parfums-search')?.addEventListener('input', function () {
     const q = this.value.toLowerCase().trim();
@@ -519,6 +556,4 @@ document.querySelectorAll('.prod-card__img').forEach(img => {
 });
 </script>
 
-</body>
 @include('templet.footer')
-</html>
