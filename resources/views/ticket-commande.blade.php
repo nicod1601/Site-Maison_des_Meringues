@@ -9,24 +9,54 @@
 	'title' => 'Tickets'
 ])
 
+@once
+@php
+if (!function_exists('gicon')) {
+	function gicon($name, $class = '') {
+		$icons = [
+			'receipt'   => '<path d="M4 3h16v18l-3-2-3 2-3-2-3 2-3-2-1 1Z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+			'coin'      => '<circle cx="12" cy="12" r="9"/><path d="M9 9.5c0-1.1 1.2-2 3-2s3 .9 3 2-1.2 1.5-3 1.5-3 .6-3 1.7 1.2 2 3 2 3-.9 3-2"/><path d="M12 6.5v11"/>',
+			'package'   => '<path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>',
+			'bag'       => '<path d="M6 7h12l1 13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/>',
+			'user'      => '<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>',
+			'mail'      => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+			'phone'     => '<path d="M15.05 5A6 6 0 0 1 19 8.95M15.05 1A10 10 0 0 1 23 8.94M3.6 8.7a15.1 15.1 0 0 0 6.6 6.7l1.8-2.1a2 2 0 0 1 2.1-.5c1 .3 2.1.5 3.2.5a2 2 0 0 1 2 2v2.8a2 2 0 0 1-2.2 2A18.6 18.6 0 0 1 2 4.2 2 2 0 0 1 4 2h2.8a2 2 0 0 1 2 2c0 1.1.2 2.2.5 3.2a2 2 0 0 1-.5 2.1Z"/>',
+			'home'      => '<path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/>',
+			'card'      => '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+			'trash'     => '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>',
+			'printer'   => '<path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M6 17h12v5H6z"/>',
+			'search'    => '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>',
+			'check'     => '<path d="M20 6 9 17l-5-5"/>',
+			'chevron-r' => '<path d="M9 18l6-6-6-6"/>',
+			'copy'      => '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+			'inbox'     => '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/>',
+			'filter-x'  => '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3Z"/><path d="m17 17 5 5M22 17l-5 5"/>',
+			'sparkle'   => '<path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="3"/>',
+		];
+		$path = $icons[$name] ?? '';
+		return '<svg class="icon '.$class.'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$path.'</svg>';
+	}
+}
+@endphp
+@endonce
+
 <style>
 /* ── BASE ───────────────────────────────────────────────────── */
 .tk-page {
-	max-width: 1060px;
-	margin: 2rem auto;
+	max-width: 1120px;
+	margin: 2.25rem auto;
 	padding: 0 1.25rem 5rem;
 	display: grid;
-	grid-template-columns: 200px 1fr;
+	grid-template-columns: 214px 1fr;
 	gap: 2rem;
 	align-items: start;
 	font-family: 'DM Sans', sans-serif;
 }
 
+.icon { width: 1em; height: 1em; flex-shrink: 0; vertical-align: -0.15em; }
+
 /* ── SIDEBAR ────────────────────────────────────────────────── */
-.tk-sidebar {
-	position: sticky;
-	top: 90px;
-}
+.tk-sidebar { position: sticky; top: 90px; }
 
 .tk-sidebar__heading {
 	font-size: .65rem;
@@ -43,21 +73,20 @@
 	border: 1px solid var(--color-border, #E8DEC8);
 	border-radius: 14px;
 	overflow: hidden;
-	margin-bottom: 1.25rem;
 }
 
 .tk-nav__item {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	padding: .75rem 1rem;
+	padding: .7rem 1rem;
 	font-size: .82rem;
 	font-weight: 500;
 	color: var(--color-text-muted, #8C7B6A);
 	cursor: pointer;
 	border-left: 2.5px solid transparent;
 	border-bottom: 1px solid var(--color-border, #E8DEC8);
-	transition: all .15s;
+	transition: background .15s, color .15s, border-color .15s;
 	user-select: none;
 }
 
@@ -71,88 +100,158 @@
 	font-weight: 700;
 }
 
-.tk-nav__dot {
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	flex-shrink: 0;
+.tk-nav__dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tk-nav__label { flex: 1; }
+
+.tk-nav__count {
+	font-size: .7rem;
+	font-weight: 700;
+	color: var(--color-text-muted, #8C7B6A);
+	background: #f5f0eb;
+	border-radius: 999px;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 6px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: background .15s, color .15s;
 }
 
-/* ── RÉSUMÉ SIDEBAR ─────────────────────────────────────────── */
-.tk-summary {
+.tk-nav__item.active .tk-nav__count { color: #fff; background: var(--color-primary, #C0395A); }
+
+.tk-sidebar__help {
+	margin-top: 1.25rem;
+	padding: .9rem 1rem;
+	background: #faf6ee;
+	border: 1px dashed var(--color-border, #E8DEC8);
+	border-radius: 14px;
+	font-size: .76rem;
+	color: var(--color-text-muted, #8C7B6A);
+	line-height: 1.5;
+}
+.tk-sidebar__help strong { color: var(--color-text, #2E1A10); }
+
+/* ── CONTENU PRINCIPAL ──────────────────────────────────────── */
+.tk-stats {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: .85rem;
+	margin-bottom: 1.5rem;
+}
+
+.tk-stat-card {
 	background: #fff;
 	border: 1px solid var(--color-border, #E8DEC8);
 	border-radius: 14px;
-	padding: 1rem 1.1rem;
+	padding: 1rem 1.15rem;
+	display: flex;
+	align-items: center;
+	gap: .85rem;
 }
 
-.tk-summary__title {
-	font-size: .65rem;
+.tk-stat-card__icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
+	background: #fdf5f7;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.15rem;
+	color: var(--color-primary, #C0395A);
+	flex-shrink: 0;
+}
+.tk-stat-card__icon .icon { width: 19px; height: 19px; }
+.tk-stat-card__icon--money { background: #f0f7ee; color: #1b7a52; }
+
+.tk-stat-card__label {
+	font-size: .68rem;
 	text-transform: uppercase;
-	letter-spacing: .12em;
+	letter-spacing: .08em;
 	color: var(--color-text-muted, #8C7B6A);
 	font-weight: 600;
-	margin-bottom: .75rem;
+	margin-bottom: 2px;
 }
 
-.tk-summary__row {
-	display: flex;
-	justify-content: space-between;
-	font-size: .8rem;
-	padding: .3rem 0;
-	color: var(--color-text-muted, #8C7B6A);
-}
-
-.tk-summary__row strong {
+.tk-stat-card__value {
+	font-family: var(--font-serif, 'Playfair Display', serif);
+	font-size: 1.35rem;
+	font-weight: 700;
 	color: var(--color-text, #2E1A10);
+	line-height: 1.1;
 }
-
-.tk-summary__row strong.red {
-	color: var(--color-primary, #C0395A);
-}
-
-/* ── CONTENU PRINCIPAL ──────────────────────────────────────── */
-.tk-content {}
+.tk-stat-card__value--accent { color: var(--color-primary, #C0395A); }
 
 .tk-header {
-	margin-bottom: 1.25rem;
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1.1rem;
+	flex-wrap: wrap;
 }
 
 .tk-title {
 	font-family: var(--font-serif, 'Playfair Display', serif);
-	font-size: 1.5rem;
+	font-size: 1.2rem;
 	font-weight: 700;
 	color: var(--color-text, #2E1A10);
-	margin: 0 0 3px;
+	margin: 0;
 }
 
-.tk-subtitle {
-	font-size: .8rem;
+.tk-subtitle { font-size: .78rem; color: var(--color-text-muted, #8C7B6A); }
+
+/* ── RECHERCHE ──────────────────────────────────────────────── */
+.tk-search {
+	position: relative;
+	margin-bottom: 1.1rem;
+}
+
+.tk-search .icon {
+	position: absolute;
+	left: 13px;
+	top: 50%;
+	transform: translateY(-50%);
 	color: var(--color-text-muted, #8C7B6A);
+	width: 15px;
+	height: 15px;
+	pointer-events: none;
 }
 
-/* ── FILTRES RAPIDES ────────────────────────────────────────── */
-.tk-filters {
-	display: flex;
-	gap: .5rem;
-	flex-wrap: wrap;
-	margin-bottom: 1.25rem;
-}
-
-.tk-filter-btn {
-	padding: .35rem .85rem;
+.tk-search input {
+	width: 100%;
+	padding: .65rem .9rem .65rem 38px;
 	border-radius: 999px;
-	border: 1px solid var(--color-border, #E8DEC8);
+	border: 1.5px solid var(--color-border, #E8DEC8);
 	background: #fff;
-	font-size: .78rem;
-	font-weight: 500;
-	color: var(--color-text-muted, #8C7B6A);
-	cursor: pointer;
-	transition: all .15s;
+	font-size: .84rem;
+	font-family: inherit;
+	color: var(--color-text, #2E1A10);
+	outline: none;
+	transition: border-color .15s;
 }
+.tk-search input:focus { border-color: var(--color-primary, #C0395A); }
+.tk-search input::placeholder { color: var(--color-text-muted, #8C7B6A); }
 
-.tk-filter-btn:hover { border-color: var(--color-primary, #C0395A); color: var(--color-primary, #C0395A); }
-.tk-filter-btn.active { background: var(--color-primary, #C0395A); border-color: var(--color-primary, #C0395A); color: #fff; font-weight: 700; }
+.tk-search__clear {
+	position: absolute;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	border: none;
+	background: #f5f0eb;
+	color: var(--color-text-muted, #8C7B6A);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+.tk-search__clear .icon { position: static; transform: none; width: 12px; height: 12px; }
+.tk-search__clear.show { display: flex; }
 
 /* ── TICKET CARD ────────────────────────────────────────────── */
 .tk-card {
@@ -161,10 +260,10 @@
 	border-radius: 16px;
 	overflow: hidden;
 	margin-bottom: 1.1rem;
-	transition: box-shadow .15s;
+	transition: box-shadow .15s, border-color .15s;
 }
 
-.tk-card:hover { box-shadow: 0 4px 20px rgba(46,26,16,.07); }
+.tk-card:hover { box-shadow: 0 6px 24px rgba(46,26,16,.08); border-color: #ddcda8; }
 
 /* ── TICKET HEAD ─────────────────────────────────────────────── */
 .tk-card__head {
@@ -178,11 +277,21 @@
 }
 
 .tk-card__ref {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
 	font-family: var(--font-serif, 'Playfair Display', serif);
 	font-size: .95rem;
 	font-weight: 700;
 	color: var(--color-text, #2E1A10);
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
 }
+.tk-card__ref .icon { color: var(--color-text-muted, #8C7B6A); width: 15px; height: 15px; }
+.tk-card__ref:hover .tk-card__copy-icon { color: var(--color-primary, #C0395A); }
+.tk-card__copy-icon { width: 13px !important; height: 13px !important; color: #c9bda3; transition: color .15s; }
 
 .tk-card__date {
 	font-size: .75rem;
@@ -190,11 +299,16 @@
 	margin-top: 2px;
 }
 
-.tk-card__head-right {
-	display: flex;
+.tk-card__head-right { display: flex; align-items: center; gap: .75rem; }
+
+.tk-delivery-tag {
+	display: inline-flex;
 	align-items: center;
-	gap: .75rem;
+	gap: 5px;
+	font-size: .75rem;
+	color: var(--color-text-muted, #8C7B6A);
 }
+.tk-delivery-tag .icon { width: 13px; height: 13px; }
 
 /* ── STATUS BADGE ────────────────────────────────────────────── */
 .tk-status {
@@ -230,9 +344,7 @@
 .tk-status--emportee::before  { background: #43a047; }
 
 /* ── TICKET BODY ─────────────────────────────────────────────── */
-.tk-card__body {
-	padding: 1.1rem 1.25rem;
-}
+.tk-card__body { padding: 1.1rem 1.25rem; }
 
 /* Bloc client admin ─ */
 .tk-client-block {
@@ -258,21 +370,14 @@
 	margin-bottom: .1rem;
 }
 
-.tk-client-block__icon {
-	color: var(--color-text-muted, #8C7B6A);
-	font-size: .95rem;
-}
-
-.tk-client-block__val {
-	color: var(--color-text, #2E1A10);
-	font-weight: 500;
-}
+.tk-client-block__icon { color: var(--color-text-muted, #8C7B6A); width: 15px; height: 15px; }
+.tk-client-block__val { color: var(--color-text, #2E1A10); font-weight: 500; }
 
 /* Mode livraison ─ */
 .tk-delivery {
 	display: inline-flex;
 	align-items: center;
-	gap: 5px;
+	gap: 6px;
 	font-size: .77rem;
 	color: var(--color-text-muted, #8C7B6A);
 	padding: .3rem .75rem;
@@ -280,17 +385,11 @@
 	border-radius: 999px;
 	margin-bottom: .9rem;
 }
+.tk-delivery .icon { width: 13px; height: 13px; }
 
 /* Table articles ─ */
-.tk-items {
-	width: 100%;
-	border-collapse: collapse;
-	font-size: .82rem;
-}
-
-.tk-items thead tr {
-	border-bottom: 1px solid var(--color-border, #E8DEC8);
-}
+.tk-items { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.tk-items thead tr { border-bottom: 1px solid var(--color-border, #E8DEC8); }
 
 .tk-items thead th {
 	font-size: .7rem;
@@ -301,36 +400,15 @@
 	padding: .35rem .5rem .35rem 0;
 	text-align: left;
 }
-
 .tk-items thead th:last-child { text-align: right; }
 
-.tk-items tbody tr {
-	border-bottom: 1px dashed #f0e8da;
-}
-
+.tk-items tbody tr { border-bottom: 1px dashed #f0e8da; }
 .tk-items tbody tr:last-child { border-bottom: none; }
-
-.tk-items tbody td {
-	padding: .55rem .5rem .55rem 0;
-	color: var(--color-text, #2E1A10);
-	vertical-align: top;
-}
-
+.tk-items tbody td { padding: .55rem .5rem .55rem 0; color: var(--color-text, #2E1A10); vertical-align: top; }
 .tk-items tbody td:last-child { text-align: right; font-weight: 700; white-space: nowrap; }
 
-.tk-items__sub {
-	display: block;
-	font-size: .72rem;
-	color: var(--color-text-muted, #8C7B6A);
-	margin-top: 2px;
-}
-
 /* Totaux ─ */
-.tk-totals {
-	margin-top: .75rem;
-	padding-top: .75rem;
-	border-top: 1.5px solid var(--color-border, #E8DEC8);
-}
+.tk-totals { margin-top: .75rem; padding-top: .75rem; border-top: 1.5px solid var(--color-border, #E8DEC8); }
 
 .tk-totals__row {
 	display: flex;
@@ -339,7 +417,6 @@
 	padding: .2rem 0;
 	color: var(--color-text-muted, #8C7B6A);
 }
-
 .tk-totals__row strong { color: var(--color-text, #2E1A10); }
 
 .tk-totals__row--big {
@@ -350,7 +427,6 @@
 	font-weight: 700;
 	color: var(--color-text, #2E1A10);
 }
-
 .tk-totals__row--big span:last-child {
 	color: var(--color-primary, #C0395A);
 	font-family: var(--font-serif, 'Playfair Display', serif);
@@ -370,6 +446,7 @@
 	color: #1565c0;
 	border: 1px solid #bee3f8;
 }
+.tk-monetico .icon { width: 14px; height: 14px; }
 
 /* ── TICKET FOOTER ───────────────────────────────────────────── */
 .tk-card__footer {
@@ -390,14 +467,8 @@
 }
 
 /* ── ADMIN ACTIONS ───────────────────────────────────────────── */
-.tk-admin-actions {
-	display: flex;
-	align-items: center;
-	gap: .6rem;
-	flex-wrap: wrap;
-}
+.tk-admin-actions { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
 
-/* Checkbox générique ─ */
 .tk-check-label {
 	display: inline-flex;
 	align-items: center;
@@ -413,68 +484,23 @@
 	transition: all .15s;
 	user-select: none;
 }
+.tk-check-label .icon { width: 14px; height: 14px; }
 
-.tk-check-label:hover {
-	border-color: #7e57c2;
-	color: #4527a0;
-	background: #f3eeff;
-}
+.tk-check-label:hover { border-color: #7e57c2; color: #4527a0; background: #f3eeff; }
+.tk-check-label.done  { border-color: #7e57c2; color: #4527a0; background: #ede7f6; }
+.tk-check-label input[type="checkbox"] { accent-color: #7e57c2; width: 15px; height: 15px; cursor: pointer; }
 
-.tk-check-label.done {
-	border-color: #7e57c2;
-	color: #4527a0;
-	background: #ede7f6;
-}
+.tk-check-label--emporter:hover { border-color: #2e7d32; color: #1b5e20; background: #f1f8e9; }
+.tk-check-label--emporter.done  { border-color: #43a047; color: #1b5e20; background: #e8f5e9; }
+.tk-check-label--emporter input[type="checkbox"] { accent-color: #43a047; }
 
-.tk-check-label input[type="checkbox"] {
-	accent-color: #7e57c2;
-	width: 15px;
-	height: 15px;
-	cursor: pointer;
-}
+.tk-check-label--expedier:hover { border-color: #1565c0; color: #0d47a1; background: #e3f2fd; }
+.tk-check-label--expedier.done  { border-color: #42a5f5; color: #0d47a1; background: #e3f2fd; }
+.tk-check-label--expedier input[type="checkbox"] { accent-color: #42a5f5; }
 
-/* Case "Emporter" (click & collect) ─ */
-.tk-check-label--emporter:hover {
-	border-color: #2e7d32;
-	color: #1b5e20;
-	background: #f1f8e9;
-}
+.tk-actions-sep { color: var(--color-text-muted, #8C7B6A); }
+.tk-actions-sep .icon { width: 13px; height: 13px; }
 
-.tk-check-label--emporter.done {
-	border-color: #43a047;
-	color: #1b5e20;
-	background: #e8f5e9;
-}
-
-.tk-check-label--emporter input[type="checkbox"] {
-	accent-color: #43a047;
-}
-
-/* Case "Expédier" (expédition) ─ */
-.tk-check-label--expedier:hover {
-	border-color: #1565c0;
-	color: #0d47a1;
-	background: #e3f2fd;
-}
-
-.tk-check-label--expedier.done {
-	border-color: #42a5f5;
-	color: #0d47a1;
-	background: #e3f2fd;
-}
-
-.tk-check-label--expedier input[type="checkbox"] {
-	accent-color: #42a5f5;
-}
-
-/* Séparateur visuel entre les deux cases ─ */
-.tk-actions-sep {
-	font-size: .75rem;
-	color: var(--color-text-muted, #8C7B6A);
-	padding: 0 .15rem;
-}
-
-/* Bouton supprimer (admin) ─ */
 .tk-btn-delete {
 	display: inline-flex;
 	align-items: center;
@@ -489,7 +515,7 @@
 	cursor: pointer;
 	transition: all .15s;
 }
-
+.tk-btn-delete .icon { width: 14px; height: 14px; }
 .tk-btn-delete:hover { background: #ffebee; border-color: #ef5350; }
 
 /* ── BOUTON PDF ──────────────────────────────────────────────── */
@@ -507,33 +533,50 @@
 	cursor: pointer;
 	transition: all .15s;
 }
-
-.tk-btn-print:hover {
-	background: #f5f0eb;
-	border-color: #8C7B6A;
-}
+.tk-btn-print .icon { width: 14px; height: 14px; }
+.tk-btn-print:hover { background: #f5f0eb; border-color: #8C7B6A; }
 
 /* ── VIDE ────────────────────────────────────────────────────── */
 .tk-empty {
 	text-align: center;
-	padding: 4rem 2rem;
+	padding: 3.5rem 2rem;
+	background: #fff;
+	border: 1px dashed var(--color-border, #E8DEC8);
+	border-radius: 16px;
 	color: var(--color-text-muted, #8C7B6A);
 }
 
-.tk-empty__icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
-.tk-empty__title { font-size: 1rem; font-weight: 700; color: var(--color-text, #2E1A10); margin-bottom: .4rem; }
+.tk-empty__icon {
+	width: 56px;
+	height: 56px;
+	margin: 0 auto 1rem;
+	border-radius: 50%;
+	background: #fdf5f7;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--color-text-disabled, #c9bda3);
+}
+.tk-empty__icon .icon { width: 26px; height: 26px; }
+
+.tk-empty__title { font-size: 1.05rem; font-weight: 700; color: var(--color-text, #2E1A10); margin-bottom: .35rem; font-family: var(--font-serif, 'Playfair Display', serif); }
 .tk-empty__sub { font-size: .82rem; margin-bottom: 1.5rem; }
 
 .tk-btn-shop {
-	display: inline-block;
-	padding: .6rem 1.5rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: .65rem 1.6rem;
 	background: var(--color-primary, #C0395A);
 	color: #fff;
 	border-radius: 999px;
 	text-decoration: none;
 	font-weight: 700;
 	font-size: .82rem;
+	transition: filter .15s, transform .15s;
 }
+.tk-btn-shop:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.tk-btn-shop .icon { width: 14px; height: 14px; }
 
 /* ── ALERTE FLASH ────────────────────────────────────────────── */
 .tk-alert {
@@ -546,155 +589,156 @@
 	font-weight: 500;
 	margin-bottom: 1.1rem;
 }
-
+.tk-alert .icon { width: 15px; height: 15px; }
 .tk-alert--success { background: #d4edda; color: #1b5e20; }
+
+/* Toast copié */
+.tk-copy-toast {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%) translateY(10px);
+	background: #2E1A10;
+	color: #fff;
+	padding: .55rem 1.1rem;
+	border-radius: 999px;
+	font-size: .8rem;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity .2s, transform .2s;
+	z-index: 100;
+}
+.tk-copy-toast .icon { width: 14px; height: 14px; color: #7ee19a; }
+.tk-copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width: 720px) {
 	.tk-page { grid-template-columns: 1fr; }
 	.tk-sidebar { position: static; }
+	.tk-nav { display: flex; overflow-x: auto; border-radius: 999px; -webkit-overflow-scrolling: touch; }
+	.tk-nav__item { border-bottom: none; border-right: 1px solid var(--color-border, #E8DEC8); white-space: nowrap; }
+	.tk-nav__item.active { border-left-color: transparent; border-bottom: 2.5px solid var(--color-primary, #C0395A); }
+	.tk-nav__item:last-child { border-right: none; }
+	.tk-sidebar__help { display: none; }
+	.tk-stats { grid-template-columns: 1fr; }
 	.tk-client-block { grid-template-columns: auto 1fr; }
 }
 
 /* ── IMPRESSION PDF ──────────────────────────────────────────── */
 @media print {
-	/* Masquer toute la page */
 	body * { visibility: hidden; }
-
-	/* N'afficher que le ticket en cours d'impression */
-	.tk-card--printing,
-	.tk-card--printing * { visibility: visible; }
-
+	.tk-card--printing, .tk-card--printing * { visibility: visible; }
 	.tk-card--printing {
 		position: fixed !important;
-		top: 0;
-		left: 0;
-		width: 100%;
+		top: 0; left: 0; width: 100%;
 		margin: 0 !important;
 		border: none !important;
 		border-radius: 0 !important;
 		box-shadow: none !important;
 	}
-
-	/* Masquer les boutons d'action dans le footer */
-	.tk-admin-actions,
-	.tk-btn-print,
-	.tk-btn-delete { display: none !important; }
-
-	/* Fond clair pour l'impression */
+	.tk-admin-actions, .tk-btn-print, .tk-btn-delete { display: none !important; }
 	.tk-card__footer { background: #f9f9f9 !important; }
 	.tk-card__body   { background: #fff !important; }
 	.tk-card__head   { background: #fff !important; }
 }
 </style>
 
+@php
+	$statusMap = [
+		'en_attente' => ['label' => 'En attente', 'class' => 'attente',  'dot' => '#f0d080'],
+		'payee'      => ['label' => 'Payée',      'class' => 'payee',    'dot' => '#66bb6a'],
+		'expediee'   => ['label' => 'Expédiée',   'class' => 'expediee', 'dot' => '#42a5f5'],
+		'terminee'   => ['label' => 'Terminée',   'class' => 'terminee', 'dot' => '#7e57c2'],
+		'emportee'   => ['label' => 'Emportée',   'class' => 'emportee', 'dot' => '#43a047'],
+		'annulee'    => ['label' => 'Annulée',    'class' => 'annulee',  'dot' => '#ef5350'],
+	];
+@endphp
+
 <div class="tk-page">
 
-	{{-- ══ SIDEBAR ══ --}}
+	{{-- ══ SIDEBAR — filtre unique ══ --}}
 	<aside class="tk-sidebar">
 
-		<p class="tk-sidebar__heading">Filtres</p>
+		<p class="tk-sidebar__heading">Filtrer</p>
 
 		<nav class="tk-nav">
 			<div class="tk-nav__item active" data-filter="toutes">
 				<span class="tk-nav__dot" style="background:#8C7B6A;"></span>
-				Toutes
+				<span class="tk-nav__label">Toutes</span>
+				<span class="tk-nav__count">{{ $commandes->count() }}</span>
 			</div>
-			<div class="tk-nav__item" data-filter="en_attente">
-				<span class="tk-nav__dot" style="background:#f0d080;"></span>
-				En attente
+			@foreach($statusMap as $key => $s)
+			<div class="tk-nav__item" data-filter="{{ $key }}">
+				<span class="tk-nav__dot" style="background:{{ $s['dot'] }};"></span>
+				<span class="tk-nav__label">{{ $s['label'] }}s</span>
+				<span class="tk-nav__count">{{ $commandes->where('statut', $key)->count() }}</span>
 			</div>
-			<div class="tk-nav__item" data-filter="payee">
-				<span class="tk-nav__dot" style="background:#66bb6a;"></span>
-				Payées
-			</div>
-			<div class="tk-nav__item" data-filter="expediee">
-				<span class="tk-nav__dot" style="background:#42a5f5;"></span>
-				Expédiées
-			</div>
-			<div class="tk-nav__item" data-filter="terminee">
-				<span class="tk-nav__dot" style="background:#7e57c2;"></span>
-				Terminées
-			</div>
-			<div class="tk-nav__item" data-filter="emportee">
-				<span class="tk-nav__dot" style="background:#43a047;"></span>
-				Emportées
-			</div>
-			<div class="tk-nav__item" data-filter="annulee">
-				<span class="tk-nav__dot" style="background:#ef5350;"></span>
-				Annulées
-			</div>
+			@endforeach
 		</nav>
 
-		{{-- Résumé --}}
-		<div class="tk-summary">
-			<p class="tk-summary__title">Résumé</p>
-			<div class="tk-summary__row">
-				<span>Total commandes</span>
-				<strong>{{ $commandes->count() }}</strong>
-			</div>
-			<div class="tk-summary__row">
-				<span>Total TTC</span>
-				<strong class="red">{{ number_format($commandes->sum('montant'), 2, ',', ' ') }} €</strong>
-			</div>
-			@if($isAdmin)
-			<div class="tk-summary__row" style="margin-top:.5rem; padding-top:.5rem; border-top:1px dashed var(--color-border,#E8DEC8);">
-				<span>En attente</span>
-				<strong>{{ $commandes->where('statut','en_attente')->count() }}</strong>
-			</div>
-			<div class="tk-summary__row">
-				<span>Payées</span>
-				<strong>{{ $commandes->where('statut','payee')->count() }}</strong>
-			</div>
-			<div class="tk-summary__row">
-				<span>Terminées</span>
-				<strong>{{ $commandes->where('statut','terminee')->count() }}</strong>
-			</div>
-			<div class="tk-summary__row">
-				<span>Expédiées</span>
-				<strong>{{ $commandes->where('statut','expediee')->count() }}</strong>
-			</div>
-			<div class="tk-summary__row">
-				<span>Emportées</span>
-				<strong>{{ $commandes->where('statut','emportee')->count() }}</strong>
-			</div>
-			@endif
+		@unless($isAdmin)
+		<div class="tk-sidebar__help">
+			Une question sur une commande ? <strong>Contactez-nous</strong>, référence en main — on vous répond rapidement.
 		</div>
+		@endunless
 
 	</aside>
 
 	{{-- ══ CONTENU ══ --}}
 	<main>
 
+		{{-- Cartes de synthèse --}}
+		<div class="tk-stats">
+			<div class="tk-stat-card">
+				<span class="tk-stat-card__icon">{!! gicon('receipt') !!}</span>
+				<div>
+					<div class="tk-stat-card__label">Commandes</div>
+					<div class="tk-stat-card__value">{{ $commandes->count() }}</div>
+				</div>
+			</div>
+			<div class="tk-stat-card">
+				<span class="tk-stat-card__icon tk-stat-card__icon--money">{!! gicon('coin') !!}</span>
+				<div>
+					<div class="tk-stat-card__label">Total TTC</div>
+					<div class="tk-stat-card__value tk-stat-card__value--accent">{{ number_format($commandes->sum('montant'), 2, ',', ' ') }} €</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="tk-header">
-			<h1 class="tk-title">
-				{{ $isAdmin ? 'Toutes les commandes' : 'Mes commandes' }}
-			</h1>
-			<p class="tk-subtitle">
+			<div>
+				<h1 class="tk-title">
+					{{ $isAdmin ? 'Toutes les commandes' : 'Historique de commandes' }}
+				</h1>
 				@if($isAdmin)
-					{{ $commandes->count() }} commande(s) au total — vue administrateur
-				@else
-					Retrouvez ici l'historique de vos commandes
+				<p class="tk-subtitle">Vue administrateur — filtrez par statut ou recherchez ci-dessous</p>
 				@endif
-			</p>
+			</div>
 		</div>
 
 		{{-- Flash --}}
 		@if(session('success'))
 		<div class="tk-alert tk-alert--success">
-			✅ {{ session('success') }}
+			{!! gicon('check') !!} {{ session('success') }}
 		</div>
 		@endif
 
-		{{-- Filtres rapides --}}
-		<div class="tk-filters">
-			<button class="tk-filter-btn active" data-filter="toutes">Toutes</button>
-			<button class="tk-filter-btn" data-filter="en_attente">En attente</button>
-			<button class="tk-filter-btn" data-filter="payee">Payées</button>
-			<button class="tk-filter-btn" data-filter="expediee">Expédiées</button>
-			<button class="tk-filter-btn" data-filter="terminee">Terminées</button>
-			<button class="tk-filter-btn" data-filter="emportee">Emportées</button>
-			<button class="tk-filter-btn" data-filter="annulee">Annulées</button>
+		{{-- Recherche live --}}
+		<div class="tk-search">
+			{!! gicon('search') !!}
+			<input
+				type="search"
+				id="tk-search-input"
+				placeholder="{{ $isAdmin ? 'Rechercher une référence ou un client…' : 'Rechercher une référence…' }}"
+				autocomplete="off"
+			>
+			<button type="button" class="tk-search__clear" id="tk-search-clear" title="Effacer la recherche">
+				{!! gicon('filter-x') !!}
+			</button>
 		</div>
 
 		{{-- ── LISTE DES TICKETS ── --}}
@@ -703,25 +747,23 @@
 		@forelse($commandes as $commande)
 
 		@php
-			$statusMap = [
-				'en_attente' => ['label' => 'En attente', 'class' => 'attente'],
-				'payee'      => ['label' => 'Payée',      'class' => 'payee'],
-				'expediee'   => ['label' => 'Expédiée',   'class' => 'expediee'],
-				'terminee'   => ['label' => 'Terminée',   'class' => 'terminee'],
-				'emportee'   => ['label' => 'Emportée',   'class' => 'emportee'],
-				'annulee'    => ['label' => 'Annulée',    'class' => 'annulee'],
-			];
 			$s = $statusMap[$commande->statut] ?? ['label' => $commande->statut, 'class' => 'attente'];
 		@endphp
 
-		<div class="tk-card" data-statut="{{ $commande->statut }}">
+		<div
+			class="tk-card"
+			data-statut="{{ $commande->statut }}"
+			data-search="{{ strtolower($commande->reference . ' ' . ($isAdmin ? ($commande->user->name ?? '') : '')) }}"
+		>
 
 			{{-- HEAD ── --}}
 			<div class="tk-card__head">
 				<div>
-					<div class="tk-card__ref">
-						🧾 {{ $commande->reference }}
-					</div>
+					<button type="button" class="tk-card__ref" onclick="copyRef(this, '{{ $commande->reference }}')" title="Copier la référence">
+						{!! gicon('receipt') !!}
+						{{ $commande->reference }}
+						{!! gicon('copy', 'tk-card__copy-icon') !!}
+					</button>
 					<div class="tk-card__date">
 						{{ $commande->created_at->translatedFormat('d M Y') }}
 						à {{ $commande->created_at->format('H\hi') }}
@@ -734,8 +776,12 @@
 					<span class="tk-status tk-status--{{ $s['class'] }}">
 						{{ $s['label'] }}
 					</span>
-					<span style="font-size:.75rem; color:var(--color-text-muted,#8C7B6A);">
-						{{ $commande->mode_livraison === 'expedition' ? '📦 Expédition' : '🚲 Click & Collect' }}
+					<span class="tk-delivery-tag">
+						@if($commande->mode_livraison === 'expedition')
+							{!! gicon('package') !!} Expédition
+						@else
+							{!! gicon('bag') !!} Click & Collect
+						@endif
 					</span>
 				</div>
 			</div>
@@ -747,17 +793,17 @@
 				@if($isAdmin)
 				<div class="tk-client-block">
 					<span class="tk-client-block__label">Informations client</span>
-					<span class="tk-client-block__icon">👤</span>
+					<span class="tk-client-block__icon">{!! gicon('user') !!}</span>
 					<span class="tk-client-block__val">{{ $commande->user->name ?? '—' }}</span>
-					<span class="tk-client-block__icon">✉️</span>
+					<span class="tk-client-block__icon">{!! gicon('mail') !!}</span>
 					<span class="tk-client-block__val">{{ $commande->user->email ?? '—' }}</span>
 					@if(!empty($commande->user->phone))
-						<span class="tk-client-block__icon">📞</span>
+						<span class="tk-client-block__icon">{!! gicon('phone') !!}</span>
 						<span class="tk-client-block__val">{{ $commande->user->phone }}</span>
 					@endif
 
 					@if(!empty($commande->user->adresse ) && !empty($commande->user->ville) && !empty($commande->user->code_postal))
-						<span class="tk-client-block__icon">🏠</span>
+						<span class="tk-client-block__icon">{!! gicon('home') !!}</span>
 						<span class="tk-client-block__val">{{ ($commande->user->adresse.' '.
 						$commande->user->ville .' '. $commande->user->code_postal)  ?? '—' }}</span>
 					@endif
@@ -823,7 +869,7 @@
 				{{-- Référence Monetico (admin seulement) --}}
 				@if($isAdmin && $commande->monetico_reference)
 				<div class="tk-monetico">
-					💳 Paiement validé — réf. Monetico :
+					{!! gicon('card') !!} Paiement validé — réf. Monetico :
 					<strong>{{ $commande->monetico_reference }}</strong>
 				</div>
 				@endif
@@ -859,10 +905,10 @@
 					{{-- Case "Terminée" verrouillée --}}
 					<label class="tk-check-label done" style="cursor:default;">
 						<input type="checkbox" checked disabled>
-						Terminée ✓
+						{!! gicon('check') !!} Terminée
 					</label>
 
-					<span class="tk-actions-sep">→</span>
+					<span class="tk-actions-sep">{!! gicon('chevron-r') !!}</span>
 
 					{{-- Case conditionnelle selon mode de livraison --}}
 					<form action="{{ route('ticket.finaliser', $commande->id_commande) }}" method="POST">
@@ -876,7 +922,7 @@
 								onchange="this.form.submit()"
 								title="Marquer comme expédiée"
 							>
-							📦 Expédier
+							{!! gicon('package') !!} Expédier
 						</label>
 						@else
 						{{-- Commande click & collect → "Emporter" --}}
@@ -886,7 +932,7 @@
 								onchange="this.form.submit()"
 								title="Marquer comme emportée"
 							>
-							🚲 Emporter
+							{!! gicon('bag') !!} Emporter
 						</label>
 						@endif
 					</form>
@@ -895,13 +941,13 @@
 					@elseif($commande->statut === 'expediee')
 					<label class="tk-check-label tk-check-label--expedier done" style="cursor:default;">
 						<input type="checkbox" checked disabled>
-						📦 Expédiée ✓
+						{!! gicon('package') !!} Expédiée
 					</label>
 
 					@elseif($commande->statut === 'emportee')
 					<label class="tk-check-label tk-check-label--emporter done" style="cursor:default;">
 						<input type="checkbox" checked disabled>
-						🚲 Emportée ✓
+						{!! gicon('bag') !!} Emportée
 					</label>
 					@endif
 
@@ -914,7 +960,7 @@
 						@csrf
 						@method('DELETE')
 						<button type="submit" class="tk-btn-delete">
-							🗑 Supprimer
+							{!! gicon('trash') !!} Supprimer
 						</button>
 					</form>
 
@@ -932,7 +978,7 @@
 					onclick="printTicket(this)"
 					title="Enregistrer en PDF"
 				>
-					🖨️ PDF
+					{!! gicon('printer') !!} PDF
 				</button>
 
 				<span class="tk-card__footer-ref">{{ $commande->reference }}</span>
@@ -944,20 +990,25 @@
 		@empty
 
 		<div class="tk-empty">
-			<span class="tk-empty__icon">🧾</span>
+			<span class="tk-empty__icon">{!! gicon('inbox') !!}</span>
 			<p class="tk-empty__title">Aucune commande pour l'instant</p>
-			<p class="tk-empty__sub">Passez votre première commande dans notre boutique !</p>
+			<p class="tk-empty__sub">
+				{{ $isAdmin ? "Les commandes des clients apparaîtront ici dès qu'elles seront passées." : "Passez votre première commande dans notre boutique !" }}
+			</p>
+			@unless($isAdmin)
 			<a href="{{ route('shop.index', 1) }}" class="tk-btn-shop">
-				Aller à la boutique →
+				Aller à la boutique {!! gicon('chevron-r') !!}
 			</a>
+			@endunless
 		</div>
 
 		@endforelse
 
-		{{-- Message filtre vide (injecté par JS) --}}
+		{{-- Message filtre/recherche vide (injecté par JS) --}}
 		<div id="tk-filter-empty" style="display:none;" class="tk-empty">
-			<span class="tk-empty__icon">🔍</span>
-			<p class="tk-empty__title">Aucune commande dans cette catégorie</p>
+			<span class="tk-empty__icon">{!! gicon('search') !!}</span>
+			<p class="tk-empty__title" id="tk-filter-empty-title">Aucune commande dans cette catégorie</p>
+			<p class="tk-empty__sub">Essayez un autre filtre ou une autre recherche.</p>
 		</div>
 
 		</div>{{-- /tk-wrap --}}
@@ -966,42 +1017,71 @@
 
 </div>{{-- /tk-page --}}
 
-<script>
-// ── Filtres ───────────────────────────────────────────────────
-const filterBtns = document.querySelectorAll('.tk-filter-btn');
-const navItems   = document.querySelectorAll('.tk-nav__item[data-filter]');
-const cards      = document.querySelectorAll('.tk-card[data-statut]');
-const emptyMsg   = document.getElementById('tk-filter-empty');
+<div class="tk-copy-toast" id="tk-copy-toast">
+	{!! gicon('check') !!} Référence copiée
+</div>
 
-function applyFilter(filter) {
+<script>
+// ── Filtres + recherche combinés (source unique : la barre latérale) ──
+const navItems    = document.querySelectorAll('.tk-nav__item[data-filter]');
+const cards        = document.querySelectorAll('.tk-card[data-statut]');
+const emptyMsg      = document.getElementById('tk-filter-empty');
+const emptyTitle    = document.getElementById('tk-filter-empty-title');
+const searchInput   = document.getElementById('tk-search-input');
+const searchClear   = document.getElementById('tk-search-clear');
+
+let currentFilter = 'toutes';
+
+function applyFilters() {
+	const query = searchInput.value.trim().toLowerCase();
 	let visible = 0;
 
 	cards.forEach(card => {
-		const show = filter === 'toutes' || card.dataset.statut === filter;
+		const matchesStatus = currentFilter === 'toutes' || card.dataset.statut === currentFilter;
+		const matchesSearch = !query || card.dataset.search.includes(query);
+		const show = matchesStatus && matchesSearch;
 		card.style.display = show ? '' : 'none';
 		if (show) visible++;
 	});
 
-	emptyMsg.style.display = visible === 0 ? 'block' : 'none';
+	if (cards.length > 0 && visible === 0) {
+		emptyMsg.style.display = 'block';
+		emptyTitle.textContent = query ? 'Aucun résultat pour cette recherche' : 'Aucune commande dans cette catégorie';
+	} else {
+		emptyMsg.style.display = 'none';
+	}
 
-	filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
-	navItems.forEach(i   => i.classList.toggle('active', i.dataset.filter === filter));
+	searchClear.classList.toggle('show', query.length > 0);
 }
 
-filterBtns.forEach(btn => btn.addEventListener('click', () => applyFilter(btn.dataset.filter)));
-navItems.forEach(item   => item.addEventListener('click', () => applyFilter(item.dataset.filter)));
+navItems.forEach(item => item.addEventListener('click', () => {
+	currentFilter = item.dataset.filter;
+	navItems.forEach(i => i.classList.toggle('active', i === item));
+	applyFilters();
+}));
+
+searchInput?.addEventListener('input', applyFilters);
+searchClear?.addEventListener('click', () => {
+	searchInput.value = '';
+	applyFilters();
+	searchInput.focus();
+});
+
+// ── Copier la référence ─────────────────────────────────────────
+function copyRef(btn, ref) {
+	navigator.clipboard?.writeText(ref).then(() => {
+		const toast = document.getElementById('tk-copy-toast');
+		toast.classList.add('show');
+		clearTimeout(window.__tkCopyTimer);
+		window.__tkCopyTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+	});
+}
 
 // ── Impression PDF ────────────────────────────────────────────
 function printTicket(btn) {
 	const card = btn.closest('.tk-card');
-
-	// Ajoute la classe qui isole ce ticket dans le @media print
 	card.classList.add('tk-card--printing');
-
-	// Lance l'impression
 	window.print();
-
-	// Retire la classe après fermeture de la boîte d'impression
 	card.classList.remove('tk-card--printing');
 }
 </script>
