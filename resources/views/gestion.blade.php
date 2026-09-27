@@ -28,6 +28,7 @@ if (!function_exists('gicon')) {
 			'chevron-l' => '<path d="M15 18l-6-6 6-6"/>',
 			'chevron-r' => '<path d="M9 18l6-6-6-6"/>',
 			'radio'     => '<circle cx="12" cy="12" r="3"/>',
+			'menu'      => '<path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/>',
 		];
 		$path = $icons[$name] ?? '';
 		return '<svg class="icon '.$class.'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$path.'</svg>';
@@ -39,7 +40,13 @@ if (!function_exists('gicon')) {
 {{-- TOPBAR --}}
 <header class="topbar">
 	<span class="topbar__brand">La Maison des <em>Meringues</em></span>
-	<a href="{{ route('index') }}" class="topbar__back">{!! gicon('chevron-l') !!} Retour à l'accueil</a>
+	<div class="topbar__right">
+		<button type="button" class="menu-toggle" id="menu-toggle" aria-label="Ouvrir le menu de navigation" aria-expanded="false" aria-controls="side-nav">
+			{!! gicon('menu') !!}
+			<span class="menu-toggle__label">Sections</span>
+		</button>
+		<a href="{{ route('index') }}" class="topbar__back">{!! gicon('chevron-l') !!} Retour à l'accueil</a>
+	</div>
 </header>
 
 <main class="container section">
@@ -159,17 +166,12 @@ if (!function_exists('gicon')) {
 	{{-- ══ COLONNE DROITE ══ --}}
 	<div class="gestion-right-panel">
 
-		{{-- Onglets --}}
-		<div class="tabs">
-			<button class="tab active" data-tab="produits">Produits</button>
-			<button class="tab" data-tab="images">Images</button>
-			<button class="tab" data-tab="rayons">Rayons</button>
-			<button class="tab" data-tab="formes">Formes</button>
-			<button class="tab" data-tab="conditionnements">Condi.</button>
-			<button class="tab" data-tab="parfums">Parfums</button>
-			<button class="tab" data-tab="themes">Thèmes</button>
-			<button class="tab" data-tab="events">Events</button>
-			<button class="tab" data-tab="prix">Prix</button>
+		{{-- Barre de section : titre courant + filtre rayon --}}
+		<div class="section-bar">
+			<div class="section-bar__current">
+				<span class="section-bar__icon" id="section-bar-icon">{!! gicon('package') !!}</span>
+				<span class="section-bar__title" id="section-bar-title">Produits</span>
+			</div>
 
 			<select id="select-rayon" class="form-select form-select--sm select--right">
 				<option value="-1" {{ !$rayonId || $rayonId == '-1' ? 'selected' : '' }}>Tous les rayons</option>
@@ -180,6 +182,30 @@ if (!function_exists('gicon')) {
 				@endforeach
 			</select>
 		</div>
+
+		{{-- Rideau derrière le menu --}}
+		<div class="nav-overlay" id="nav-overlay"></div>
+
+		{{-- Menu latéral coulissant : choix de la section affichée --}}
+		<nav class="side-nav" id="side-nav" aria-hidden="true">
+			<div class="side-nav__head">
+				<span class="side-nav__head-title">Sections</span>
+				<button type="button" class="side-nav__close" id="side-nav-close" aria-label="Fermer le menu">
+					{!! gicon('close') !!}
+				</button>
+			</div>
+			<ul class="side-nav__list">
+				<li><button class="side-nav__item active" data-tab="produits" data-label="Produits">{!! gicon('package') !!}<span>Produits</span><em class="side-nav__count">{{ count($produits) }}</em></button></li>
+				<li><button class="side-nav__item" data-tab="images" data-label="Images">{!! gicon('image') !!}<span>Images</span><em class="side-nav__count">{{ $images->total() }}</em></button></li>
+				<li><button class="side-nav__item" data-tab="rayons" data-label="Rayons">{!! gicon('folder') !!}<span>Rayons</span><em class="side-nav__count">{{ count($rayons) }}</em></button></li>
+				<li><button class="side-nav__item" data-tab="formes" data-label="Formes">{!! gicon('diamond') !!}<span>Formes</span><em class="side-nav__count">{{ count($formes) }}</em></button></li>
+				<li><button class="side-nav__item" data-tab="conditionnements" data-label="Conditionnements">{!! gicon('inbox') !!}<span>Conditionnements</span><em class="side-nav__count">{{ count($conditionnements) }}</em></button></li>
+				<li><button class="side-nav__item" data-tab="parfums" data-label="Parfums">{!! gicon('star') !!}<span>Parfums</span><em class="side-nav__count">{{ count($parfums) }}</em></button></li>
+				<li><button class="side-nav__item" data-tab="themes" data-label="Thèmes">{!! gicon('tag') !!}<span>Thèmes</span><em class="side-nav__count">{{ count($themes) }}</em></button></li>
+				<li><button class="side-nav__item" data-tab="events" data-label="Events">{!! gicon('calendar') !!}<span>Events</span><em class="side-nav__count">{{ count($events) }}</em></button></li>
+				<li><button class="side-nav__item" data-tab="prix" data-label="Prix">{!! gicon('coin') !!}<span>Prix</span><em class="side-nav__count">{{ count($forme_condi) }}</em></button></li>
+			</ul>
+		</nav>
 
 		{{-- ══ PRODUITS ══ --}}
 		<div id="tab-produits" class="tab-panel">
@@ -225,10 +251,26 @@ if (!function_exists('gicon')) {
 								<th>Rayons</th>
 								<th>Thème</th>
 								<th>Stock</th>
-								<th title="Nouveauté" class="th-toggle">{!! gicon('star') !!}</th>
-								<th title="Disponible à emporter" class="th-toggle">{!! gicon('bag') !!}</th>
-								<th title="Disponible en expédition" class="th-toggle">{!! gicon('package') !!}</th>
-								<th title="Visible en live" class="th-toggle th-actions">{!! gicon('radio') !!}</th>
+								<th class="th-toggle">
+									<button type="button" class="th-bulk" data-field="nouveaute" title="Cocher/décocher Nouveauté pour tous les produits">
+										{!! gicon('star') !!}<span>Nouveauté</span>
+									</button>
+								</th>
+								<th class="th-toggle">
+									<button type="button" class="th-bulk" data-field="dispo_emporter" title="Cocher/décocher « à emporter » pour tous les produits">
+										{!! gicon('bag') !!}<span>À emporter</span>
+									</button>
+								</th>
+								<th class="th-toggle">
+									<button type="button" class="th-bulk" data-field="dispo_expedition" title="Cocher/décocher « expédition » pour tous les produits">
+										{!! gicon('package') !!}<span>Expédition</span>
+									</button>
+								</th>
+								<th class="th-toggle th-actions">
+									<button type="button" class="th-bulk" data-field="live" title="Cocher/décocher « visible en live » pour tous les produits">
+										{!! gicon('radio') !!}<span>Live</span>
+									</button>
+								</th>
 								<th title="Actions" class="th-actions">Actions</th>
 							</tr>
 						</thead>
@@ -1056,7 +1098,9 @@ if (!function_exists('gicon')) {
 
 <div id="loading-overlay">
 	<div class="loading-box">
-		<div class="spinner"></div>
+		<div class="meringue-loader">
+			<span class="meringue-loader__pearl"></span>
+		</div>
 		<p>Traitement en cours…</p>
 	</div>
 </div>
@@ -1095,32 +1139,68 @@ dropZone.addEventListener('drop', e => {
 });
 
 // ════════════════════════════════════════
-// ONGLETS
+// SECTIONS (ex-onglets, pilotées par le menu latéral)
 // ════════════════════════════════════════
+const sectionBarIcon  = document.getElementById('section-bar-icon');
+const sectionBarTitle = document.getElementById('section-bar-title');
+
 function activerOnglet(tabName) {
-	document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+	document.querySelectorAll('.side-nav__item').forEach(t => t.classList.remove('active'));
 	document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-	document.querySelectorAll('.quick-nav__item').forEach(i => i.classList.remove('active'));
 
-	const tabBtn = document.querySelector(`.tabs .tab[data-tab="${tabName}"]`);
+	const navBtn = document.querySelector(`.side-nav__item[data-tab="${tabName}"]`);
 	const panel  = document.getElementById('tab-' + tabName);
-	const navBtn = document.querySelector(`.quick-nav__item[data-target="${tabName}"]`);
 
-	if (tabBtn) tabBtn.classList.add('active');
-	if (panel)  panel.classList.remove('hidden');
-	if (navBtn) navBtn.classList.add('active');
+	if (navBtn) {
+		navBtn.classList.add('active');
+		if (sectionBarTitle) sectionBarTitle.textContent = navBtn.dataset.label || tabName;
+		if (sectionBarIcon)  sectionBarIcon.innerHTML = navBtn.querySelector('svg').outerHTML;
+	}
+	if (panel) panel.classList.remove('hidden');
+
+	fermerMenu();
 }
 
-document.querySelectorAll('.tabs .tab').forEach(btn => {
+document.querySelectorAll('.side-nav__item').forEach(btn => {
 	btn.addEventListener('click', () => activerOnglet(btn.dataset.tab));
 });
-document.querySelectorAll('.quick-nav__item').forEach(btn => {
-	btn.addEventListener('click', () => activerOnglet(btn.dataset.target));
-});
 
-// Lire le paramètre tab dans l'URL et activer le bon onglet
+// Lire le paramètre tab dans l'URL et activer la bonne section
 const tabParam = new URLSearchParams(window.location.search).get('tab');
 if (tabParam) activerOnglet(tabParam);
+
+// ════════════════════════════════════════
+// MENU LATÉRAL COULISSANT
+// ════════════════════════════════════════
+const menuToggle  = document.getElementById('menu-toggle');
+const sideNav     = document.getElementById('side-nav');
+const navOverlay  = document.getElementById('nav-overlay');
+const sideNavClose = document.getElementById('side-nav-close');
+
+function ouvrirMenu() {
+	sideNav.classList.add('open');
+	navOverlay.classList.add('visible');
+	sideNav.setAttribute('aria-hidden', 'false');
+	menuToggle.setAttribute('aria-expanded', 'true');
+	document.body.classList.add('nav-locked');
+}
+
+function fermerMenu() {
+	sideNav.classList.remove('open');
+	navOverlay.classList.remove('visible');
+	sideNav.setAttribute('aria-hidden', 'true');
+	menuToggle.setAttribute('aria-expanded', 'false');
+	document.body.classList.remove('nav-locked');
+}
+
+menuToggle.addEventListener('click', () => {
+	sideNav.classList.contains('open') ? fermerMenu() : ouvrirMenu();
+});
+sideNavClose.addEventListener('click', fermerMenu);
+navOverlay.addEventListener('click', fermerMenu);
+document.addEventListener('keydown', e => {
+	if (e.key === 'Escape' && sideNav.classList.contains('open')) fermerMenu();
+});
 
 // ════════════════════════════════════════
 // FLASH MESSAGE (toast au retour de redirect)
@@ -1133,11 +1213,36 @@ if (tabParam) activerOnglet(tabParam);
 @endif
 
 // ════════════════════════════════════════
+// ÉCRAN DE CHARGEMENT GLOBAL
+// ════════════════════════════════════════
+const loaderGlobal     = document.getElementById('loading-overlay');
+const loaderGlobalTexte = loaderGlobal.querySelector('.loading-box p');
+
+function afficherLoaderGlobal(texte) {
+	loaderGlobalTexte.textContent = texte || 'Traitement en cours…';
+	loaderGlobal.classList.add('visible');
+}
+
+function masquerLoaderGlobal() {
+	loaderGlobal.classList.remove('visible');
+}
+
+// ════════════════════════════════════════
 // CONFIRMATION SUPPRESSION
 // ════════════════════════════════════════
 function confirmSuppr(label) {
-	return confirm('Voulez-vous vraiment supprimer ' + label + ' ?');
+	const ok = confirm('Voulez-vous vraiment supprimer ' + label + ' ?');
+	if (ok) afficherLoaderGlobal('Suppression en cours…');
+	return ok;
 }
+
+// Tous les formulaires "classiques" (création, édition, live rayon…) affichent
+// l'écran de chargement le temps que la page se recharge. Les suppressions sont
+// gérées à part via confirmSuppr(), et l'import a son propre message plus bas.
+document.querySelectorAll('form:not(.form-delete)').forEach(form => {
+	if (form.id === 'import-form') return;
+	form.addEventListener('submit', () => afficherLoaderGlobal('Traitement en cours…'));
+});
 
 // ════════════════════════════════════════
 // OUVERTURE MODALS (boutons fixes)
@@ -1202,7 +1307,7 @@ if (searchImages) {
 // OVERLAY IMPORT
 // ════════════════════════════════════════
 document.getElementById('import-form').addEventListener('submit', () => {
-	document.getElementById('loading-overlay').classList.add('visible');
+	afficherLoaderGlobal('Import du fichier en cours…');
 });
 
 const submitBtn = document.getElementById('import-form').querySelector('button[type="submit"]');
@@ -1321,6 +1426,53 @@ document.querySelectorAll('input[name="live"], input[name="dispo_expedition"], i
 			else { afficherToast('Mise à jour effectuée', 'success'); }
 		})
 		.catch(() => { this.checked = !checked; afficherToast('Erreur réseau', 'error'); });
+	});
+});
+
+// ════════════════════════════════════════
+// BASCULE GROUPÉE PAR COLONNE (boutons d'en-tête)
+// ════════════════════════════════════════
+document.querySelectorAll('.th-bulk').forEach(btn => {
+	btn.addEventListener('click', function () {
+		const field = this.dataset.field;
+		const table = this.closest('table');
+		const boxes = [...table.querySelectorAll(`input[name="${field}"]`)];
+		if (!boxes.length || this.classList.contains('is-loading')) return;
+
+		const newState = !boxes.every(cb => cb.checked); // si tout est déjà coché → on décoche tout, sinon on coche tout
+		const aChanger = boxes.filter(cb => cb.checked !== newState);
+		if (!aChanger.length) return;
+
+		this.classList.add('is-loading');
+		this.disabled = true;
+		aChanger.forEach(cb => cb.disabled = true);
+		afficherLoaderGlobal(newState ? 'Cochage en cours…' : 'Décochage en cours…');
+
+		const requetes = aChanger.map(cb => {
+			cb.checked = newState;
+			const form = cb.closest('form');
+			const body = new URLSearchParams();
+			body.append('_token', '{{ csrf_token() }}');
+			body.append('_method', 'PATCH');
+			body.append(field, newState ? '1' : '0');
+
+			return fetch(form.action, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: body.toString()
+			}).catch(() => { cb.checked = !newState; });
+		});
+
+		Promise.all(requetes).then(() => {
+			this.classList.remove('is-loading');
+			this.disabled = false;
+			aChanger.forEach(cb => cb.disabled = false);
+			masquerLoaderGlobal();
+			afficherToast(
+				newState ? `${aChanger.length} produit(s) coché(s)` : `${aChanger.length} produit(s) décoché(s)`,
+				'success'
+			);
+		});
 	});
 });
 

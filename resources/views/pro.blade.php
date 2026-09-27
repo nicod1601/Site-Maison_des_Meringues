@@ -11,27 +11,27 @@
     {{-- ══════════════════════════════════════
          HERO
     ══════════════════════════════════════ --}}
-    <section class="hero" aria-label="Introduction professionnelle">
-        <div class="hero__deco" aria-hidden="true">
-            <span class="hero__deco-ring hero__deco-ring--1"></span>
-            <span class="hero__deco-ring hero__deco-ring--2"></span>
-            <span class="hero__deco-ring hero__deco-ring--3"></span>
+    <section class="pro-hero" aria-label="Introduction professionnelle">
+        <div class="pro-hero__deco" aria-hidden="true">
+            <span class="pro-hero__deco-ring pro-hero__deco-ring--1"></span>
+            <span class="pro-hero__deco-ring pro-hero__deco-ring--2"></span>
+            <span class="pro-hero__deco-ring pro-hero__deco-ring--3"></span>
         </div>
         <div class="inner">
-            <div class="hero__inner">
-                <span class="hero__eyebrow">
+            <div class="pro-hero__inner">
+                <span class="pro-hero__eyebrow">
                     <i class="ti ti-building-store" aria-hidden="true"></i>
                     Espace Professionnel
                 </span>
-                <h1 class="hero__title">
+                <h1 class="pro-hero__title">
                     Des meringues <em>d'exception</em><br>
                     pour votre activité
                 </h1>
-                <p class="hero__sub">
+                <p class="pro-hero__sub">
                     Revendeurs, épiceries fines, hôtels &amp; restaurants — nous accompagnons
                     les professionnels qui partagent notre exigence de qualité artisanale.
                 </p>
-                <div class="hero__ctas">
+                <div class="pro-hero__ctas">
                     <a href="#contact" class="btn-hero">
                         <i class="ti ti-mail" aria-hidden="true"></i>
                         Prendre contact
@@ -260,12 +260,12 @@
                                     </p>
                                     @if ($condi->type === 'sachet')
                                     <div class="prod-card__badges">
-                                        <span class="badge">× 4</span>
-                                        <span class="badge">× 10</span>
+                                        <span class="pro-badge">× 4</span>
+                                        <span class="pro-badge">× 10</span>
                                     </div>
                                     @elseif ($condi->type === 'boite')
                                     <div class="prod-card__badges">
-                                        <span class="badge">× 8</span>
+                                        <span class="pro-badge">× 8</span>
                                     </div>
                                     @endif
                                 </div>
@@ -331,11 +331,19 @@
          CONTACT
     ══════════════════════════════════════ --}}
     <section class="contact" id="contact" aria-labelledby="titre-contact">
+        <div class="contact__deco" aria-hidden="true">
+            <span class="contact__deco-ring contact__deco-ring--1"></span>
+            <span class="contact__deco-ring contact__deco-ring--2"></span>
+        </div>
         <div class="inner">
             <p class="section-label section-label--rose">Travailler ensemble</p>
             <h2 class="section-title section-title--white" id="titre-contact">
                 Nous contacter
             </h2>
+            <p class="section-sub section-sub--white contact__lead">
+                Par téléphone pour une réponse immédiate, ou par formulaire pour nous détailler
+                votre projet — nous revenons vers chaque professionnel sous 24&nbsp;h ouvrées.
+            </p>
 
             <div class="contact__layout">
 
@@ -372,40 +380,40 @@
 
                         <div class="form-row">
                             <div>
-                                <label class="form-label" for="prenom">Prénom</label>
+                                <label class="pro-form-label" for="prenom">Prénom</label>
                                 <input
                                     type="text"
                                     id="prenom"
                                     name="prenom"
-                                    class="form-input @error('prenom') form-input--error @enderror"
+                                    class="pro-form-input @error('prenom') pro-form-input--error @enderror"
                                     placeholder="Marie"
                                     value="{{ old('prenom') }}"
                                     required
                                 >
-                                @error('prenom')<span class="form-error">{{ $message }}</span>@enderror
+                                @error('prenom')<span class="pro-form-error">{{ $message }}</span>@enderror
                             </div>
                             <div>
-                                <label class="form-label" for="nom">Nom</label>
+                                <label class="pro-form-label" for="nom">Nom</label>
                                 <input
                                     type="text"
                                     id="nom"
                                     name="nom"
-                                    class="form-input @error('nom') form-input--error @enderror"
+                                    class="pro-form-input @error('nom') pro-form-input--error @enderror"
                                     placeholder="Dupont"
                                     value="{{ old('nom') }}"
                                     required
                                 >
-                                @error('nom')<span class="form-error">{{ $message }}</span>@enderror
+                                @error('nom')<span class="pro-form-error">{{ $message }}</span>@enderror
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label" for="societe">Société / Établissement</label>
+                        <div class="pro-form-group">
+                            <label class="pro-form-label" for="societe">Société / Établissement</label>
                             <input
                                 type="text"
                                 id="societe"
                                 name="societe"
-                                class="form-input"
+                                class="pro-form-input"
                                 placeholder="Épicerie du Marché"
                                 value="{{ old('societe') }}"
                             >
@@ -413,34 +421,34 @@
 
                         <div class="form-row">
                             <div>
-                                <label class="form-label" for="email">Email</label>
+                                <label class="pro-form-label" for="email">Email</label>
                                 <input
                                     type="email"
                                     id="email"
                                     name="email"
-                                    class="form-input @error('email') form-input--error @enderror"
+                                    class="pro-form-input @error('email') pro-form-input--error @enderror"
                                     placeholder="vous@exemple.fr"
                                     value="{{ old('email') }}"
                                     required
                                 >
-                                @error('email')<span class="form-error">{{ $message }}</span>@enderror
+                                @error('email')<span class="pro-form-error">{{ $message }}</span>@enderror
                             </div>
                             <div>
-                                <label class="form-label" for="telephone">Téléphone</label>
+                                <label class="pro-form-label" for="telephone">Téléphone</label>
                                 <input
                                     type="tel"
                                     id="telephone"
                                     name="telephone"
-                                    class="form-input"
+                                    class="pro-form-input"
                                     placeholder="06 00 00 00 00"
                                     value="{{ old('telephone') }}"
                                 >
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label" for="type_pro">Type d'activité</label>
-                            <select id="type_pro" name="type_pro" class="form-select @error('type_pro') form-input--error @enderror">
+                        <div class="pro-form-group">
+                            <label class="pro-form-label" for="type_pro">Type d'activité</label>
+                            <select id="type_pro" name="type_pro" class="pro-form-select @error('type_pro') pro-form-input--error @enderror">
                                 <option value="" disabled {{ old('type_pro') ? '' : 'selected' }}>Choisir votre activité…</option>
                                 <option value="epicerie"   {{ old('type_pro') === 'epicerie'   ? 'selected' : '' }}>Épicerie fine</option>
                                 <option value="restaurant" {{ old('type_pro') === 'restaurant' ? 'selected' : '' }}>Restaurant / Hôtel</option>
@@ -448,48 +456,53 @@
                                 <option value="evenement"  {{ old('type_pro') === 'evenement'  ? 'selected' : '' }}>Événementiel</option>
                                 <option value="autre"      {{ old('type_pro') === 'autre'      ? 'selected' : '' }}>Autre</option>
                             </select>
-                            @error('type_pro')<span class="form-error">{{ $message }}</span>@enderror
+                            @error('type_pro')<span class="pro-form-error">{{ $message }}</span>@enderror
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label" for="message">Message</label>
+                        <div class="pro-form-group">
+                            <label class="pro-form-label" for="message">Message</label>
                             <textarea
                                 id="message"
                                 name="message"
-                                class="form-textarea @error('message') form-input--error @enderror"
+                                class="pro-form-textarea @error('message') pro-form-input--error @enderror"
                                 placeholder="Décrivez votre projet, vos volumes estimés, vos questions…"
                                 required
                             >{{ old('message') }}</textarea>
-                            @error('message')<span class="form-error">{{ $message }}</span>@enderror
+                            @error('message')<span class="pro-form-error">{{ $message }}</span>@enderror
                         </div>
 
                         <button type="submit" class="btn-submit">
                             <i class="ti ti-send" aria-hidden="true"></i>
                             Envoyer ma demande
                         </button>
+                        <p class="contact__form-note">
+                            <i class="ti ti-shield-check" aria-hidden="true"></i>
+                            Réponse sous 24&nbsp;h ouvrées — sans engagement.
+                        </p>
                     </form>
                 </div>
 
                 {{-- Infos de contact --}}
                 <div class="contact__info">
-                    <p class="section-sub section-sub--white">
-                        Vous êtes professionnel et souhaitez référencer nos produits&nbsp;?
-                        Écrivez-nous ou appelez-nous directement — nous répondons sous 24&nbsp;h.
-                    </p>
+
+                    <a href="tel:+33235102449" class="contact-call-card">
+                        <span class="contact-call-card__icon">
+                            <i class="ti ti-phone-call" aria-hidden="true"></i>
+                        </span>
+                        <span class="contact-call-card__body">
+                            <span class="contact-call-card__label">Appelez-nous directement</span>
+                            <span class="contact-call-card__number">02 35 10 24 49</span>
+                            <span class="contact-call-card__hours">
+                                <i class="ti ti-clock" aria-hidden="true"></i>
+                                Lun – Sam · 9h – 18h
+                            </span>
+                        </span>
+                        <span class="contact-call-card__arrow" aria-hidden="true">
+                            <i class="ti ti-arrow-up-right"></i>
+                        </span>
+                    </a>
 
                     <div class="contact__info-cards">
-                        <div class="contact-info-card">
-                            <div class="contact-info-card__icon">
-                                <i class="ti ti-phone" aria-hidden="true"></i>
-                            </div>
-                            <div>
-                                <div class="contact-info-card__label">Téléphone</div>
-                                <a href="tel:+33235102449" class="contact-info-card__val">
-                                    02 35 10 24 49
-                                </a>
-                            </div>
-                        </div>
-
                         <div class="contact-info-card">
                             <div class="contact-info-card__icon">
                                 <i class="ti ti-mail" aria-hidden="true"></i>
@@ -515,15 +528,6 @@
                             </div>
                         </div>
 
-                        <div class="contact-info-card">
-                            <div class="contact-info-card__icon">
-                                <i class="ti ti-clock" aria-hidden="true"></i>
-                            </div>
-                            <div>
-                                <div class="contact-info-card__label">Horaires</div>
-                                <div class="contact-info-card__val">Lun – Sam : 9h – 18h</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
