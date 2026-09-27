@@ -11,21 +11,21 @@
 	</head>
 	<style>
 		/* Curseur normal */
-		* {
-			cursor: url("{{ asset('fichier/image/sourie/cursor-50.png') }}") 0 0, auto !important;
-		}
+        * {
+            cursor: url("{{ asset('fichier/image/sourie/cursor-50.png') }}") 0 0, auto !important;
+        }
 
-		/* Curseur quand on peut cliquer */
-		a,
-		button,
-		input[type="button"],
-		input[type="submit"],
-		input[type="reset"],
-		select,
-		[role="button"],
-		[onclick] {
-			cursor: url("{{ asset('fichier/image/sourie/cursor-hand-50.png') }}") 0 0, pointer !important;
-		}
+        /* Curseur quand on peut cliquer */
+        a,
+        button,
+        input[type="button"],
+        input[type="submit"],
+        input[type="reset"],
+        select,
+        [role="button"],
+        [onclick] {
+            cursor: url("{{ asset('fichier/image/sourie/cursor-hand-50.png') }}") 0 0, pointer !important;
+        }
 	</style>
 	<body>
 		<nav class="navbar">
@@ -210,9 +210,31 @@
 
 		<header class="{{ request()->is('/') ? 'page-header-home' : 'page-header'}}">
 			<div class="{{ request()->is('/') ? 'container-home' : 'container'}}">
-				<h1 class="{{ request()->is('/') ? 'page-header__title-home' : 'page-header__title'}} mt-md">{{$titre}}</h1>
-				<p class="page-header__sub">{{$note ?? ''}}</p>
+				@if(request()->is('/'))
+					<span class="page-header-home__eyebrow">
+						<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="3"/></svg>
+						Fabrication artisanale
+					</span>
+					<h1 class="page-header__title-home mt-md">
+						Bienvenue à La Maison des<br><em>Meringues</em>
+					</h1>
+					<p class="page-header__sub">{{ $note ?? "Des meringues artisanales pochées avec passion, à déguster sur place ou à emporter." }}</p>
+					<div class="page-header-home__ctas">
+						<a href="/shop/1" class="btn btn--gold">Découvrir la boutique</a>
+						<a href="#nous-trouver" class="btn btn--ghost" style="color:#F3EDE6;border-color:rgba(255,255,255,.4);">Nous trouver</a>
+					</div>
+				@else
+					<h1 class="page-header__title mt-md">{{$titre}}</h1>
+					<p class="page-header__sub">{{$note ?? ''}}</p>
+				@endif
 			</div>
+
+			@if(request()->is('/'))
+			<span class="page-header-home__scroll">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+				Découvrir
+			</span>
+			@endif
 		</header>
 
 		{{-- Script navbar — sécurisé avec vérification null --}}

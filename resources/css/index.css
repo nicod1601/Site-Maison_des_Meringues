@@ -3,27 +3,113 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
   color: var(--color-white);
+  box-shadow: 0 8px 20px rgba(122, 28, 59, 0.22);
+  transition: transform var(--transition-base);
+}
+.product-card:hover .act-icon-circle { transform: scale(1.08) rotate(-4deg); }
+
+/* ── Animations au scroll ──────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 700ms cubic-bezier(.22,1,.36,1), transform 700ms cubic-bezier(.22,1,.36,1);
+}
+.reveal--visible { opacity: 1; transform: translateY(0); }
+.reveal--delay-1.reveal--visible { transition-delay: 90ms; }
+.reveal--delay-2.reveal--visible { transition-delay: 180ms; }
+.reveal--delay-3.reveal--visible { transition-delay: 270ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .page-header-home::before { animation: none; }
 }
 
-/* Carousel produits */
+/* ── Carousel produits ─────────────────────────────────────── */
+.produits-carousel-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
 .produits-carousel {
+    flex: 1;
     display: flex;
     overflow: hidden;
+    border-radius: var(--radius-lg);
 }
 
-.produit-item {
-    min-width: 100%;
-    transition: transform 0.5s ease;
+.carousel-arrow {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-white);
+    border: 1.5px solid var(--color-border);
+    color: var(--color-primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+.carousel-arrow:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-white);
+    transform: scale(1.06);
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: var(--space-lg);
+}
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-border);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    padding: 0;
+}
+.carousel-dot.active {
+    width: 22px;
+    border-radius: 999px;
+    background: var(--color-primary);
 }
 
 /* Horaires table */
-.horaires-table { width: 100%; border-collapse: collapse; }
+.horaires-table__today { position: relative; }
+.horaires-table__today td:first-child {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+.horaires-table__today td:first-child::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  margin-right: 8px;
+}
+
+/* Carte Google Maps responsive */
+.map-wrap { position: relative; width: 100%; padding-top: 65%; }
+.map-wrap iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
 .horaires-table td {
   padding: 10px 0;
   border-bottom: 1px solid var(--color-border);
@@ -41,6 +127,12 @@
   padding: var(--space-xl);
   text-align: center;
   color: var(--color-cream-dark);
+  transition: transform var(--transition-base), background var(--transition-base), border-color var(--transition-base);
+}
+.livraison-card:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(232,204,137,0.45);
+  transform: translateY(-4px);
 }
 .livraison-card h3 {
   color: var(--color-gold-light);
@@ -63,14 +155,9 @@
   justify-content: center;
   margin: 0 auto;
   color: var(--color-gold-light);
+  transition: transform var(--transition-base);
 }
-
-
-/* Carousel produits */
-.produits-carousel {
-    display: flex;
-    overflow: hidden;
-}
+.livraison-card:hover .livraison-card__icon { transform: scale(1.08); }
 
 .produit-item {
     min-width: 100%;
