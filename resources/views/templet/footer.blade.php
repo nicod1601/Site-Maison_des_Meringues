@@ -1,11 +1,27 @@
 <footer class="footer">
+	<div class="footer__deco" aria-hidden="true">
+		<span></span><span></span><span></span>
+	</div>
 	<div class="container">
 		<div class="footer__grid">
 
 			<!-- Marque -->
 			<div class="footer__brand">
-				<h3>Maison des <span style="color: var(--color-primary);">Meringues</span></h3>
+				<div class="footer__brand-logo">
+					<img src="{{ asset('fichier/image/logo.webp') }}" alt="Logo La Maison des Meringues">
+					<h3>Maison des <span style="color: var(--color-primary-light);">Meringues</span></h3>
+				</div>
 				<p>Des meringues artisanales préparées avec passion, pour taquiner vos papilles à chaque bouchée.</p>
+
+				@php
+					$maintenant = now();
+					$ouvert = !$maintenant->isSunday() && (int) $maintenant->format('H') >= 9 && (int) $maintenant->format('H') < 18;
+				@endphp
+				<span class="footer__status {{ $ouvert ? 'footer__status--open' : 'footer__status--closed' }}">
+					<span class="footer__status-dot"></span>
+					{{ $ouvert ? 'Ouvert actuellement' : 'Fermé actuellement' }}
+				</span>
+
 				<div class="social-links" style="margin-top: var(--space-lg);">
 					<!--<a href="#" aria-label="Instagram">
 						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -80,9 +96,9 @@
 					</li>
 				</ul>
 
-				<div style="margin-top: var(--space-xl);">
+				<div style="margin-top: var(--space-lg);">
 					<p class="footer__heading">Horaires</p>
-					<p style="font-size: var(--text-sm); opacity: 0.75; line-height: 1.8;">
+					<p style="font-size: var(--text-sm); opacity: 0.75; line-height: 1.6;">
 						Lun – Sam : 9h – 18h<br>
 						Dimanche : Fermé
 					</p>
@@ -103,3 +119,24 @@
 
 	</div>
 </footer>
+
+<button type="button" class="back-to-top" id="back-to-top" aria-label="Retour en haut de la page">
+	<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M9 14V4M4 9l5-5 5 5"/>
+	</svg>
+</button>
+
+<script>
+	(function () {
+		const btn = document.getElementById('back-to-top');
+		if (!btn) return;
+
+		const maj = () => btn.classList.toggle('visible', window.scrollY > 500);
+		maj();
+		window.addEventListener('scroll', maj, { passive: true });
+
+		btn.addEventListener('click', () => {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		});
+	})();
+</script>

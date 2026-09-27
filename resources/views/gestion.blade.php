@@ -1143,10 +1143,16 @@ dropZone.addEventListener('drop', e => {
 // ════════════════════════════════════════
 const sectionBarIcon  = document.getElementById('section-bar-icon');
 const sectionBarTitle = document.getElementById('section-bar-title');
+const selectRayon = document.getElementById('select-rayon');
 
 function activerOnglet(tabName) {
 	document.querySelectorAll('.side-nav__item').forEach(t => t.classList.remove('active'));
 	document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+
+	if(selectRayon){
+		selectRayon.classList.toggle('hidden', tabName !== 'produits');
+	}
+	
 
 	const navBtn = document.querySelector(`.side-nav__item[data-tab="${tabName}"]`);
 	const panel  = document.getElementById('tab-' + tabName);

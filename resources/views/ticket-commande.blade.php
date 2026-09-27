@@ -32,6 +32,8 @@ if (!function_exists('gicon')) {
 			'inbox'     => '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/>',
 			'filter-x'  => '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3Z"/><path d="m17 17 5 5M22 17l-5 5"/>',
 			'sparkle'   => '<path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="3"/>',
+			'clock'     => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+			'x-circle'  => '<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>',
 		];
 		$path = $icons[$name] ?? '';
 		return '<svg class="icon '.$class.'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$path.'</svg>';
@@ -100,7 +102,18 @@ if (!function_exists('gicon')) {
 	font-weight: 700;
 }
 
-.tk-nav__dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tk-nav__icon {
+	width: 26px;
+	height: 26px;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	transition: transform .15s;
+}
+.tk-nav__icon .icon { width: 14px; height: 14px; }
+.tk-nav__item:hover .tk-nav__icon { transform: scale(1.08); }
 .tk-nav__label { flex: 1; }
 
 .tk-nav__count {
@@ -139,6 +152,7 @@ if (!function_exists('gicon')) {
 	gap: .85rem;
 	margin-bottom: 1.5rem;
 }
+.tk-stats--3 { grid-template-columns: repeat(3, 1fr); }
 
 .tk-stat-card {
 	background: #fff;
@@ -148,13 +162,15 @@ if (!function_exists('gicon')) {
 	display: flex;
 	align-items: center;
 	gap: .85rem;
+	transition: box-shadow .15s, transform .15s;
 }
+.tk-stat-card:hover { box-shadow: 0 8px 22px rgba(46,26,16,.08); transform: translateY(-1px); }
 
 .tk-stat-card__icon {
-	width: 40px;
-	height: 40px;
-	border-radius: 10px;
-	background: #fdf5f7;
+	width: 42px;
+	height: 42px;
+	border-radius: 11px;
+	background: linear-gradient(135deg, #fdf5f7, #fbe4ea);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -163,7 +179,8 @@ if (!function_exists('gicon')) {
 	flex-shrink: 0;
 }
 .tk-stat-card__icon .icon { width: 19px; height: 19px; }
-.tk-stat-card__icon--money { background: #f0f7ee; color: #1b7a52; }
+.tk-stat-card__icon--money { background: linear-gradient(135deg, #f0f7ee, #dcf0d6); color: #1b7a52; }
+.tk-stat-card__icon--wait  { background: linear-gradient(135deg, #fff8e1, #fbebb8); color: #8a6400; }
 
 .tk-stat-card__label {
 	font-size: .68rem;
@@ -257,13 +274,20 @@ if (!function_exists('gicon')) {
 .tk-card {
 	background: #fff;
 	border: 1px solid var(--color-border, #E8DEC8);
+	border-left: 4px solid var(--tk-accent, #ccc);
 	border-radius: 16px;
 	overflow: hidden;
 	margin-bottom: 1.1rem;
-	transition: box-shadow .15s, border-color .15s;
+	transition: box-shadow .15s, border-color .15s, transform .15s;
+	animation: tk-fade-in .35s ease both;
 }
 
-.tk-card:hover { box-shadow: 0 6px 24px rgba(46,26,16,.08); border-color: #ddcda8; }
+.tk-card:hover { box-shadow: 0 10px 28px rgba(46,26,16,.10); border-color: #ddcda8; transform: translateY(-1px); }
+
+@keyframes tk-fade-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
 
 /* ── TICKET HEAD ─────────────────────────────────────────────── */
 .tk-card__head {
@@ -645,16 +669,88 @@ if (!function_exists('gicon')) {
 	.tk-card__body   { background: #fff !important; }
 	.tk-card__head   { background: #fff !important; }
 }
+/* ── ÉCRAN DE CHARGEMENT ─────────────────────────────────────── */
+#tk-loading-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(46, 26, 16, 0.5);
+	z-index: 999;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	backdrop-filter: blur(6px);
+}
+#tk-loading-overlay.visible { display: flex; }
+
+.tk-loading-box {
+	background: #fff;
+	border: 1px solid var(--color-border, #E8DEC8);
+	border-radius: 20px;
+	padding: 2.2rem 2.6rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1.1rem;
+	box-shadow: 0 20px 60px rgba(192,57,90,.16), 0 8px 32px rgba(46,26,16,.18);
+	text-align: center;
+	min-width: 220px;
+	animation: tk-loading-in 220ms cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes tk-loading-in {
+	from { opacity: 0; transform: translateY(6px) scale(.97); }
+	to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.tk-loading-box p {
+	font-size: .85rem;
+	color: var(--color-text, #2E1A10);
+	margin: 0;
+	font-weight: 700;
+}
+
+.tk-meringue {
+	position: relative;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background:
+		radial-gradient(circle at 32% 28%, rgba(255,255,255,.6), rgba(255,255,255,0) 42%),
+		conic-gradient(from -20deg,
+			#F3AFAE 0deg,   #E2572B 26deg,
+			#F6CBC7 52deg,  #D9481F 78deg,
+			#F3AFAE 104deg, #E2572B 130deg,
+			#F6CBC7 156deg, #D9481F 182deg,
+			#F3AFAE 208deg, #E2572B 234deg,
+			#F6CBC7 260deg, #D9481F 286deg,
+			#F3AFAE 312deg, #E2572B 338deg,
+			#F3AFAE 360deg
+		);
+	box-shadow: 0 8px 18px rgba(192,57,90,.28), inset 0 0 0 1px rgba(255,255,255,.35);
+	animation: tk-meringue-spin 1.6s linear infinite;
+}
+.tk-meringue::after {
+	content: '';
+	position: absolute;
+	top: 50%; left: 50%;
+	width: 10px; height: 10px;
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+	background: radial-gradient(circle at 34% 28%, #fff, #D9D0BC 55%, #A69A80 100%);
+	box-shadow: 0 1px 3px rgba(26,20,16,.35);
+}
+@keyframes tk-meringue-spin { to { transform: rotate(360deg); } }
+
 </style>
+
+
 
 @php
 	$statusMap = [
-		'en_attente' => ['label' => 'En attente', 'class' => 'attente',  'dot' => '#f0d080'],
-		'payee'      => ['label' => 'Payée',      'class' => 'payee',    'dot' => '#66bb6a'],
-		'expediee'   => ['label' => 'Expédiée',   'class' => 'expediee', 'dot' => '#42a5f5'],
-		'terminee'   => ['label' => 'Terminée',   'class' => 'terminee', 'dot' => '#7e57c2'],
-		'emportee'   => ['label' => 'Emportée',   'class' => 'emportee', 'dot' => '#43a047'],
-		'annulee'    => ['label' => 'Annulée',    'class' => 'annulee',  'dot' => '#ef5350'],
+		'en_attente' => ['label' => 'En attente', 'class' => 'attente',  'dot' => '#f0d080', 'icon' => 'clock'],
+		'payee'      => ['label' => 'Payée',      'class' => 'payee',    'dot' => '#66bb6a', 'icon' => 'check'],
+		'expediee'   => ['label' => 'Expédiée',   'class' => 'expediee', 'dot' => '#42a5f5', 'icon' => 'package'],
+		'terminee'   => ['label' => 'Terminée',   'class' => 'terminee', 'dot' => '#7e57c2', 'icon' => 'sparkle'],
+		'emportee'   => ['label' => 'Emportée',   'class' => 'emportee', 'dot' => '#43a047', 'icon' => 'bag'],
+		'annulee'    => ['label' => 'Annulée',    'class' => 'annulee',  'dot' => '#ef5350', 'icon' => 'x-circle'],
 	];
 @endphp
 
@@ -667,13 +763,13 @@ if (!function_exists('gicon')) {
 
 		<nav class="tk-nav">
 			<div class="tk-nav__item active" data-filter="toutes">
-				<span class="tk-nav__dot" style="background:#8C7B6A;"></span>
+				<span class="tk-nav__icon" style="background:#8C7B6A1a; color:#8C7B6A;">{!! gicon('inbox') !!}</span>
 				<span class="tk-nav__label">Toutes</span>
 				<span class="tk-nav__count">{{ $commandes->count() }}</span>
 			</div>
 			@foreach($statusMap as $key => $s)
 			<div class="tk-nav__item" data-filter="{{ $key }}">
-				<span class="tk-nav__dot" style="background:{{ $s['dot'] }};"></span>
+				<span class="tk-nav__icon" style="background:{{ $s['dot'] }}1a; color:{{ $s['dot'] }};">{!! gicon($s['icon']) !!}</span>
 				<span class="tk-nav__label">{{ $s['label'] }}s</span>
 				<span class="tk-nav__count">{{ $commandes->where('statut', $key)->count() }}</span>
 			</div>
@@ -692,7 +788,7 @@ if (!function_exists('gicon')) {
 	<main>
 
 		{{-- Cartes de synthèse --}}
-		<div class="tk-stats">
+		<div class="tk-stats {{ $isAdmin ? 'tk-stats--3' : '' }}">
 			<div class="tk-stat-card">
 				<span class="tk-stat-card__icon">{!! gicon('receipt') !!}</span>
 				<div>
@@ -707,6 +803,15 @@ if (!function_exists('gicon')) {
 					<div class="tk-stat-card__value tk-stat-card__value--accent">{{ number_format($commandes->sum('montant'), 2, ',', ' ') }} €</div>
 				</div>
 			</div>
+			@if($isAdmin)
+			<div class="tk-stat-card">
+				<span class="tk-stat-card__icon tk-stat-card__icon--wait">{!! gicon('clock') !!}</span>
+				<div>
+					<div class="tk-stat-card__label">En attente</div>
+					<div class="tk-stat-card__value">{{ $commandes->where('statut', 'en_attente')->count() }}</div>
+				</div>
+			</div>
+			@endif
 		</div>
 
 		<div class="tk-header">
@@ -747,13 +852,14 @@ if (!function_exists('gicon')) {
 		@forelse($commandes as $commande)
 
 		@php
-			$s = $statusMap[$commande->statut] ?? ['label' => $commande->statut, 'class' => 'attente'];
+			$s = $statusMap[$commande->statut] ?? ['label' => $commande->statut, 'class' => 'attente', 'dot' => '#ccc', 'icon' => 'receipt'];
 		@endphp
 
 		<div
 			class="tk-card"
 			data-statut="{{ $commande->statut }}"
 			data-search="{{ strtolower($commande->reference . ' ' . ($isAdmin ? ($commande->user->name ?? '') : '')) }}"
+			style="--tk-accent: {{ $s['dot'] }};"
 		>
 
 			{{-- HEAD ── --}}
@@ -955,7 +1061,7 @@ if (!function_exists('gicon')) {
 					<form
 						action="{{ route('ticket.destroy', $commande->id_commande) }}"
 						method="POST"
-						onsubmit="return confirm('Supprimer définitivement cette commande ?')"
+						onsubmit="return tkConfirmSuppr()"
 					>
 						@csrf
 						@method('DELETE')
@@ -1021,6 +1127,13 @@ if (!function_exists('gicon')) {
 	{!! gicon('check') !!} Référence copiée
 </div>
 
+<div id="tk-loading-overlay">
+	<div class="tk-loading-box">
+		<div class="tk-meringue"></div>
+		<p>Mise à jour en cours…</p>
+	</div>
+</div>
+
 <script>
 // ── Filtres + recherche combinés (source unique : la barre latérale) ──
 const navItems    = document.querySelectorAll('.tk-nav__item[data-filter]');
@@ -1077,7 +1190,23 @@ function copyRef(btn, ref) {
 	});
 }
 
-// ── Impression PDF ────────────────────────────────────────────
+// ── Écran de chargement ──────────────────────────────────────
+const tkLoader = document.getElementById('tk-loading-overlay');
+function tkAfficherLoader() { tkLoader?.classList.add('visible'); }
+
+function tkConfirmSuppr() {
+	const ok = confirm('Supprimer définitivement cette commande ?');
+	if (ok) tkAfficherLoader();
+	return ok;
+}
+
+// Les cases "terminer / expédier / emporter" soumettent leur formulaire au clic :
+// on affiche le loader dès qu'un de ces formulaires part (la suppression est gérée à part ci-dessus).
+document.querySelectorAll('.tk-card form:not([onsubmit])').forEach(form => {
+	form.addEventListener('submit', tkAfficherLoader);
+});
+
+// Impression PDF : on désactive le loader pour ne pas gêner window.print()
 function printTicket(btn) {
 	const card = btn.closest('.tk-card');
 	card.classList.add('tk-card--printing');
