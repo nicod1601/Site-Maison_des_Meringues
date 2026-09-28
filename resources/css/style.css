@@ -424,6 +424,7 @@ hr {
   box-shadow: none;
   transform: translateY(-2px);
 }
+.navbar__cta-group ~ .navbar__cta { margin-left: 10px; }
 
 /* Profil */
 .navbar__profile {

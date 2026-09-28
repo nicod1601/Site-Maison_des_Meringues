@@ -10,7 +10,7 @@
 		<title>{{ $title ?? 'Accueil' }} — La Maison des Meringues</title>
 	</head>
 	<style>
-		/* Curseur normal */
+        /* Curseur normal */
         * {
             cursor: url("{{ asset('fichier/image/sourie/cursor-50.png') }}") 0 0, auto !important;
         }
@@ -208,6 +208,7 @@
 			</div>
 		</nav>
 
+		@if(empty($hideHeader))
 		<header class="{{ request()->is('/') ? 'page-header-home' : 'page-header'}}">
 			<div class="{{ request()->is('/') ? 'container-home' : 'container'}}">
 				@if(request()->is('/'))
@@ -236,6 +237,7 @@
 			</span>
 			@endif
 		</header>
+		@endif
 
 		{{-- Script navbar — sécurisé avec vérification null --}}
 		<script>
