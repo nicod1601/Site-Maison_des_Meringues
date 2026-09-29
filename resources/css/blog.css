@@ -981,3 +981,98 @@ body {
     justify-content: center;
   }
 }
+
+
+/* ══════════════════════════════════════════════════════════
+   ICÔNES (remplacent les emojis d'interface)
+══════════════════════════════════════════════════════════ */
+.bicon { width: 1em; height: 1em; flex-shrink: 0; vertical-align: -0.15em; }
+
+.post-card__admin-btn .bicon { width: 14px; height: 14px; }
+.post-card__admin-btn { color: var(--c-text-mid); }
+
+.modal__close .bicon { width: 15px; height: 15px; }
+
+.img-tab { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.img-tab .bicon { width: 14px; height: 14px; }
+
+.sidebar-nav__item .bicon { width: 17px; height: 17px; opacity: 0.75; }
+
+.blog-empty__icon .bicon { width: 3.2rem; height: 3.2rem; stroke-width: 1.2; }
+
+.file-drop-zone__icon { width: 26px; height: 26px; margin-bottom: 5px; opacity: 0.5; }
+
+.file-preview__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 6px auto 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--c-rose);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--t);
+}
+.file-preview__remove:hover { color: var(--c-rose-dark); }
+.file-preview__remove .bicon { width: 13px; height: 13px; }
+
+.toast .bicon,
+.toast svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════════════════
+   NAVIGATION SIDEBAR (liens rapides)
+══════════════════════════════════════════════════════════ */
+.sidebar-nav { padding: 6px; }
+.sidebar-nav .sidebar-nav__item { border-radius: 10px; }
+
+/* ══════════════════════════════════════════════════════════
+   CATÉGORIE ACTIVE
+══════════════════════════════════════════════════════════ */
+.aside-category-list li.active {
+  background: var(--c-rose-pale2);
+  color: var(--c-rose);
+  font-weight: 600;
+}
+.aside-category-list li.active span {
+  background: var(--c-rose);
+  color: #fff;
+}
+
+.blog-empty__reset {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--c-rose);
+  text-decoration: none;
+}
+.blog-empty__reset:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════════════════════════════
+   TOAST — variantes selon le type
+══════════════════════════════════════════════════════════ */
+.toast--success { background: var(--c-rose-dark); }
+.toast--error   { background: #7A1E1E; }
+.toast--warning { background: #8A5A00; }
+
+/* ══════════════════════════════════════════════════════════
+   ANIMATIONS AU SCROLL
+══════════════════════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.reveal--visible { opacity: 1; transform: translateY(0); }
+
+.posts-grid .post-card.reveal:nth-of-type(2) { transition-delay: 60ms; }
+.posts-grid .post-card.reveal:nth-of-type(3) { transition-delay: 120ms; }
+.posts-grid .post-card.reveal:nth-of-type(4) { transition-delay: 180ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}

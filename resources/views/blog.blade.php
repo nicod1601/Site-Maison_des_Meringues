@@ -6,6 +6,30 @@
 
 @vite(['resources/css/blog.css'])
 
+@php
+if (!function_exists('bicon')) {
+	function bicon(string $name, string $class = ''): string {
+		$icons = [
+			'home'    => '<path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/>',
+			'bag'     => '<path d="M6 7h12l1 13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/>',
+			'brief'   => '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+			'pen'     => '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+			'trash'   => '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>',
+			'x'       => '<path d="M18 6 6 18M6 6l12 12"/>',
+			'link'    => '<path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><path d="M8 12h8"/>',
+			'upload'  => '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+			'inbox'   => '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/>',
+			'check'   => '<path d="M20 6 9 17l-5-5"/>',
+			'alert'   => '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+			'grid'    => '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+			'lock'    => '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+		];
+		$path = $icons[$name] ?? '';
+		return '<svg class="bicon ' . $class . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $path . '</svg>';
+	}
+}
+@endphp
+
 <div class="blog-body">
 
 	{{-- ══════════════════════════════
@@ -42,6 +66,12 @@
 			</div>
 		</div>
 
+		<nav class="sidebar-card sidebar-nav" aria-label="Navigation rapide">
+			<a href="/" class="sidebar-nav__item">{!! bicon('home') !!} Accueil</a>
+			<a href="{{ route('shop.index', 1) }}" class="sidebar-nav__item">{!! bicon('bag') !!} Boutique</a>
+			<a href="/pro" class="sidebar-nav__item">{!! bicon('brief') !!} Professionnels</a>
+		</nav>
+
 	</aside>
 
 	{{-- ══════════════════════════════
@@ -51,7 +81,7 @@
 
 		{{-- Barre "créer une publication" (admin) --}}
 		@if($isAdmin)
-		<div class="blog-toolbar" id="adminToolbar">
+		<div class="blog-toolbar reveal" id="adminToolbar">
 			<div class="blog-toolbar__avatar"><img src="{{ asset('fichier/image/logo.webp') }}" alt="Logo"></div>
 			<div class="blog-toolbar__fake-input" onclick="openModal()">
 				Publier une nouvelle annonce…
@@ -68,7 +98,7 @@
 
 		{{-- Posts --}}
 		@forelse($posts as $post)
-		<article class="post-card" data-id="{{ $post['id'] }}">
+		<article class="post-card reveal" data-id="{{ $post['id'] }}" data-category="{{ $post['category'] }}">
 
 			{{-- Header du post --}}
 			<div class="post-card__header">
@@ -89,14 +119,14 @@
 				<div class="post-card__admin-actions">
 					<button class="post-card__admin-btn post-card__admin-btn--edit"
 							onclick="editPost({{ json_encode($post) }})"
-							title="Modifier">
-						✎
+							aria-label="Modifier l'annonce" title="Modifier">
+						{!! bicon('pen') !!}
 					</button>
 
 					<button class="post-card__admin-btn post-card__admin-btn--delete"
 							onclick="deletePost({{ $post['id'] }})"
-							title="Supprimer">
-						×
+							aria-label="Supprimer l'annonce" title="Supprimer">
+						{!! bicon('trash') !!}
 					</button>
 				</div>
 				@endif
@@ -159,8 +189,8 @@
 
 		</article>
 		@empty
-			<div class="blog-empty visible">
-				<span class="blog-empty__icon">🍡</span>
+			<div class="blog-empty visible" id="blogEmptyOriginal">
+				<span class="blog-empty__icon">{!! bicon('inbox') !!}</span>
 				<h3 class="blog-empty__title">Aucune annonce pour l'instant</h3>
 				@if($isAdmin)
 					<p>Publiez votre première annonce en cliquant sur « Publier ».</p>
@@ -169,6 +199,17 @@
 				@endif
 			</div>
 		@endforelse
+
+		{{-- Message affiché par JS quand un filtre de catégorie ne donne aucun résultat --}}
+		<div class="blog-empty" id="blogEmptyFilter">
+			<span class="blog-empty__icon">{!! bicon('grid') !!}</span>
+			<h3 class="blog-empty__title">Aucune annonce dans cette catégorie</h3>
+			<p>
+				<a href="#" onclick="filterByCategory('__all__'); return false;" class="blog-empty__reset">
+					Afficher toutes les annonces
+				</a>
+			</p>
+		</div>
 
 	</main>
 
@@ -180,12 +221,18 @@
 		{{-- Widget catégories --}}
 		<div class="aside-widget">
 			<div class="aside-widget__title">Catégories</div>
-			<ul class="aside-category-list">
+			<ul class="aside-category-list" id="categoryList">
 				@php
 					$categories = collect($posts)->groupBy('category');
 				@endphp
+				@if($categories->isNotEmpty())
+				<li class="active" data-category="__all__" onclick="filterByCategory('__all__')">
+					Toutes
+					<span>{{ count($posts) }}</span>
+				</li>
+				@endif
 				@foreach($categories as $cat => $items)
-				<li onclick="filterByCategory('{{ $cat }}')">
+				<li data-category="{{ $cat }}" onclick="filterByCategory('{{ $cat }}')">
 					{{ $cat }}
 					<span>{{ count($items) }}</span>
 				</li>
@@ -204,9 +251,9 @@
 					<div class="aside-about__dot"></div>
 					<div class="aside-about__line"></div>
 				</div>
-				<p>Création des meringues fait maison. Les Meringues sont fait avec des ingrédients de de très bonne qualité et fait avec
-					beaucoup d'amour. Nous sommes situé en Normandie, plus précisément à Ypreville. Nous espérons que nos meringues vous
-					plairont !
+				<p>Des meringues faites maison, avec des ingrédients de très bonne qualité et beaucoup d'amour.
+					Nous sommes situés en Normandie, plus précisément à Ypreville. Nous espérons que nos
+					meringues vous plairont&nbsp;!
 				</p>
 			</div>
 		</div>
@@ -221,7 +268,7 @@
 @if($isAdmin)
 <div class="modal-backdrop" id="modalBackdrop" onclick="handleBackdropClick(event)">
 	<div class="modal">
-		<button class="modal__close" onclick="closeModal()">✕</button>
+		<button class="modal__close" onclick="closeModal()" aria-label="Fermer">{!! bicon('x') !!}</button>
 		<h2 class="modal__title" id="modalTitle">Nouvelle annonce</h2>
 		<p class="modal__sub" id="modalSub">Rédigez votre annonce — elle sera visible par tous vos clients.</p>
 
@@ -267,18 +314,15 @@
 			<div class="form-group">
 				<label class="form-label">Image (optionnel)</label>
 				<div class="img-tabs" id="imgTabs">
-					<button type="button" class="img-tab img-tab--active" id="tabUrl"  onclick="switchImageTab('url')">🔗 Lien URL</button>
-					<button type="button" class="img-tab"                 id="tabFile" onclick="switchImageTab('file')">📁 Importer</button>
+					<button type="button" class="img-tab img-tab--active" id="tabUrl"  onclick="switchImageTab('url')">{!! bicon('link') !!} Lien URL</button>
+					<button type="button" class="img-tab"                 id="tabFile" onclick="switchImageTab('file')">{!! bicon('upload') !!} Importer</button>
 				</div>
 				<div id="panelUrl">
 					<input class="form-input" id="fieldImage" type="url" placeholder="https://…">
 				</div>
 				<div id="panelFile" style="display:none;">
 					<label class="file-drop-zone" id="fileDropZone" for="fieldImageFile">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28" style="margin-bottom:5px;opacity:.5">
-							<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-							<polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-						</svg>
+						{!! bicon('upload', 'file-drop-zone__icon') !!}
 						<span id="fileDropLabel">Cliquer ou déposer une image ici</span>
 						<span style="font-size:.72rem;opacity:.45;margin-top:2px;">JPG, PNG, GIF, WEBP — max 4 Mo</span>
 						<input type="file" id="fieldImageFile" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none" onchange="handleFileSelect(this)">
@@ -286,9 +330,8 @@
 					<div id="filePreviewWrap" style="display:none;margin-top:8px;text-align:center;">
 						<img id="filePreview" src="" alt="Prévisualisation"
 							 style="max-height:110px;max-width:100%;border-radius:8px;object-fit:cover;">
-						<button type="button" onclick="clearFileInput()"
-								style="display:block;margin:4px auto 0;font-size:.78rem;color:#c0395a;background:none;border:none;cursor:pointer;">
-							✕ Supprimer
+						<button type="button" onclick="clearFileInput()" class="file-preview__remove">
+							{!! bicon('trash') !!} Supprimer
 						</button>
 					</div>
 				</div>
@@ -306,10 +349,8 @@
 @endif
 
 {{-- TOAST --}}
-<div class="toast" id="toast">
-	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-		<polyline points="20 6 9 17 4 12"/>
-	</svg>
+<div class="toast" id="toast" role="status" aria-live="polite">
+	<span id="toastIcon"></span>
 	<span id="toastMsg">Publié avec succès !</span>
 </div>
 
@@ -330,10 +371,25 @@ let activeImageTab = 'url';
 
 /* ── Filtrer par catégorie ── */
 function filterByCategory(cat) {
-	document.querySelectorAll('.post-card').forEach(card => {
-		const pill = card.querySelector('.post-card__category-pill');
-		card.style.display = (!pill || pill.textContent.trim() === cat) ? '' : 'none';
+	const cards       = document.querySelectorAll('.post-card');
+	const emptyOrigin = document.getElementById('blogEmptyOriginal');
+	const emptyFilter = document.getElementById('blogEmptyFilter');
+	let visibles = 0;
+
+	cards.forEach(card => {
+		const show = (cat === '__all__') || (card.dataset.category === cat);
+		card.style.display = show ? '' : 'none';
+		if (show) visibles++;
 	});
+
+	document.querySelectorAll('#categoryList li[data-category]').forEach(li => {
+		li.classList.toggle('active', li.dataset.category === cat);
+	});
+
+	if (emptyOrigin) emptyOrigin.style.display = 'none'; // il n'y a alors aucun post du tout
+	if (emptyFilter) emptyFilter.classList.toggle('visible', cards.length > 0 && visibles === 0);
+
+	document.getElementById('postsGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ── Onglets image ── */
@@ -384,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ── Réactions ── */
 async function react(postId, type) {
-	if (!IS_AUTH) { showToast('⚠️ Connectez-vous pour réagir.'); return; }
+	if (!IS_AUTH) { showToast('Connectez-vous pour réagir.', 'warning'); return; }
 	const res = await fetch(ROUTES.react(postId), {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
@@ -432,7 +488,7 @@ function editPost(post) {
 	document.getElementById('fieldEmoji').value    = post.emoji;
 	if (post.image_path) {
 		switchImageTab('file');
-		document.getElementById('fileDropLabel').textContent = '📎 Image existante — sélectionner pour remplacer';
+		document.getElementById('fileDropLabel').textContent = 'Image existante — cliquer pour la remplacer';
 	} else {
 		switchImageTab('url');
 		document.getElementById('fieldImage').value = post.image_url ?? '';
@@ -452,7 +508,7 @@ function handleBackdropClick(e) {
 async function publishPost() {
 	const title   = document.getElementById('fieldTitle').value.trim();
 	const content = document.getElementById('fieldContent').value.trim();
-	if (!title || !content) { showToast('⚠️ Titre et contenu obligatoires.'); return; }
+	if (!title || !content) { showToast('Titre et contenu obligatoires.', 'warning'); return; }
 
 	const isEdit = !!editingId;
 	const url    = isEdit ? ROUTES.update(editingId) : ROUTES.store;
@@ -474,10 +530,10 @@ async function publishPost() {
 
 	const res  = await fetch(url, { method: 'POST', headers: { 'X-CSRF-TOKEN': CSRF }, body: fd });
 	const data = await res.json();
-	if (!data.success) { showToast('❌ Une erreur est survenue.'); return; }
+	if (!data.success) { showToast('Une erreur est survenue.', 'error'); return; }
 
 	closeModal();
-	showToast(isEdit ? '✅ Annonce modifiée !' : '✅ Annonce publiée !');
+	showToast(isEdit ? 'Annonce modifiée !' : 'Annonce publiée !', 'success');
 	setTimeout(() => location.reload(), 900);
 }
 
@@ -486,20 +542,50 @@ async function deletePost(id) {
 	if (!confirm('Supprimer cette annonce définitivement ?')) return;
 	const res  = await fetch(ROUTES.destroy(id), { method: 'DELETE', headers: { 'X-CSRF-TOKEN': CSRF } });
 	const data = await res.json();
-	if (!data.success) { showToast('❌ Une erreur est survenue.'); return; }
+	if (!data.success) { showToast('Une erreur est survenue.', 'error'); return; }
 	document.querySelector(`.post-card[data-id="${id}"]`)?.remove();
 	const count = document.getElementById('postCount');
 	if (count) count.textContent = parseInt(count.textContent) - 1;
-	showToast('🗑 Annonce supprimée.');
+	showToast('Annonce supprimée.', 'success');
 }
 
 /* ── Toast ── */
+const TOAST_ICONS = {
+	success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+	error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+	warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+};
+
 let toastTimer;
-function showToast(msg) {
+function showToast(msg, type = 'success') {
 	const t = document.getElementById('toast');
-	document.getElementById('toastMsg').textContent = msg;
-	t.classList.add('show');
+	document.getElementById('toastMsg').textContent  = msg;
+	document.getElementById('toastIcon').innerHTML   = TOAST_ICONS[type] ?? TOAST_ICONS.success;
+	t.classList.remove('toast--success', 'toast--error', 'toast--warning');
+	t.classList.add('toast--' + type, 'show');
 	clearTimeout(toastTimer);
 	toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
 }
+
+/* ── Animations au scroll ── */
+(function () {
+	const reveals = document.querySelectorAll('.reveal');
+	if (!reveals.length) return;
+
+	if (!('IntersectionObserver' in window)) {
+		reveals.forEach(el => el.classList.add('reveal--visible'));
+		return;
+	}
+
+	const observer = new IntersectionObserver(entries => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+				entry.target.classList.add('reveal--visible');
+				observer.unobserve(entry.target);
+			}
+		});
+	}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+	reveals.forEach(el => observer.observe(el));
+})();
 </script>

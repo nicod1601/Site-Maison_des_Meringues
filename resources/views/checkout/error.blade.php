@@ -1,15 +1,47 @@
-@include('templet.header', ['titre' => 'Paiement refusé', 'title' => 'Erreur paiement'])
+@include('templet.header', [
+	'titre' => 'Paiement non abouti',
+	'note'  => 'Votre panier est conservé',
+	'title' => 'Erreur paiement',
+])
 
-<main style="max-width:600px;margin:3rem auto;text-align:center;padding:0 1rem;">
-	<div style="font-size:4rem;">❌</div>
-	<h2 style="font-family:var(--font-serif);margin:1rem 0;">Paiement non abouti</h2>
-	<p style="color:var(--color-text-muted);">
-		Votre paiement n'a pas pu être traité. Votre panier est conservé.
-	</p>
-	<a href="{{ route('panier.index') }}"
-	   style="display:inline-block;margin-top:2rem;padding:.75rem 2rem;background:var(--color-primary);color:#fff;border-radius:8px;text-decoration:none;font-weight:700;">
-		Retour au panier
-	</a>
+@vite('resources/css/checkout.css')
+@include('checkout._icons')
+
+<main class="co">
+	<div class="co__inner">
+
+		@include('checkout._steps', ['etape' => 2, 'erreur' => true])
+
+		<section class="co-result co-result--error" aria-labelledby="co-result-title">
+			<div class="co-result__icon">
+				<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path class="co-result__draw" d="M15 15l18 18"/>
+					<path class="co-result__draw co-result__draw--2" d="M33 15L15 33"/>
+				</svg>
+			</div>
+
+			<h2 class="co-result__title" id="co-result-title">Paiement non abouti</h2>
+			<p class="co-result__text">
+				Votre paiement n'a pas pu être traité. Pas d'inquiétude&nbsp;: votre panier est conservé
+				et vous pouvez réessayer quand vous le souhaitez.
+			</p>
+
+			<div class="co-result__actions">
+				<a href="{{ route('checkout.index') }}" class="co-btn co-btn--primary">
+					{!! coicon('refresh') !!} Réessayer le paiement
+				</a>
+				<a href="{{ route('panier.index') }}" class="co-btn co-btn--ghost">
+					Retour au panier
+				</a>
+			</div>
+
+			<p class="co-result__help">
+				Un souci persistant&nbsp;? Appelez-nous au
+				<a href="tel:+33235102449">02 35 10 24 49</a>, nous vous aidons volontiers.
+			</p>
+		</section>
+
+	</div>
 </main>
 
 @include('templet.footer')
