@@ -1,7 +1,8 @@
 @include('templet.header', [
     'titre' => 'Espace Professionnel',
     'note'  => 'présentation des produits + infos + contact',
-    'title' => 'Professionnel'
+    'title' => 'Professionnel',
+    'hideHeader' => true,
 ])
 @vite('resources/css/pro.css')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">

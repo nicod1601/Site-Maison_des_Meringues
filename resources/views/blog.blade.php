@@ -1,7 +1,8 @@
 @include('templet.header', [
 	'titre' => 'Blog',
 	'note'  => 'Douceurs Artisanales',
-	'title' => 'Blog'
+	'title' => 'Blog',
+	'hideHeader' => true,
 ])
 
 @vite(['resources/css/blog.css'])
