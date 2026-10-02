@@ -18,6 +18,7 @@ export default defineConfig({
 				'resources/css/panier.css',
 				'resources/css/checkout.css',
 				'resources/js/app.js',
+				'resources/js/auth.js',
 			],
 			refresh: true,
 		}),
