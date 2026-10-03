@@ -45,7 +45,7 @@ return [
             'port' => env('MAIL_PORT', 2525),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
-            'timeout' => null,
+            'timeout' => env('MAIL_TIMEOUT', 10),
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
@@ -109,6 +109,14 @@ return [
     | used globally for all emails that are sent by your application.
     |
     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Destinataire du formulaire « Espace pro »
+    |--------------------------------------------------------------------------
+    | Lu par ProController via config('mail.pro_contact_to').
+    */
+    'pro_contact_to' => env('MAIL_PRO_CONTACT_TO') ?: env('MAIL_FROM_ADDRESS', 'contact@lamaisondesmeringues.fr'),
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),

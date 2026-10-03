@@ -46,6 +46,9 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('login')->with('status', 'Compte créé avec succès ! Connectez-vous.');
+        // Nouvelle identité → nouvel identifiant de session (protection contre la fixation de session)
+        $request->session()->regenerate();
+
+        return redirect()->route('index')->with('status', 'Bienvenue ! Votre compte a bien été créé.');
     }
 }

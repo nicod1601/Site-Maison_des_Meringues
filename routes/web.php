@@ -3,7 +3,6 @@
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\BlogController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PanierController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccueilController;
@@ -14,7 +13,6 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProController;
 use App\Http\Controllers\TicketCommandeController;
-use App\Http\Controllers\TestController;
 
 // ── Pages publiques ───────────────────────────────────────────
 Route::get('/',      [AccueilController::class, 'index'])->name('index');
@@ -36,11 +34,6 @@ Route::post('/checkout/retour', [CommandeController::class, 'retour'])->name('ch
 // ── Compte obligatoire ────────────────────────────────────────
 Route::middleware(['auth'])->group(function () {
 
-	// Profil
-	Route::get   ('/profile', [ProfileController::class, 'edit'])   ->name('profile.edit');
-	Route::patch ('/profile', [ProfileController::class, 'update']) ->name('profile.update');
-	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 	// Paramètres
 	Route::prefix('settings')->group(function () {
 		Route::get ('/',          [SettingsController::class, 'index'])         ->name('settings');
@@ -59,12 +52,11 @@ Route::middleware(['auth'])->group(function () {
 	Route::get('/ticketCommande', [TicketCommandeController::class, 'index'])->name('ticketCommande');
 
 	Route::delete('/ticket-commande/{id}', [TicketCommandeController::class, 'destroy'])
-	->name('ticket.destroy')
-	->middleware('auth');
+	->name('ticket.destroy');
 
 	Route::patch('/ticketCommande/{id}/terminer', [TicketCommandeController::class, 'terminer'])
 	->name('ticket.terminer')
-	->middleware(['auth', 'admin']);
+	->middleware('admin');
 
 	Route::patch('/tickets/{id}/finaliser', [TicketCommandeController::class, 'finaliser'])
 	 ->name('ticket.finaliser');
@@ -129,9 +121,5 @@ Route::middleware(['auth', 'admin'])->group(function () {
 	Route::post  ('/gestion/image/{image}/remplacer', [ImageController::class, 'remplacer'])->name('image.remplacer');
 	Route::delete('/gestion/image/{image}',           [ImageController::class, 'destroy']) ->name('image.destroy');
 });
-
-// ── Tests ─────────────────────────────────────────────────────
-Route::get('/test/foo', [TestController::class, 'foo'])->middleware('auth')->name('test.foo');
-Route::get('/test/bar', [TestController::class, 'bar'])->name('test.bar');
 
 require __DIR__.'/auth.php';

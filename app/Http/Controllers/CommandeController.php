@@ -3,10 +3,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Commande;
 use App\Models\Panier;
+use App\Models\PendingCheckout;
 use DansMaCulotte\Monetico\Monetico;
 use DansMaCulotte\Monetico\Resources\BillingAddressResource;
 use DansMaCulotte\Monetico\Requests\PurchaseRequest;
+use DansMaCulotte\Monetico\Responses\PurchaseResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class CommandeController extends Controller
@@ -58,37 +62,51 @@ class CommandeController extends Controller
 			}
 		}
 
-		// ── Juste une référence unique, on stocke en session ──────────
+		// ── Photo du panier : prix recalculés depuis le catalogue ──────
+		// (on ne fait pas confiance au prix figé dans la ligne du panier)
+		$panier->load(['lignes.produit.forme', 'lignes.produit.parfum']);
+
+		$lignes = [];
+		$total  = 0;
+
+		foreach ($panier->lignes as $ligne) {
+			$prix = (float) $ligne->formeCondi->prix;
+			$total += $prix * $ligne->quantite;
+
+			$lignes[] = [
+				'id_ligne'         => $ligne->id_ligne,
+				'designation'      => ($ligne->produit->forme->nom_forme ?? 'Meringue') . ' — ' . ($ligne->produit->parfum->nom_parfum ?? ''),
+				'sous_designation' => $ligne->formeCondi->conditionnement->type ?? null,
+				'quantite'         => $ligne->quantite,
+				'prix_unitaire'    => $prix,
+			];
+		}
+
+		$montant   = number_format($total, 2, '.', '');
 		$reference = 'CMD-' . strtoupper(Str::random(8)) . '-' . time();
 
-		\DB::table('pending_checkouts')->insert([
+		PendingCheckout::create([
 			'reference'      => $reference,
 			'user_id'        => auth()->id(),
-			'montant'        => $panier->total(),
+			'montant'        => $montant,
 			'mode_livraison' => $request->mode_livraison,
-			'created_at'     => now(),
-			'updated_at'     => now(),
-		]);
-
-		session([
-			'monetico_reference'    => $reference,
-			'monetico_user_id'      => auth()->id(),
-			'monetico_mode_livraison' => $request->mode_livraison,
+			'lignes'         => $lignes,
 		]);
 
 		// ── Préparer Monetico ──────────────────────────────────────────
-		$monetico = new Monetico(
-			config('services.monetico.tpe'),
-			config('services.monetico.cle'),
-			config('services.monetico.societe'),
-		);
+		$monetico = $this->monetico();
+
+		$user = auth()->user();
+
+		// L'utilisateur n'a qu'un champ « name » : on le sépare en prénom / nom
+		[$prenom, $nom] = array_pad(explode(' ', trim($user->name), 2), 2, null);
 
 		$purchase = new PurchaseRequest([
 			'reference'   => $reference,
 			'description' => 'Commande La Maison des Meringues',
 			'language'    => 'FR',
-			'email'       => auth()->user()->email,
-			'amount'      => $panier->total(),
+			'email'       => $user->email,
+			'amount'      => $montant,
 			'currency'    => 'EUR',
 			'dateTime'    => new \DateTime(),
 			'successUrl'  => route('checkout.success'),
@@ -96,11 +114,11 @@ class CommandeController extends Controller
 		]);
 
 		$purchase->setBillingAddress(new BillingAddressResource([
-			'firstName'    => auth()->user()->prenom ?? 'Client',
-			'lastName'     => auth()->user()->nom ?? 'Client',
-			'addressLine1' => auth()->user()->adresse ?? '1 rue inconnue',
-			'city'         => auth()->user()->ville ?? 'Paris',
-			'postalCode'   => auth()->user()->code_postal ?? '75000',
+			'firstName'    => $prenom ?: 'Client',
+			'lastName'     => $nom ?: ($prenom ?: 'Client'),
+			'addressLine1' => $user->adresse ?: '1 rue inconnue',
+			'city'         => $user->ville ?: 'Paris',
+			'postalCode'   => $user->code_postal ?: '75000',
 			'country'      => 'FR',
 		]));
 
@@ -126,54 +144,96 @@ class CommandeController extends Controller
 	}
 
 	// ── Retour serveur Monetico (POST automatique) ─────────────────
+	// Route exemptée de CSRF (bootstrap/app.php) : c'est le sceau MAC qui prouve
+	// que la requête vient bien de Monetico.
 	public function retour(Request $request)
 	{
-		$codRetour = $request->input('code-retour', '');
-		$reference = $request->input('reference', '');
+		// 1. Seuls les paiements acceptés nous intéressent
+		//    (« payetest » n'existe qu'en mode test). Rien à créer pour le reste :
+		//    on acquitte simplement pour que Monetico ne réessaie pas.
+		$codesAcceptes = config('services.monetico.test_mode') ? ['paiement', 'payetest'] : ['paiement'];
 
-		if ($codRetour !== 'paiement') {
-			return response('OK', 200);
+		if (! in_array($request->input('code-retour'), $codesAcceptes, true)) {
+			return $this->acquittement();
 		}
 
-		$pending = \DB::table('pending_checkouts')->where('reference', $reference)->first();
+		// 2. Authenticité : sceau MAC (empêche de forger un faux retour de paiement)
+		try {
+			$response = new PurchaseResponse($request->all());
 
-		if (! $pending) {
-			return response('OK', 200);
+			if (! $this->monetico()->validate($response)) {
+				Log::warning('Monetico : sceau invalide', ['ip' => $request->ip(), 'reference' => $request->input('reference')]);
+				return response('Sceau invalide', 400);
+			}
+		} catch (\Throwable $e) {
+			Log::warning('Monetico : retour illisible — ' . $e->getMessage(), ['ip' => $request->ip()]);
+			return response('Requête invalide', 400);
 		}
 
-		$panier = Panier::with([
-			'lignes.produit.forme',
-			'lignes.produit.parfum',
-			'lignes.formeCondi.conditionnement',
-		])->where('user_id', $pending->user_id)->first();
+		// 3. Création de la commande : une seule fois, même si Monetico rappelle
+		DB::transaction(function () use ($response) {
+			$pending = PendingCheckout::where('reference', $response->reference)->lockForUpdate()->first();
 
-		if (! $panier) {
-			return response('OK', 200);
-		}
+			if (! $pending) {
+				return; // déjà traité (ou référence inconnue)
+			}
 
-		$commande = Commande::create([
-			'user_id'            => $pending->user_id,
-			'reference'          => $reference,
-			'montant'            => $pending->montant,
-			'mode_livraison'     => $pending->mode_livraison,
-			'statut'             => 'payee',
-			'monetico_reference' => $request->input('numauto'),
-		]);
+			// 4. Le montant payé doit correspondre au montant attendu
+			$montantPaye = round((float) preg_replace('/[^0-9.]/', '', str_replace(',', '.', $response->amount)), 2);
 
-		foreach ($panier->lignes as $ligne) {
-			$commande->lignes()->create([
-				'designation'      => $ligne->produit->forme->nom_forme . ' — ' . $ligne->produit->parfum->nom_parfum,
-				'sous_designation' => $ligne->formeCondi->conditionnement->type,
-				'quantite'         => $ligne->quantite,
-				'prix_unitaire'    => $ligne->prix_unitaire,
+			if (abs($montantPaye - (float) $pending->montant) > 0.001) {
+				Log::error('Monetico : montant incohérent', [
+					'reference' => $pending->reference,
+					'attendu'   => $pending->montant,
+					'recu'      => $response->amount,
+				]);
+				return;
+			}
+
+			$commande = Commande::create([
+				'user_id'            => $pending->user_id,
+				'reference'          => $pending->reference,
+				'montant'            => $pending->montant,
+				'mode_livraison'     => $pending->mode_livraison,
+				'statut'             => 'payee',
+				'monetico_reference' => $response->authNumber,
 			]);
-		}
 
-		$panier->lignes()->delete();
+			$lignes = $pending->lignes ?? [];
 
-		// Nettoie la table temporaire
-		\DB::table('pending_checkouts')->where('reference', $reference)->delete();
+			foreach ($lignes as $ligne) {
+				$commande->lignes()->create([
+					'designation'      => $ligne['designation'],
+					'sous_designation' => $ligne['sous_designation'],
+					'quantite'         => $ligne['quantite'],
+					'prix_unitaire'    => $ligne['prix_unitaire'],
+				]);
+			}
 
-		return response('OK', 200);
+			// On ne vide que les lignes réellement payées
+			Panier::where('user_id', $pending->user_id)->first()
+				?->lignes()
+				->whereIn('id_ligne', collect($lignes)->pluck('id_ligne'))
+				->delete();
+
+			$pending->delete();
+		});
+
+		return $this->acquittement();
+	}
+
+	// Réponse attendue par Monetico pour considérer le retour comme reçu
+	private function acquittement()
+	{
+		return response("version=2\ncdr=0\n", 200)->header('Content-Type', 'text/plain');
+	}
+
+	private function monetico(): Monetico
+	{
+		return new Monetico(
+			config('services.monetico.tpe'),
+			config('services.monetico.cle'),
+			config('services.monetico.societe'),
+		);
 	}
 }

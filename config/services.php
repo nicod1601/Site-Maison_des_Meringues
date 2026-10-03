@@ -38,7 +38,7 @@ return [
 	'monetico' => [
 		'tpe'       => env('MONETICO_TPE'),
 		'cle'       => env('MONETICO_CLE'),
-		'societe'   => "aubergedyp",
+		'societe'   => env('MONETICO_SOCIETE', 'aubergedyp'),
 		'test_mode' => env('MONETICO_TEST_MODE', false),
 	],
 

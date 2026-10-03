@@ -151,10 +151,12 @@ class ShopController extends Controller
 
 		$images = Image::all();
 
-		$panier = Panier::with('lignes.produit')
-					->where('user_id', auth()->id())
-					->first();
-		$ListeProduits = $panier ? $panier->lignes : collect();
+		// Lecture seule : ne crée jamais de panier juste pour afficher la boutique
+		$panier = Panier::courant(creer: false);
+		if ($panier->exists) {
+			$panier->load('lignes.produit');
+		}
+		$ListeProduits = $panier->lignes;
 
 		$conditionnements = Conditionnement::all();
 

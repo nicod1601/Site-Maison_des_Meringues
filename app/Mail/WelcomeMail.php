@@ -16,7 +16,7 @@ class WelcomeMail extends Mailable
 	{
 		return $this
 			->subject('Bienvenue à La Maison des Meringues 🍬')
-			->view('emails.test')
+			->view('emails.welcome')
 			->with([
 				'prenom'   => $this->prenom,
 				'shop_url' => config('app.url'),
